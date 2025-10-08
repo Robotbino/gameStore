@@ -1,15 +1,14 @@
 import { useState } from "react";
 
 interface ListGroupProps{
-    items: String[];
+    items: string[];
     heading: string;
+    onSelectItem: (item: string) =>void;
 }
-function ListGroup({items, heading}: ListGroupProps) {
-    //This is a hook, allow us to use tools in react
-    //StateVariable
+function ListGroup({items, heading, onSelectItem}: ListGroupProps) {
+    //This is a hook
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const getMessage = () =>{
-        /* This means if the condition is true the paragraph will be shown */
         return items.length === 0 && <p>No Items Found</p>;
     }
 //There are no for loops in React thus we have to use ES6 maps to bind the data
@@ -45,7 +44,9 @@ a react component
           ? 'list-group-item active'
           : 'list-group-item'}
           key={index} 
-          onClick={() => setSelectedIndex(index)}>
+          onClick={() =>  {
+            setSelectedIndex(index);
+            onSelectItem(items)} }>
             {items}
           </li>
         ))}
