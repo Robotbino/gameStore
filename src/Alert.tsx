@@ -1,12 +1,15 @@
-import React from 'react'
+import React, { type ReactNode } from 'react'
 
 interface Props{
-  children: string;
+  children: ReactNode;
 }
 
-const Alert = () => {
+const Alert = ({children}: Props) => {
   return (
-    <div className='alert-alert'>Alert</div>
+    <div className="alert alert-primary" 
+      onClick={()=>{console.log("Yess")}}>
+      {children}
+    </div>
   )
 }
 
