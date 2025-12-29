@@ -47,6 +47,34 @@ const gameData: GameData = {
       genre: "Roguelike",
       price: 24.99,
       imageUrl: "https://f4.bcbits.com/img/a2368914893_10.jpg"
+    },
+    {
+      id: 6,
+      title: "Hades",
+      genre: "Roguelike",
+      price: 24.99,
+      imageUrl: "https://f4.bcbits.com/img/a2368914893_10.jpg"
+    },
+    {
+      id: 7,
+      title: "Hades",
+      genre: "Roguelike",
+      price: 24.99,
+      imageUrl: "https://f4.bcbits.com/img/a2368914893_10.jpg"
+    },
+    {
+      id: 8,
+      title: "Hades",
+      genre: "Roguelike",
+      price: 24.99,
+      imageUrl: "https://f4.bcbits.com/img/a2368914893_10.jpg"
+    },
+    {
+      id: 9,
+      title: "Hades",
+      genre: "Roguelike",
+      price: 24.99,
+      imageUrl: "https://f4.bcbits.com/img/a2368914893_10.jpg"
     }
   ]
 };

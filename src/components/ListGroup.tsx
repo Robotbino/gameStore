@@ -24,17 +24,16 @@ a react component
       </>
     );
   /* 
-      If we want to conditionally render elements but do not want to
-      make our code verbose we have to add conditional functions for 
-      elements 
-      */
+    If we want to conditionally render elements but do not want to
+    make our code verbose we have to add conditional functions for 
+    elements 
+    */
   return (
     <>
-      <h1>{heading}</h1>
       {getMessage()}
-      <ul className="list-group">
+      <div className="container">
         {items.map((items, index) => (
-          <li
+          <div
             className={
               selectedIndex === index
                 ? "list-group-item active"
@@ -52,9 +51,9 @@ a react component
               alt={items.title}
               className="gameImage"
             ></img>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </>
   );
 }
