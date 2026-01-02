@@ -90,23 +90,114 @@ h2 {
 .container{
     display:grid;
     width: 1000px;
-    height: 500px;
-    background-color: aquamarine;
+    height: 600px;
+    align-items: center;
+    justify-items: center;
+    background-color: rgb(170, 198, 188);
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows:repeat(2, 1fr) ;
     padding: var(--space-4);
-    margin-top: var(--space-2);
+    margin-top: var(--space-1);
 }
 .gameImage:hover{
     transform: scale(1.1);
     transition: all 0.3s ease-in-out;
     cursor: pointer;
 }
-nav{
+nav.navbar{
     background-color: darkslategrey;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-0) var(--space-4);
+    padding: var(--space-2) var(--space-4);
+}
+
+
+.userProfilePicture{
+  margin: var(--space-4) auto;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+}
+.sidebar {
+  position: fixed;
+  width: 250px;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  background: #2c3e50;
+  transition: transform 0.3s ease;
+}
+/*Sidebar close animation*/
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+
+.sideBarTitleLabel{
+  color: white;
+  margin-left: var(--space-2);
+  margin-right: var(--space-20);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  padding: var(--space-4) 0;
+}
+.userProfileSection{
+  text-align: left;
+  padding: var(--space-2);
+  border-bottom: 1px solid #6f7174;
+  color: white;
+}
+
+.userProfileSection label {
+  margin-left: var(--space-2);
+}
+.sideBarMenu{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+}
+.sidebar .sideBarMenu li a{
+  display: block;
+  padding: var(--space-3) var(--space-5);
+  color: white;
+  text-decoration: none;
+}
+
+.sideBarMenu li a:hover{
+  background-color: #6f7174;
+}
+.app-layout {
+  min-height: 100vh;
+}
+
+.main-wrapper {
+  display: flex;
+}
+
+.content {
+  flex: 1;
+  /*Pushing content to the side with the same pixel amount as the width of the sidebar*/
+  margin-left: 250px; 
+  transition: margin-left 0.3s ease;
+}
+
+.btn-toggle-sideBar{
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: var(--text-lg);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.btn-toggle-sideBar.closed {
+  transform: translateX(100%);
+}
+
+.sidebar.closed + .content,
+.main-wrapper:has(.sidebar.closed) .content {
+  margin-left: 0;
 }

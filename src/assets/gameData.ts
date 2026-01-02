@@ -15,7 +15,7 @@ const gameData: GameData = {
   games: [
     {
       id: 1,
-      title: "The Witcher 3: Wild Hunt",
+      title: "The Witcher 3",
       genre: "RPG",
       price: 29.99,
       imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgOPtH8lO6v8aRGGNpdEpaJgtR5GEO1UlnPv33E4-9hyPDQHa7"
@@ -50,31 +50,31 @@ const gameData: GameData = {
     },
     {
       id: 6,
-      title: "Hades",
+      title: "ARC Raiders",
       genre: "Roguelike",
       price: 24.99,
-      imageUrl: "https://f4.bcbits.com/img/a2368914893_10.jpg"
+      imageUrl: "https://4kwallpapers.com/images/walls/thumbs_3t/19874.jpg"
     },
     {
       id: 7,
-      title: "Hades",
+      title: "Dota 2",
       genre: "Roguelike",
       price: 24.99,
-      imageUrl: "https://f4.bcbits.com/img/a2368914893_10.jpg"
+      imageUrl: "https://upload.wikimedia.org/wikipedia/en/3/31/Dota_2_Steam_artwork.jpg"
     },
     {
       id: 8,
-      title: "Hades",
+      title: "Stardew Valley",
       genre: "Roguelike",
       price: 24.99,
-      imageUrl: "https://f4.bcbits.com/img/a2368914893_10.jpg"
+      imageUrl: "https://eastside-online.org/wp-content/uploads/2022/03/stardewfeatureimage.jpg"
     },
     {
       id: 9,
-      title: "Hades",
+      title: "NARAKA:BLADEPOINT",
       genre: "Roguelike",
       price: 24.99,
-      imageUrl: "https://f4.bcbits.com/img/a2368914893_10.jpg"
+      imageUrl: "https://upload.wikimedia.org/wikipedia/en/5/57/Naraka_Bladepoint_cover_art_full.jpg"
     }
   ]
 };
