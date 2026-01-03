@@ -12,6 +12,27 @@ function ListGroup({ items, heading, onSelectItem }: ListGroupProps) {
   const getMessage = () => {
     return items.length === 0 && <p>No Items Found</p>;
   };
+
+
+  const renderStars = (rating: number) => {
+   const fullStars = Math.floor(rating);
+   const hasHalfStar = rating % 1 >= 0.5;
+  
+   return(
+    <div className="starRating">
+    {[...Array(5)].map((_, i) => (
+          <span key={i} className={
+            i < fullStars ? "star filled" : 
+            (i === fullStars && hasHalfStar) ? "star half" : "star"
+          }>
+            ★
+          </span>
+        ))}
+      <span className="rating-number">{rating.toFixed(1)}</span>
+    </div>
+   );
+  };
+
   //There are no for loops in React thus we have to use ES6 maps to bind the data
   /* We cannot just have a iterator out like this as it has to be an HTML element or 
 a react component
@@ -44,8 +65,11 @@ a react component
               {item.title}
             </span>
             <img src={item.imageUrl} alt={item.title} className="gameImage" />
+            <div className="ratingContainer">
+                {renderStars(item.rating)}
+              </div>  
             <span className="game-price">R {item.price.toFixed(2)}</span>
-            <span className="game-rating">R {item.price.toFixed(2)}</span>
+              
             {selectedIndex === index && (
               <span className="selected-indicator"> (Selected)</span>
             )}
