@@ -5,6 +5,7 @@ export interface Game {
   genre: string;
   price: number;
   imageUrl: string;
+  rating: number;
 }
 
 interface GameData {
@@ -12,68 +13,77 @@ interface GameData {
 }
 
 const gameData: GameData = {
-  games: [
+   games: [
     {
       id: 1,
       title: "The Witcher 3",
       genre: "RPG",
-      price: 29.99,
+      price: 899.99,
+      rating: 4.8,
       imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgOPtH8lO6v8aRGGNpdEpaJgtR5GEO1UlnPv33E4-9hyPDQHa7"
     },
     {
       id: 2,
       title: "Cyberpunk 2077",
       genre: "Action RPG",
-      price: 59.99,
+      price: 599.99,
+      rating: 4.2,
       imageUrl: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcS1dtbBhNNHqyHAUugdokcqjmfvEZgr46h6oVQsLayl0K880gCw"
     },
     {
       id: 3,
       title: "Minecraft",
       genre: "Sandbox",
-      price: 26.95,
+      price: 269.95,
+      rating: 4.9,
       imageUrl: "https://upload.wikimedia.org/wikipedia/en/b/b6/Minecraft_2024_cover_art.png"
     },
     {
       id: 4,
       title: "Among Us",
       genre: "Party",
-      price: 4.99,
+      price: 46.99,
+      rating: 4.5,
       imageUrl: "https://upload.wikimedia.org/wikipedia/en/9/9a/Among_Us_cover_art.jpg"
     },
     {
       id: 5,
       title: "Hades",
       genre: "Roguelike",
-      price: 24.99,
+      price: 545.99,
+      rating: 4.9,
       imageUrl: "https://f4.bcbits.com/img/a2368914893_10.jpg"
     },
     {
       id: 6,
       title: "ARC Raiders",
       genre: "Roguelike",
-      price: 24.99,
+      price: 214.99,
+      rating: 4.0,
       imageUrl: "https://4kwallpapers.com/images/walls/thumbs_3t/19874.jpg"
     },
     {
       id: 7,
       title: "Dota 2",
-      genre: "Roguelike",
-      price: 24.99,
+      genre: "MOBA",
+      price: 424.99,
+      rating: 4.6,
       imageUrl: "https://upload.wikimedia.org/wikipedia/en/3/31/Dota_2_Steam_artwork.jpg"
     },
     {
       id: 8,
       title: "Stardew Valley",
-      genre: "Roguelike",
-      price: 24.99,
+      genre: "Simulation",
+      price: 524.99,
+      rating: 4.9,
       imageUrl: "https://eastside-online.org/wp-content/uploads/2022/03/stardewfeatureimage.jpg"
     },
     {
       id: 9,
       title: "NARAKA:BLADEPOINT",
-      genre: "Roguelike",
-      price: 24.99,
+      genre: "Battle Royale",
+      price: 824.99,
+      rating: 4.3,
       imageUrl: "https://upload.wikimedia.org/wikipedia/en/5/57/Naraka_Bladepoint_cover_art_full.jpg"
     }
   ]

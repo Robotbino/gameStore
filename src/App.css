@@ -63,10 +63,10 @@ html {
 }
 
 body{
-    font-family: var(--font-primary);
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  font-family: var(--font-primary);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 h1 {
@@ -81,38 +81,60 @@ h2 {
   margin-bottom: var(--space-4);
 }
 
-.gameImage{
-    width: 100px;
-    height: 150px;
-    display: block;
-    margin-top: 10px;
+.gameImage {
+  width: 100%;
+  max-width: 220px; 
+  max-height: 230px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 4px;
 }
-.container{
-    display:grid;
-    width: 1000px;
-    height: 600px;
-    align-items: center;
-    justify-items: center;
-    background-color: rgb(170, 198, 188);
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows:repeat(2, 1fr) ;
-    padding: var(--space-4);
-    margin-top: var(--space-1);
+.game-title {
+  height: 40px;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-xl);
 }
-.gameImage:hover{
-    transform: scale(1.1);
-    transition: all 0.3s ease-in-out;
-    cursor: pointer;
+.container {
+  display: grid;
+  width: 100%;
+  max-width: 1000px;
+  background-color: rgb(170, 198, 188);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: var(--space-4);
+  margin-top: var(--space-1);
+  box-sizing: border-box;
 }
-nav.navbar{
-    background-color: darkslategrey;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-2) var(--space-4);
+.container::-webkit-scrollbar {
+  display: none;
 }
 
+.container > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+
+}
+.gameImage:hover{
+  transform: scale(1.05);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+nav.navbar{
+  background-color: darkslategrey;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+}
 
 .userProfilePicture{
   margin: var(--space-4) auto;
@@ -122,7 +144,7 @@ nav.navbar{
 }
 .sidebar {
   position: fixed;
-  width: 250px;
+  width: 300px;
   left: 0;
   top: 0;
   height: 100vh;
@@ -137,7 +159,7 @@ nav.navbar{
 .sideBarTitleLabel{
   color: white;
   margin-left: var(--space-2);
-  margin-right: var(--space-20);
+  margin-right: var(--space-24);
   font-size: var(--text-2xl);
   font-weight: var(--font-weight-bold);
   text-align: center;
@@ -179,7 +201,6 @@ nav.navbar{
 
 .content {
   flex: 1;
-  /*Pushing content to the side with the same pixel amount as the width of the sidebar*/
   margin-left: 250px; 
   transition: margin-left 0.3s ease;
 }

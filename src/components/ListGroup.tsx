@@ -32,25 +32,23 @@ a react component
     <>
       {getMessage()}
       <div className="container">
-        {items.map((items, index) => (
+        {items.map((item, index) => (
           <div
-            className={
-              selectedIndex === index
-                ? "list-group-item active"
-                : "list-group-item"
-            }
             key={index}
             onClick={() => {
               setSelectedIndex(index);
-              onSelectItem(items);
+              onSelectItem(item);
             }}
           >
-            {items.title}
-            <img
-              src={items.imageUrl}
-              alt={items.title}
-              className="gameImage"
-            ></img>
+            <span className="game-title" title={item.title}>
+              {item.title}
+            </span>
+            <img src={item.imageUrl} alt={item.title} className="gameImage" />
+            <span className="game-price">R {item.price.toFixed(2)}</span>
+            <span className="game-rating">R {item.price.toFixed(2)}</span>
+            {selectedIndex === index && (
+              <span className="selected-indicator"> (Selected)</span>
+            )}
           </div>
         ))}
       </div>

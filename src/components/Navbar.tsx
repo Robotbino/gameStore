@@ -20,7 +20,7 @@ export default function NavBar({
         onClick={toggleSidebar}>
         {isSidebarOpen ? "✕" : "☰"}
         </button>
-        <label className="navbar-brand" >
+        <label className="sideBarTitleLabel" >
           Game Store
         </label>
       </div>
