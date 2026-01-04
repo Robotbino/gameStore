@@ -4,33 +4,45 @@ interface SideBarProps {
   isOpen?: boolean;
 }
 
-export default function SideBar({ 
+export default function SideBar({
   isOpen,
   isSidebarOpen,
-  setIsSidebarOpen }: SideBarProps) {
+  setIsSidebarOpen,
+}: SideBarProps) {
   function closeSidebar() {
     // Logic to close the sidebar
     setIsSidebarOpen(!isSidebarOpen);
   }
-  
 
   return (
     <aside className={`sidebar ${isOpen ? "open" : "closed"}`}>
       <nav>
-        <label className="sideBarTitleLabel" >GameStore</label>
-        <button className="btn-toggle-sideBar" onClick={closeSidebar} >&#x2715;</button>
-        <br/>
-        <div className="userProfileSection" >
-          <img className="userProfilePicture" src="src/assets/useProfileImg.png" alt="User Profile image" />
+        <label className="sideBarTitleLabel">GameStore</label>
+        <button className="btn-toggle-sideBar" onClick={closeSidebar}>
+          ☰
+        </button>
+        <br />
+        <div className="userProfileSection">
+          <img
+            className="userProfilePicture"
+            src="src/assets/useProfileImg.png"
+            alt="User Profile image"
+          />
           <label>UserName</label>
         </div>
 
         <ul className="sideBarMenu">
           <li>
-            <a href="/">Home</a>
+            <a href="/games">
+              <i className="fa-solid fa-gamepad sideBarIcons"></i>
+              Games
+            </a>
           </li>
           <li>
-            <a href="/games">Games</a>
+             <a href="/library">
+            <i className="fa-solid fa-book sideBarIcons"></i>
+              Library
+          </a>
           </li>
         </ul>
       </nav>

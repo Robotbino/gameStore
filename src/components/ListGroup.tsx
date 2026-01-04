@@ -61,14 +61,16 @@ a react component
               onSelectItem(item);
             }}
           >
-            <span className="game-title" title={item.title}>
-              {item.title}
-            </span>
-            <img src={item.imageUrl} alt={item.title} className="gameImage" />
-            <div className="ratingContainer">
-                {renderStars(item.rating)}
-              </div>  
-            <span className="game-price">R {item.price.toFixed(2)}</span>
+            <div className={`list-item ${selectedIndex === index ? "selected" : ""} itemContainer`}>
+              <span className="game-title" title={item.title}>
+                {item.title}
+              </span>
+              <img src={item.imageUrl} alt={item.title} className="gameImage" />
+              <div className="ratingContainer">
+                  {renderStars(item.rating)}
+                </div>  
+              <span className="game-price">R {item.price.toFixed(2)}</span>
+            </div>
               
             {selectedIndex === index && (
               <span className="selected-indicator"> (Selected)</span>

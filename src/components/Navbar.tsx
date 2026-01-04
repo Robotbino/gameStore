@@ -1,7 +1,7 @@
 interface NavBarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (isOpen: boolean) => void;
-  isOpen:boolean;
+  isOpen: boolean;
 }
 export default function NavBar({
   isSidebarOpen,
@@ -15,20 +15,14 @@ export default function NavBar({
   return (
     <nav className="navbar ">
       <div>
-        
-        <button className="btn-toggle-sideBar" 
-        onClick={toggleSidebar}>
-        {isSidebarOpen ? "✕" : "☰"}
-        </button>
-        <label className="sideBarTitleLabel" >
-          Game Store
-        </label>
+        <label className="NavBar-title">Game Store</label>
       </div>
-      <div>
+      <div className="search-bar">
+        <i className="fa-solid fa-magnifying-glass"></i>
         <input
           type="text"
           placeholder="Search Games..."
-          className="form-control"
+          className="form-control search-input"
         />
       </div>
     </nav>

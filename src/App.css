@@ -92,7 +92,7 @@ h2 {
 .game-title {
   height: 40px;
   width: 100%;
-  text-align: center;
+  text-align: start;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -104,15 +104,35 @@ h2 {
   display: grid;
   width: 100%;
   max-width: 1000px;
-  background-color: rgb(170, 198, 188);
+  background-color: rgb(180, 180, 180);
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   padding: var(--space-4);
   margin-top: var(--space-1);
   box-sizing: border-box;
+  border-radius: 20px;
 }
 .container::-webkit-scrollbar {
   display: none;
+}
+.search-bar{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  color: white;
+}
+.heroContainer{
+  width: 100%;
+  max-width: 1500px;
+  margin: var(--space-1) auto;
+  box-sizing: border-box;
+}
+.heroImage{
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
 .container > div {
@@ -128,7 +148,7 @@ h2 {
   cursor: pointer;
 }
 nav.navbar{
-  background-color: darkslategrey;
+  background-color: rgb(69, 69, 69);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -148,22 +168,33 @@ nav.navbar{
   left: 0;
   top: 0;
   height: 100vh;
-  background: #2c3e50;
+  background:  rgb(80, 80, 80);
   transition: transform 0.3s ease;
+}
+.sideBarIcons{
+  margin-left: var(--space-4);
+  margin-right: var(--space-3);
+  color:white;
+  font-size: var(--text-xl);
 }
 /*Sidebar close animation*/
 .sidebar.closed {
-  transform: translateX(-100%);
+  transform: translateX(-80%);
 }
-
 .sideBarTitleLabel{
   color: white;
-  margin-left: var(--space-2);
+  margin-left: var(--space-10);
   margin-right: var(--space-24);
   font-size: var(--text-2xl);
   font-weight: var(--font-weight-bold);
   text-align: center;
   padding: var(--space-4) 0;
+}
+.NavBar-title{
+  color: white;
+  margin-left: var(--space-24);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-bold);
 }
 .userProfileSection{
   text-align: left;
@@ -171,10 +202,15 @@ nav.navbar{
   border-bottom: 1px solid #6f7174;
   color: white;
 }
+.userProfileSection:hover{
+  background-color: #6f7174;
+  cursor: pointer;
+}
 
 .userProfileSection label {
-  margin-left: var(--space-2);
+  margin-left: var(--space-4);
 }
+
 .sideBarMenu{
   list-style: none;
   padding: 0;
@@ -186,25 +222,8 @@ nav.navbar{
   padding: var(--space-3) var(--space-5);
   color: white;
   text-decoration: none;
+  font-size: var(--text-xl);
 }
-
-.sideBarMenu li a:hover{
-  background-color: #6f7174;
-}
-.app-layout {
-  min-height: 100vh;
-}
-
-.main-wrapper {
-  display: flex;
-}
-
-.content {
-  flex: 1;
-  margin-left: 250px; 
-  transition: margin-left 0.3s ease;
-}
-
 .btn-toggle-sideBar{
   background-color: transparent;
   border: none;
@@ -217,6 +236,38 @@ nav.navbar{
 .btn-toggle-sideBar.closed {
   transform: translateX(100%);
 }
+.game-price{
+  margin-top:var(--space-1);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
+  color: #000000;
+}
+.itemContainer{
+  display: flex;
+  flex-direction: column;
+  padding-left: var(--space-10);
+  width: 100%;
+}
+.sideBarMenu li a:hover{
+  background-color: #6f7174;
+}
+.app-layout {
+  min-height: 100vh;
+}
+
+.main-wrapper {
+  display: flex;
+}
+main{
+  background-color: #ccc;
+}
+.content {
+  flex: 1;
+  margin-left: 250px; 
+  transition: margin-left 0.3s ease;
+}
+
+
 
 .sidebar.closed + .content,
 .main-wrapper:has(.sidebar.closed) .content {
@@ -231,7 +282,7 @@ nav.navbar{
   border-radius: 15px;
   border: 1px solid #555;
   padding: 1px 5px;
-  background-color: rgb(22, 22, 22);
+  background-color: transparent;
 }
 .rating {
   display: flex;
@@ -243,7 +294,7 @@ nav.navbar{
 
 .star {
   color: #ccc;
-  font-size: var(--text-lg);
+  font-size: var(--text-xl);
 }
 
 .star.filled {
@@ -258,6 +309,67 @@ nav.navbar{
 
 .rating-number {
   margin-left: 4px;
-  font-size: var(--text-xs);
-  color: #555;
+  margin: auto auto;
+  font-size: var(--text-lg);
+  font-weight:bolder;
+  color: #000000;
+}
+
+/*------Hero Section -----*/
+.hero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 400px;
+  max-width: 1320px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin: var(--space-4) auto;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-6);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+}
+
+.hero-title {
+  font-size: var(--text-2xl);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.hero-genre {
+  font-size: var(--text-sm);
+  opacity: 0.8;
+  margin: 0 0 var(--space-2) 0;
+}
+
+.hero-price {
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--space-4) 0;
+}
+
+.hero-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: var(--space-2) var(--space-6);
+  border-radius: 8px;
+  font-size: var(--text-base);
+  cursor: pointer;
+}
+
+.hero-btn:hover {
+  background-color: #0056b3;
 }
