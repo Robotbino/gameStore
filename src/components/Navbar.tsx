@@ -13,14 +13,14 @@ export default function NavBar({
   }
 
   return (
-    <nav className="navbar ">
-      <div>
-        <label className="NavBar-title">Game Store</label>
-      </div>
+    <nav className="navbar">
+      
+      <label className="navbar-title">Game Store</label>
+      
       <div className="search-bar">
         <i className="fa-solid fa-magnifying-glass"></i>
         <input
-          type="text"
+          type="search"
           placeholder="Search Games..."
           className="form-control search-input"
         />

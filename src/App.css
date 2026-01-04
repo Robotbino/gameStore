@@ -81,6 +81,11 @@ h2 {
   margin-bottom: var(--space-4);
 }
 
+.app-layout{
+ background-color: #ccc;
+ min-height: 100vh;
+}
+
 .gameImage {
   width: 100%;
   max-width: 220px; 
@@ -100,6 +105,7 @@ h2 {
   font-weight: var(--font-weight-semibold);
   font-size: var(--text-xl);
 }
+
 .container {
   display: grid;
   width: 100%;
@@ -112,9 +118,11 @@ h2 {
   box-sizing: border-box;
   border-radius: 20px;
 }
+
 .container::-webkit-scrollbar {
   display: none;
 }
+
 .search-bar{
   display: flex;
   flex-direction: row;
@@ -122,12 +130,15 @@ h2 {
   gap: var(--space-3);
   color: white;
 }
+
 .heroContainer{
   width: 100%;
   max-width: 1500px;
   margin: var(--space-1) auto;
   box-sizing: border-box;
 }
+
+
 .heroImage{
   width: 100%;
   max-height: 400px;
@@ -149,13 +160,19 @@ h2 {
 }
 nav.navbar{
   background-color: rgb(69, 69, 69);
+  margin:  0 auto;
+  max-width: 50%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding: var(--space-2) var(--space-4);
+  border-radius: 24px;
 }
 
+input[type="search"] {
+  border-radius: 20px;
+}
 .userProfilePicture{
   margin: var(--space-4) auto;
   width: 70px;
@@ -164,7 +181,7 @@ nav.navbar{
 }
 .sidebar {
   position: fixed;
-  width: 300px;
+  width: 280px;
   left: 0;
   top: 0;
   height: 100vh;
@@ -184,17 +201,15 @@ nav.navbar{
 .sideBarTitleLabel{
   color: white;
   margin-left: var(--space-10);
-  margin-right: var(--space-24);
+  margin-right: var(--space-20);
   font-size: var(--text-2xl);
   font-weight: var(--font-weight-bold);
   text-align: center;
   padding: var(--space-4) 0;
 }
-.NavBar-title{
-  color: white;
-  margin-left: var(--space-24);
-  font-size: var(--text-2xl);
-  font-weight: var(--font-weight-bold);
+.navbar-title{
+  text-align: center;
+  font-size: var(--text-3xl);
 }
 .userProfileSection{
   text-align: left;
@@ -231,6 +246,7 @@ nav.navbar{
   font-size: var(--text-lg);
   cursor: pointer;
   transition: transform 0.3s ease;
+  margin-right: var(--space-1);
 }
 
 .btn-toggle-sideBar.closed {
@@ -253,6 +269,7 @@ nav.navbar{
 }
 .app-layout {
   min-height: 100vh;
+  background-color: r
 }
 
 .main-wrapper {
@@ -263,11 +280,10 @@ main{
 }
 .content {
   flex: 1;
-  margin-left: 250px; 
+  margin-left: 300px; 
+  margin-right: 10px;
   transition: margin-left 0.3s ease;
 }
-
-
 
 .sidebar.closed + .content,
 .main-wrapper:has(.sidebar.closed) .content {
