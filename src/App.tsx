@@ -13,9 +13,10 @@ function App() {
   function showSelectGame(game: Game) {
     console.log("Selected Game:", game);
   }
+  
   function handleSelectGame(game: Game) {
-  setSelectedGame(game);  // Actually update the state
-}
+    setSelectedGame(game); 
+  }
 
   return (
     <div className="app-layout">
@@ -36,7 +37,7 @@ function App() {
           <ListGroup
             items={gameData.games}
             heading="Available Games"
-            onSelectItem={showSelectGame}
+            onSelectItem={handleSelectGame}
           />
         </main>
       </div>

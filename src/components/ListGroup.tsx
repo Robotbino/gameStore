@@ -9,10 +9,15 @@ interface ListGroupProps {
 function ListGroup({ items, heading, onSelectItem }: ListGroupProps) {
   //This is a hook
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
   const getMessage = () => {
     return items.length === 0 && <p>No Items Found</p>;
   };
 
+  function selectedGame() {
+    console.log("Selected Game:", items[selectedIndex]);
+    setSelectedIndex(selectedIndex);
+  }
 
   const renderStars = (rating: number) => {
    const fullStars = Math.floor(rating);
@@ -33,10 +38,6 @@ function ListGroup({ items, heading, onSelectItem }: ListGroupProps) {
    );
   };
 
-  //There are no for loops in React thus we have to use ES6 maps to bind the data
-  /* We cannot just have a iterator out like this as it has to be an HTML element or 
-a react component
-*/
   if (items.length === 0)
     return (
       <>
@@ -44,11 +45,7 @@ a react component
         <p>No items found</p>
       </>
     );
-  /* 
-    If we want to conditionally render elements but do not want to
-    make our code verbose we have to add conditional functions for 
-    elements 
-    */
+
   return (
     <>
       {getMessage()}
@@ -61,14 +58,18 @@ a react component
               onSelectItem(item);
             }}
           >
-            <div className={`list-item ${selectedIndex === index ? "selected" : ""} itemContainer`}>
+          <div className={`list-item ${selectedIndex === index ? "selected" : ""} itemContainer`}
+            onClick={selectedGame}>
+
               <span className="game-title" title={item.title}>
                 {item.title}
               </span>
+
               <img src={item.imageUrl} alt={item.title} className="gameImage" />
+
               <div className="ratingContainer">
                   {renderStars(item.rating)}
-                </div>  
+              </div>  
               <span className="game-price">R {item.price.toFixed(2)}</span>
             </div>
               
