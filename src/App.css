@@ -1,28 +1,39 @@
+/* ============================================
+   CSS VARIABLES (Design Tokens)
+   ============================================ */
 :root{ 
-/* Font families */ 
---font-primary: "Ubuntu", sans-serif ,-apple-system, BlinkMacSystemFont, sans-serif; 
---font-secondary: 'Georgia', 'Times New Roman', serif; --font-mono: 'Roboto Mono', 'Courier New', monospace; /* Base font size (for rem calculations) */ 
-
---font-size-base: 16px; /* Font sizes using rem for scalability */ 
---text-xs: 0.75rem; /* 12px */ 
---text-sm: 0.875rem; /* 14px */ 
---text-base: 1rem; /* 16px */ 
---text-lg: 1.125rem; /* 18px */ 
---text-xl: 1.25rem; /* 20px */ 
---text-2xl: 1.5rem; /* 24px */ 
---text-5xl: 3rem; /* 48px */ 
-/* Font weights */ 
---font-weight-light: 300; 
---font-weight-normal: 400; 
---font-weight-medium: 500; 
---font-weight-semibold: 600; 
---font-weight-bold: 700; 
-/* Line heights */ 
---leading-none: 1; 
---leading-tight: 1.25; 
---leading-normal: 1.5; 
---leading-relaxed: 1.625; 
---leading-loose: 2; 
+  /* Font families */ 
+  --font-primary: "Ubuntu", sans-serif ,-apple-system, BlinkMacSystemFont, sans-serif; 
+  --font-secondary: 'Georgia', 'Times New Roman', serif; 
+  --font-mono: 'Roboto Mono', 'Courier New', monospace; 
+  
+  /* Base font size (for rem calculations) */ 
+  --font-size-base: 16px; 
+  
+  /* Font sizes using rem for scalability */ 
+  --text-xs: 0.75rem; /* 12px */ 
+  --text-sm: 0.875rem; /* 14px */ 
+  --text-base: 1rem; /* 16px */ 
+  --text-lg: 1.125rem; /* 18px */ 
+  --text-xl: 1.25rem; /* 20px */ 
+  --text-2xl: 1.5rem; /* 24px */ 
+  --text-3xl: 1.875rem; /* 30px */
+  --text-4xl: 2.25rem; /* 36px */
+  --text-5xl: 3rem; /* 48px */ 
+  
+  /* Font weights */ 
+  --font-weight-light: 300; 
+  --font-weight-normal: 400; 
+  --font-weight-medium: 500; 
+  --font-weight-semibold: 600; 
+  --font-weight-bold: 700; 
+  
+  /* Line heights */ 
+  --leading-none: 1; 
+  --leading-tight: 1.25; 
+  --leading-normal: 1.5; 
+  --leading-relaxed: 1.625; 
+  --leading-loose: 2; 
 
   /* Base spacing unit */
   --spacing-unit: 4px;
@@ -52,17 +63,19 @@
   --container-padding: var(--space-4);
   --section-spacing: var(--space-16);
   --card-padding: var(--space-4);
-
-  
 }
 
+
+/* ============================================
+   GLOBAL/BASE STYLES
+   ============================================ */
 html {
   font-size: var(--font-size-base);
   font-family: var(--font-primary);
   line-height: var(--leading-normal);
 }
 
-body{
+body {
   font-family: var(--font-primary);
   margin: 0;
   padding: 0;
@@ -81,86 +94,43 @@ h2 {
   margin-bottom: var(--space-4);
 }
 
-.app-layout{
- background-color: #ccc;
- min-height: 100vh;
+
+/* ============================================
+   LAYOUT STYLES
+   ============================================ */
+.app-layout {
+  min-height: 100vh;
+  background-color: #ccc;
 }
 
-.gameImage {
-  width: 100%;
-  max-width: 220px; 
-  max-height: 230px;
-  aspect-ratio: 3 / 4;
-  object-fit: cover;
-  border-radius: 4px;
-}
-.game-title {
-  height: 40px;
-  width: 100%;
-  text-align: start;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  box-sizing: border-box;
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--text-xl);
-}
-
-.container {
-  display: grid;
-  width: 100%;
-  max-width: 1000px;
-  background-color: rgb(180, 180, 180);
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  padding: var(--space-4);
-  margin-top: var(--space-1);
-  box-sizing: border-box;
-  border-radius: 20px;
-}
-
-.container::-webkit-scrollbar {
-  display: none;
-}
-
-.search-bar{
+.main-wrapper {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--space-3);
-  color: white;
 }
 
-.heroContainer{
-  width: 100%;
-  max-width: 1500px;
-  margin: var(--space-1) auto;
-  box-sizing: border-box;
+main {
+  background-color: #ccc;
+}
+
+.content {
+  flex: 1;
+  margin-left: 300px; 
+  margin-right: 10px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Adjust content margin when sidebar is closed */
+.sidebar.closed + .content,
+.main-wrapper:has(.sidebar.closed) .content {
+  margin-left: 0;
 }
 
 
-.heroImage{
-  width: 100%;
-  max-height: 400px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.container > div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-
-}
-.gameImage:hover{
-  transform: scale(1.05);
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
-}
-nav.navbar{
+/* ============================================
+   NAVBAR STYLES
+   ============================================ */
+nav.navbar {
   background-color: rgb(69, 69, 69);
-  margin:  0 auto;
+  margin: 2px auto;
   max-width: 50%;
   display: flex;
   flex-direction: row;
@@ -168,37 +138,46 @@ nav.navbar{
   align-items: center;
   padding: var(--space-2) var(--space-4);
   border-radius: 24px;
+  transition: transform 0.3s ease;
+}
+
+.navbar-title {
+  text-align: center;
+  font-size: var(--text-3xl);
+}
+
+.search-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  color: white;
 }
 
 input[type="search"] {
   border-radius: 20px;
 }
-.userProfilePicture{
-  margin: var(--space-4) auto;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-}
+
+
+/* ============================================
+   SIDEBAR STYLES
+   ============================================ */
 .sidebar {
   position: fixed;
   width: 280px;
   left: 0;
   top: 0;
   height: 100vh;
-  background:  rgb(80, 80, 80);
+  background: rgb(80, 80, 80);
   transition: transform 0.3s ease;
 }
-.sideBarIcons{
-  margin-left: var(--space-4);
-  margin-right: var(--space-3);
-  color:white;
-  font-size: var(--text-xl);
-}
-/*Sidebar close animation*/
+
+/* Sidebar closed animation */
 .sidebar.closed {
   transform: translateX(-80%);
 }
-.sideBarTitleLabel{
+
+.sideBarTitleLabel {
   color: white;
   margin-left: var(--space-10);
   margin-right: var(--space-20);
@@ -207,39 +186,8 @@ input[type="search"] {
   text-align: center;
   padding: var(--space-4) 0;
 }
-.navbar-title{
-  text-align: center;
-  font-size: var(--text-3xl);
-}
-.userProfileSection{
-  text-align: left;
-  padding: var(--space-2);
-  border-bottom: 1px solid #6f7174;
-  color: white;
-}
-.userProfileSection:hover{
-  background-color: #6f7174;
-  cursor: pointer;
-}
 
-.userProfileSection label {
-  margin-left: var(--space-4);
-}
-
-.sideBarMenu{
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-}
-.sidebar .sideBarMenu li a{
-  display: block;
-  padding: var(--space-3) var(--space-5);
-  color: white;
-  text-decoration: none;
-  font-size: var(--text-xl);
-}
-.btn-toggle-sideBar{
+.btn-toggle-sideBar {
   background-color: transparent;
   border: none;
   color: white;
@@ -252,86 +200,61 @@ input[type="search"] {
 .btn-toggle-sideBar.closed {
   transform: translateX(100%);
 }
-.game-price{
-  margin-top:var(--space-1);
-  font-size: var(--text-lg);
-  font-weight: var(--font-weight-bold);
-  color: #000000;
+
+/* Sidebar User Profile Section */
+.userProfileSection {
+  text-align: left;
+  padding: var(--space-2);
+  border-bottom: 1px solid #6f7174;
+  color: white;
 }
-.itemContainer{
-  display: flex;
-  flex-direction: column;
-  padding-left: var(--space-10);
-  width: 100%;
-}
-.sideBarMenu li a:hover{
+
+.userProfileSection:hover {
   background-color: #6f7174;
-}
-.app-layout {
-  min-height: 100vh;
-  background-color: r
+  cursor: pointer;
 }
 
-.main-wrapper {
-  display: flex;
-}
-main{
-  background-color: #ccc;
-}
-.content {
-  flex: 1;
-  margin-left: 300px; 
-  margin-right: 10px;
-  transition: margin-left 0.3s ease;
+.userProfileSection label {
+  margin-left: var(--space-4);
 }
 
-.sidebar.closed + .content,
-.main-wrapper:has(.sidebar.closed) .content {
-  margin-left: 0;
+.userProfilePicture {
+  margin: var(--space-4) auto;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
 }
 
-.ratingContainer{
-  height: 34px;
-  text-align: center;
-  margin-top: 3px;
-  width: 120px;
-  border-radius: 15px;
-  border: 1px solid #555;
-  padding: 1px 5px;
-  background-color: transparent;
-}
-.rating {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  margin-top: 4px;
+/* Sidebar Menu */
+.sideBarMenu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.star {
-  color: #ccc;
+.sidebar .sideBarMenu li a {
+  display: block;
+  padding: var(--space-3) var(--space-5);
+  color: white;
+  text-decoration: none;
   font-size: var(--text-xl);
 }
 
-.star.filled {
-  color: #ffc107;
+.sideBarMenu li a:hover {
+  background-color: #6f7174;
 }
 
-.star.half {
-  background: linear-gradient(90deg, #ffc107 50%, #ccc 50%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.sideBarIcons {
+  margin-left: var(--space-4);
+  margin-right: var(--space-3);
+  color: white;
+  font-size: var(--text-xl);
 }
 
-.rating-number {
-  margin-left: 4px;
-  margin: auto auto;
-  font-size: var(--text-lg);
-  font-weight:bolder;
-  color: #000000;
-}
 
-/*------Hero Section -----*/
+/* ============================================
+   HERO SECTION STYLES
+   ============================================ */
 .hero {
   position: relative;
   width: 100%;
@@ -343,10 +266,20 @@ main{
   margin: var(--space-4) auto;
 }
 
-.hero-image {
+.heroContainer {
+  width: 100%;
+  max-width: 1500px;
+  margin: var(--space-1) auto;
+  box-sizing: border-box;
+}
+
+.hero-image,
+.heroImage {
   width: 100%;
   height: 100%;
+  max-height: 400px;
   object-fit: cover;
+  border-radius: 10px;
 }
 
 .hero-content {
@@ -388,4 +321,123 @@ main{
 
 .hero-btn:hover {
   background-color: #0056b3;
+}
+
+
+/* ============================================
+   GAME LIST/CONTAINER STYLES
+   ============================================ */
+.container {
+  display: grid;
+  width: 100%;
+  max-width: 1000px;
+  background-color: rgb(180, 180, 180);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: var(--space-4);
+  margin-top: var(--space-1);
+  box-sizing: border-box;
+  border-radius: 20px;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+.container > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.itemContainer {
+  display: flex;
+  flex-direction: column;
+  padding-left: var(--space-10);
+  width: 100%;
+}
+
+
+/* ============================================
+   GAME CARD STYLES
+   ============================================ */
+.gameImage {
+  width: 100%;
+  max-width: 220px; 
+  max-height: 230px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.gameImage:hover {
+  transform: scale(1.05);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.game-title {
+  height: 40px;
+  width: 100%;
+  text-align: start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-xl);
+}
+
+.game-price {
+  margin-top: var(--space-1);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
+  color: #000000;
+}
+
+
+/* ============================================
+   RATING STYLES
+   ============================================ */
+.ratingContainer {
+  height: 34px;
+  text-align: center;
+  margin-top: 3px;
+  width: 120px;
+  border-radius: 15px;
+  border: 1px solid #555;
+  padding: 1px 5px;
+  background-color: transparent;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.star {
+  color: #ccc;
+  font-size: var(--text-xl);
+}
+
+.star.filled {
+  color: #ffc107;
+}
+
+.star.half {
+  background: linear-gradient(90deg, #ffc107 50%, #ccc 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.rating-number {
+  margin-left: 4px;
+  margin: auto auto;
+  font-size: var(--text-lg);
+  font-weight: bolder;
+  color: #000000;
 }
