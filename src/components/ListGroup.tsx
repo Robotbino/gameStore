@@ -72,10 +72,6 @@ function ListGroup({ items, heading, onSelectItem }: ListGroupProps) {
               </div>  
               <span className="game-price">R {item.price.toFixed(2)}</span>
             </div>
-              
-            {selectedIndex === index && (
-              <span className="selected-indicator"> (Selected)</span>
-            )}
           </div>
         ))}
       </div>

@@ -10,10 +10,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Game>(gameData.games[0]);
 
-  function showSelectGame(game: Game) {
-    console.log("Selected Game:", game);
-  }
-  
+
   function handleSelectGame(game: Game) {
     setSelectedGame(game); 
   }
