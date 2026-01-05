@@ -14,9 +14,10 @@ export default function NavBar({
 
   return (
     <nav className="navbar">
-      
-      <label className="navbar-title">Game Store</label>
-      
+      <div className="storeLogo">
+        <i className="fa-solid fa-chess-board storeLogoIcon"></i>
+        <label className="navbar-title">Game Store</label>
+      </div>
       <div className="search-bar">
         <i className="fa-solid fa-magnifying-glass"></i>
         <input

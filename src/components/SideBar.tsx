@@ -17,10 +17,12 @@ export default function SideBar({
   return (
     <aside className={`sidebar ${isOpen ? "open" : "closed"}`}>
       <nav>
+        <div className="sideBarLogo">
         <label className="sideBarTitleLabel">GameStore</label>
         <button className="btn-toggle-sideBar" onClick={closeSidebar}>
           ☰
         </button>
+        </div>
         <br />
         <div className="userProfileSection">
           <img
@@ -30,7 +32,7 @@ export default function SideBar({
           />
           <label>UserName</label>
         </div>
-
+        <hr style={{border: "1px solid #6f7174"}} />
         <ul className="sideBarMenu">
           <li>
             <a href="/games">

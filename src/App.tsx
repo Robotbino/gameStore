@@ -19,11 +19,7 @@ function App() {
 
   return (
     <div className="app-layout">
-      <NavBar
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-        isOpen={isSidebarOpen}
-      />
+      
       <div className="main-wrapper">
         <SideBar
           isOpen={isSidebarOpen}
@@ -31,6 +27,11 @@ function App() {
           isSidebarOpen={isSidebarOpen}
         />
         <main className="content">
+           <NavBar
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+            isOpen={isSidebarOpen}
+            />
           <HeroSection item={selectedGame} />
           <ListGroup
             items={gameData.games}
