@@ -17,7 +17,7 @@ export default function HeroSection({item}: HeroSectionProps) {
         <h1 className="hero-title">{item.title}</h1>
         <p className="hero-genre">{item.genre}</p>
         <p className="hero-price">R{item.price.toFixed(2)}</p>
-        <button className="hero-btn">Play Now</button>
+        <button className="hero-btn">Check out</button>
       </div>
     </div>
   );
