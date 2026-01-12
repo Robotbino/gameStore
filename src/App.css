@@ -63,12 +63,24 @@
   --container-padding: var(--space-4);
   --section-spacing: var(--space-16);
   --card-padding: var(--space-4);
+
   /* Colors */
   --primary-color: #262626;
   --secondary-color: #333333;
 
-  /*font-colours*/
-  --font-color-light: #f5f5f5;
+  /* Font colours */
+  --font-color-light: #d6d6d6;
+
+
+  /* ============================================
+     LAYOUT CONTROL VARIABLES
+     Adjust these to easily modify sizing
+     ============================================ */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 56px;  /* 20% of 280px visible when closed */
+  --content-padding: var(--space-4);
+  --hero-max-width: 1320px;
+  --hero-max-height: 400px;
 }
 
 
@@ -85,6 +97,10 @@ body {
   font-family: var(--font-primary);
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
@@ -111,20 +127,21 @@ h2 {
 
 .main-wrapper {
   display: flex;
+  min-height: 100vh;
 }
 
 .content {
   flex: 1;
-  margin-left: 300px; 
-  margin-right: 10px;
+  margin-left: var(--sidebar-width);
+  padding: var(--content-padding);
   transition: margin-left 0.3s ease;
   background-color: var(--primary-color);
+  min-width: 0; /* Prevents flex child overflow */
 }
 
 /* Adjust content margin when sidebar is closed */
-.sidebar.closed + .content,
 .main-wrapper:has(.sidebar.closed) .content {
-  margin-left: 0;
+  margin-left: var(--sidebar-collapsed-width);
 }
 
 
@@ -180,17 +197,18 @@ input[type="search"] {
    ============================================ */
 .sidebar {
   position: fixed;
-  width: 280px;
+  width: var(--sidebar-width);
   left: 0;
   top: 0;
   height: 100vh;
-  background:  var(--secondary-color);
+  background: var(--secondary-color);
   transition: transform 0.3s ease;
+  z-index: 100;
 }
 
 /* Sidebar closed animation */
 .sidebar.closed {
-  transform: translateX(-80%);
+  transform: translateX(calc(-1 * (var(--sidebar-width) - var(--sidebar-collapsed-width))));
 }
 
 .sideBarTitleLabel {
@@ -241,7 +259,6 @@ input[type="search"] {
 }
 
 /* Sidebar Menu */
-
 .sideBarLogo{
   display: flex;
   justify-content: center;
@@ -277,37 +294,39 @@ input[type="search"] {
 
 
 /* ============================================
-   HERO SECTION STYLES
-   ============================================ */
+  HERO SECTION STYLES
+  ============================================ */
+
+/* Container that holds the hero - controls positioning and width */
+.heroContainer {
+  width: 100%;
+  max-width: var(--hero-max-width);
+  padding: 0 var(--content-padding);
+  margin: 0; /* Left-aligned within content area */
+  transition: max-width 0.3s ease;
+}
+
+/* The actual hero card */
 .hero {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  max-height: 400px;
-  max-width: 1320px;
+  max-height: var(--hero-max-height);
   overflow: hidden;
   border-radius: 12px;
-  margin: var(--space-4) auto;
-}
-
-.heroContainer {
-  width: 100%;
-  max-width: 1500px;
-  margin: var(--space-1) auto;
-  box-sizing: border-box;
 }
 
 .hero-image,
 .heroImage {
   width: 100%;
   height: 100%;
-  max-height: 400px;
   object-fit: cover;
+  display: block;
 }
 
 .hero-content {
   position: absolute;
-  top: 0;           /* ADD THIS - covers full height */
+  top: 0;           
   bottom: 0;
   left: 0;
   right: 0;
@@ -321,9 +340,9 @@ input[type="search"] {
     #262626 90%
   );
   color: white;
-  display: flex;                 /* ADD THIS - for positioning */
-  flex-direction: column;        /* ADD THIS */
-  justify-content: flex-end;     /* ADD THIS - keeps content at bottom */
+  display: flex;                
+  flex-direction: column;        
+  justify-content: flex-end;     
 }
 
 .hero-title {
@@ -427,24 +446,32 @@ input[type="search"] {
 }
 
 .game-price {
+  display: inline;
   margin-top: var(--space-1);
   font-size: var(--text-lg);
   font-weight: var(--font-weight-bold);
-  color: #000000;
+  color: var(--font-color-light);
 }
 
 
 /* ============================================
    RATING STYLES
    ============================================ */
+
+.gameInfo{
+  display: flex;
+  flex-direction: row;
+  align-items:center;
+  gap: var(--space-4);
+}
 .ratingContainer {
   height: 34px;
   text-align: center;
   margin-top: 3px;
-  width: 130px;
+  width: 125px;
   border-radius: 24px;
   border: 1px solid #8f8f8f;
-  padding: 1px 5px;
+  padding: 0px 5px;
   background-color: transparent;
 }
 
@@ -458,11 +485,11 @@ input[type="search"] {
 
 .star {
   color: #ccc;
-  font-size: var(--text-xl);
+  font-size: var(--text-base);
 }
 
 .star.filled {
-  color: #ffc107;
+  color: #c19b29;
 }
 
 .star.half {

@@ -66,11 +66,13 @@ function ListGroup({ items, heading, onSelectItem }: ListGroupProps) {
               </span>
 
               <img src={item.imageUrl} alt={item.title} className="gameImage" />
-
-              <div className="ratingContainer">
-                  {renderStars(item.rating)}
-              </div>  
-              <span className="game-price">R {item.price.toFixed(2)}</span>
+              <div className="gameInfo">
+                
+                <div className="ratingContainer">
+                    {renderStars(item.rating)}
+                </div> 
+                <label className="game-price">R {item.price.toFixed(2)}</label>
+              </div>
             </div>
           </div>
         ))}
