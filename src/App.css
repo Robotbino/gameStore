@@ -70,14 +70,14 @@
 
   /* Font colours */
   --font-color-light: #d6d6d6;
-
+  --muted-icon-color: #8f8f8f;
 
   /* ============================================
      LAYOUT CONTROL VARIABLES
-     Adjust these to easily modify sizing
      ============================================ */
   --sidebar-width: 280px;
   --sidebar-collapsed-width: 56px;  /* 20% of 280px visible when closed */
+  --sidebar-colour: rgb(29, 29, 29);
   --content-padding: var(--space-4);
   --hero-max-width: 1320px;
   --hero-max-height: 400px;
@@ -201,7 +201,7 @@ input[type="search"] {
   left: 0;
   top: 0;
   height: 100vh;
-  background: var(--secondary-color);
+  background: var(--sidebar-colour);
   transition: transform 0.3s ease;
   z-index: 100;
 }
@@ -276,7 +276,7 @@ input[type="search"] {
 .sidebar .sideBarMenu li a {
   display: block;
   padding: var(--space-3) var(--space-5);
-  color: white;
+  color: var(--font-color-light);
   text-decoration: none;
   font-size: var(--text-xl);
 }
@@ -288,7 +288,7 @@ input[type="search"] {
 .sideBarIcons {
   margin-left: var(--space-4);
   margin-right: var(--space-3);
-  color: white;
+  color: var(--muted-icon-color);
   font-size: var(--text-xl);
 }
 
@@ -504,4 +504,67 @@ input[type="search"] {
   font-size: var(--text-lg);
   font-weight: bolder;
   color: #000000;
+}
+
+.quickLaunchTitle{
+  color: var(--muted-icon-color);
+  margin-left: var(--space-16);
+  margin-top: var(--space-20);
+  margin-bottom: var(--space-1);
+  font-size: var(--text-md);
+  font-weight: var(--font-weight-normal);
+  text-align: left;
+}
+
+.quickLaunchContainer.open{
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  gap:20px;
+  width: var(--sidebar-width);
+  height: 230px;
+  overflow: hidden;
+}
+.quickLaunchItem {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  object-fit: cover;
+  margin-left: 10px;
+  gap: 2px;
+  width: calc(var(--sidebar-width) - 20px);
+  height: 100px;
+  border-radius: 5px;
+  cursor: pointer;
+  position: relative;        /* Needed for pseudo-element positioning */
+  overflow: hidden;          /* Hides the pseudo-element when off-screen */
+}
+
+.quickLaunchItem::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #6f7174;
+  border-radius: 5px;
+  transform: translateX(-100%);   /* Start off-screen to the right */
+  transition: transform 0.5s ease;         
+  z-index: -1;                   /* Behind the content */
+}
+
+.quickLaunchItem:hover::before {
+  transform: translateX(0);      /* Slide in to fill container */
+}
+
+.quickLaunchItemImage {
+  width: 90px;
+  height: 90px;
+  margin-left: 5px;
+  aspect-ratio: 16 / 9;
+  border-radius: 5px;
+  position: relative;            /* Keeps image above the pseudo-element */
+  z-index: 1;
 }

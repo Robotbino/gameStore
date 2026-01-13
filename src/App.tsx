@@ -23,6 +23,7 @@ function App() {
           isOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
           isSidebarOpen={isSidebarOpen}
+          games={gameData.games}
         />
         <main className="content">
            <NavBar
