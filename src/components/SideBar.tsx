@@ -35,7 +35,7 @@ export default function SideBar({
         <hr style={{border: "1px solid #6f7174"}} />
           <ul className="sideBarMenu">
             <li>
-              <a href="/games">
+              <a href="/">
                 <i className={`fa-solid fa-gamepad sideBarIcons`}></i>
                 Games
               </a>
