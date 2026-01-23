@@ -11,7 +11,7 @@ export default function AboutGames({items}: AboutGames){
   
    return(
      <div className="aboutGenreContainer">
-    {[...Array(Array.length)].map((_, i) => (
+    {[...Array(4)].map((_, i) => (
           <div key={i}
            className="descriptionGenre">
             #{items.genre[i]}
@@ -77,18 +77,22 @@ export default function AboutGames({items}: AboutGames){
                      
                     <div className="commentContainer">
                      
-                      <div>
+                      <div className="userProfileSection">
                         <img className="userCommentImage" src={items.reviews[0].user.avatar}/>
+                        <div>
+                          <div className="commentUserName">
+                            {items.reviews[0].user.username}
+                          </div>
+                          <div className="commentUserRating" >
+                             ★ {items.reviews[0].rating}
+                          </div>
+                        </div>
                       </div>
-                       <div className="commentUserName">
-                      {items.reviews[0].user.username}
-                      </div>
-                      <div className="commentUserRating" >
-                        {items.reviews[0].rating}
-                      </div>
+                        
+                       
                       <div className="commentUserComment">
                         {items.reviews[0].comment}
-                        </div>
+                      </div>
                     </div>
                   </div>
                   <div className="carousel-item">

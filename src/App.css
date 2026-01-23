@@ -572,7 +572,6 @@ input[type="search"] {
   padding: var(--space-4);
   height: 600px;
   max-width: 1300px;
-  border:1px solid red;
   width: 100%;
   box-sizing: border-box;
   background-color: var(--deep-black-color);
@@ -672,13 +671,14 @@ input[type="search"] {
 .commentContainer {
   display: flex;
   justify-content: flex-start;
-  align-items: flex-start;
-  height: 400px;
+  align-items: start;
+  flex-direction: column;
+  height: 300px;
   width: 630px;
   padding: 10px, 10px, 10px, 0px;
-  border: 1px solid blue;
   background-color: var(--primary-color);
   border-radius: 1rem;
+  border:1px solid #8f8f8f;
   /* Remove margin-left and margin-top, let flexbox center it */
 }
 
@@ -694,14 +694,18 @@ input[type="search"] {
   color:white;
   margin-top: var(--space-10);
   margin-left: var(--space-10);
+  font-size: var(--text-2xl);
 }
 .commentUserRating{
   color:white;
-  margin-top: var(--space-10);
   margin-left: var(--space-10);
 }
 .commentUserComment{
   color:white;
   margin-top: var(--space-10);
   margin-left: var(--space-10);
+}
+
+.userProfileSection{
+  display: flex;
 }
