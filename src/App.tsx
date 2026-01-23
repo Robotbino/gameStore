@@ -4,16 +4,16 @@ import gameData, { type Game } from "./assets/gameData.ts";
 import NavBar from "./components/Navbar.tsx";
 import SideBar from "./components/SideBar.tsx";
 import HeroSection from "./components/HeroSection.tsx";
+import { Routes, Route } from 'react-router-dom';
+import HomePage from "./components/HomePage.tsx";
+import AboutGame from "./components/AboutGame.tsx"
+ 
 import "./App.css";
+import AboutGames from "./components/AboutGame.tsx";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedGame, setSelectedGame] = useState<Game>(gameData.games[0]);
 
-
-  function handleSelectGame(game: Game) {
-    setSelectedGame(game); 
-  }
 
   return (
     <div className="app-layout">
@@ -31,12 +31,16 @@ function App() {
             setIsSidebarOpen={setIsSidebarOpen}
             isOpen={isSidebarOpen}
             />
-          <HeroSection item={selectedGame} />
-          <ListGroup
-            items={gameData.games}
-            heading="Available Games"
-            onSelectItem={handleSelectGame}
-          />
+           <Routes>
+            <Route path="/" element={
+              <HomePage  itemData={gameData.games}  />
+              } />
+            { 
+              <Route path={`/aboutGame/${gameData.games[0].id}`}
+              element = {<AboutGame items={gameData.games[0]}/>}/> 
+            }
+          </Routes>
+          
         </main>
       </div>
     </div>

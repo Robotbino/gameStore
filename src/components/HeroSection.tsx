@@ -1,9 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import type { Game } from "../assets/gameData";
 
 interface HeroSectionProps {
   item: Game;
 }
 export default function HeroSection({item}: HeroSectionProps) {
+  const navigate = useNavigate();
   if (!item) return null;  // Guard for null
   
   return (
@@ -17,7 +19,10 @@ export default function HeroSection({item}: HeroSectionProps) {
         <h1 className="hero-title">{item.title}</h1>
         <p className="hero-genre">{item.genre}</p>
         <p className="hero-price">R{item.price.toFixed(2)}</p>
-        <button className="hero-btn">Check out</button>
+        <button className="hero-btn"
+        onClick={()=>{navigate(`/aboutGame/${item.id}`)}}>Check out
+
+        </button>
       </div>
     </div>
   );

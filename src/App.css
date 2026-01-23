@@ -67,6 +67,9 @@
   /* Colors */
   --primary-color: #262626;
   --secondary-color: #333333;
+  --icon-grey: #5b5b5b;
+  --deep-black-color:#191919;
+
 
   /* Font colours */
   --font-color-light: #d6d6d6;
@@ -287,12 +290,22 @@ input[type="search"] {
 
 .sideBarIcons {
   margin-left: var(--space-4);
+<<<<<<< HEAD
   margin-right: var(--space-3);
   color: var(--muted-icon-color);
+=======
+  margin-right: var(--space-10);
+  color: var(--icon-grey);
+>>>>>>> 7ff0c081f88bd05ca2d957b57e2a79ca39a66262
   font-size: var(--text-xl);
 }
 
+.aboutMeSectionImage{
+  height: 300px;
+  width:auto;
+  
 
+}
 /* ============================================
   HERO SECTION STYLES
   ============================================ */
@@ -505,6 +518,7 @@ input[type="search"] {
   font-weight: bolder;
   color: #000000;
 }
+<<<<<<< HEAD
 
 .quickLaunchTitle{
   color: var(--muted-icon-color);
@@ -567,4 +581,228 @@ input[type="search"] {
   border-radius: 5px;
   position: relative;            /* Keeps image above the pseudo-element */
   z-index: 1;
+=======
+/* ============================================
+   About Game STYLES
+   ============================================ */
+.aboutMeContainer{
+  display: flex;
+  margin: var(--space-1) auto;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items:center;
+  width: 100%;
+  max-width: 1300px;
+  background-color: var(--secondary-color);
+  gap: 12px;
+  padding: var(--space-4);
+  margin-top: var(--space-1);
+  box-sizing: border-box;
+  border-radius: 20px;
+  color: var(--font-color-light)
+}
+.mainAboutSection{
+  display: flex;
+  gap: var(--space-10);
+  height:800px;
+  width: 100%;
+}
+
+.descriptionHeader{
+  font-weight: var(--font-weight-semibold);
+  font-size: x-large;
+  margin-left:var(--space-2);
+  margin-top: var(--space-4);
+}
+.desriptionBlock{
+  display: flex;
+  flex-direction:column;
+  justify-items: space-between;
+  margin: var(--space-4) var(--space-4);
+}
+
+.descriptionSection{
+  padding-left: var(--space-1);
+  padding-top: var(--space-10);
+  padding-bottom: var(--space-10);
+  text-wrap:var(--space-3);
+}
+
+.aboutGameImage{
+  width: 100%;
+  margin-left: 1rem;
+  margin-top:1rem;
+  max-width: 210px; 
+  max-height: 300px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 4px;
+
+}
+
+.mainAboutSection{
+  height: 50vh
+}
+
+.btn-aboutMePurchase {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap:10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: var(--space-2) var(--space-4);
+  border-radius: 8px;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  width: 150px;
+}
+
+.caroselHead{
+  display:flex;
+  flex-direction: column;
+  justify-content:start;
+  align-items: center;
+  margin: var(--space-10) auto;
+  padding: var(--space-4);
+  height: 600px;
+  max-width: 1300px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--deep-black-color);
+  border-radius: 1rem;
+}
+
+.aboutStar {
+  color: #ccc;
+  font-size: var(--text-xl);
+}
+
+.aboutStar.filled {
+  color: #c7a02b ;
+}
+
+.aboutStar.half {
+  background: linear-gradient(90deg, #c7a02b 50%, #949494 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.aboutRating-number {
+  margin-left: 4px;
+  margin: auto auto;
+  font-size: var(--text-xl);
+  font-weight: bolder;
+  color: #e1e1e1;
+}
+.aboutRatingContainer {
+  height: 50px;
+  text-align: center;
+  margin-top: 3px;
+  width: 150px;
+  border-radius: 24px;
+  border: 1px solid #8f8f8f;
+  padding: 8px 5px;
+  background-color: transparent;
+}
+.descriptionBlock{
+  display:flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height:100%;
+  margin-top:var(--space-2);
+  margin-right: var(--space-1);
+  max-height:350px;
+}
+.aboutSectionFooter{
+  display: flex;
+  justify-content: start;
+  margin: var(--space-5) var(--space-0);
+  gap:var(--space-5);
+}
+
+.descriptionGenre{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left:var(--space-1);
+  width: 110px;
+  height:30px;
+  border-radius: var(--space-10);
+  background-color: var(--icon-grey);
+  font-size: small;
+}
+.aboutGenreContainer{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel {
+  height: 500px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.carousel-inner {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.carousel-item {
+  height: 100%;
+}
+
+.carousel-item.active {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+.commentContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: start;
+  flex-direction: column;
+  height: 300px;
+  width: 630px;
+  padding: 10px, 10px, 10px, 0px;
+  background-color: var(--primary-color);
+  border-radius: 1rem;
+  border:1px solid #8f8f8f;
+  /* Remove margin-left and margin-top, let flexbox center it */
+}
+
+.userCommentImage{
+  width:100px;
+  height:100px;
+  margin-top:var(--space-8);
+  margin-left: var(--space-10);
+  background-color: white;
+  border-radius: 50%;
+}
+.commentUserName{
+  color:white;
+  margin-top: var(--space-10);
+  margin-left: var(--space-10);
+  font-size: var(--text-2xl);
+}
+.commentUserRating{
+  color:white;
+  margin-left: var(--space-10);
+}
+.commentUserComment{
+  color:white;
+  margin-top: var(--space-10);
+  margin-left: var(--space-10);
+}
+
+.userProfileSection{
+  display: flex;
+>>>>>>> 7ff0c081f88bd05ca2d957b57e2a79ca39a66262
 }

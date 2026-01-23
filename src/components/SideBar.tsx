@@ -49,18 +49,18 @@ export default function SideBar({
           />
           <label>UserName</label>
         </div>
-        <hr style={{ border: "1px solid #6f7174" }} />
-        <ul className="sideBarMenu">
-          <li>
-            <a href="/whatsHot">
-              <i className={`fa-solid fa-fire-flame-curved sideBarIcons`}></i>
-              Whats hot?
-            </a>
-          </li>
-          <li>
-            <a href="/library">
-              <i className={`fa-solid fa-book sideBarIcons`}></i>
-              Library
+        <hr style={{border: "1px solid #6f7174"}} />
+          <ul className="sideBarMenu">
+            <li>
+              <a href="/">
+                <i className={`fa-solid fa-gamepad sideBarIcons`}></i>
+                Games
+              </a>
+            </li>
+            <li>
+              <a href="/library">
+              <i className={`fa-solid fa-book sideBarIcons` }></i>
+                Library
             </a>
           </li>
         </ul>
