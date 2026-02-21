@@ -1,77 +1,58 @@
 import type { Game } from "../assets/gameData";
 
 interface SideBarProps {
-  isSidebarOpen: boolean;
-  setIsSidebarOpen: (isOpen: boolean) => void;
-  isOpen?: boolean;
+  isOpen: boolean;
+  onToggle: () => void;
   games: Game[];
 }
 
-export default function SideBar({
-  isOpen,
-  isSidebarOpen,
-  setIsSidebarOpen,
-  games,
-}: SideBarProps) {
-  function closeSidebar() {
-    // Logic to close the sidebar
-    setIsSidebarOpen(!isSidebarOpen);
-  }
-
-  function QuickLaunchItem({ game }: { game: Game }) {
-    return (
-      <div className="quickLaunchItem">
-        <img
-          className="quickLaunchItemImage"
-          src={game.imageUrl}
-          alt={game.title}
-        />
-        <div style={{color:"#d6d6d6",marginLeft:"5px"}}>{game.title}</div>
-      </div>
-    );
-  }
+export default function SideBar({ isOpen, onToggle, games }: SideBarProps) {
+  const navItems = [
+    { icon: "🔥", label: "What's Hot", href: "/whats-hot" },
+    { icon: "📚", label: "Library", href: "/library" },
+    { icon: "🎯", label: "Discover", href: "/discover" },
+  ];
 
   return (
-    <aside className={`sidebar ${isOpen ? "open" : "closed"}`}>
-      <nav>
-        <div className="sideBarLogo">
-          <label className="sideBarTitleLabel">GameStore</label>
-          <button className="btn-toggle-sideBar" onClick={closeSidebar}>
-            ☰
-          </button>
-        </div>
-        <br />
-        <div className="userProfileSection">
-          <img
-            className="userProfilePicture"
-            src="src/assets/useProfileImg.png"
-            alt="User Profile image"
-          />
-          <label>UserName</label>
-        </div>
-        <hr style={{border: "1px solid #6f7174"}} />
-          <ul className="sideBarMenu">
-            <li>
-              <a href="/">
-                <i className={`fa-solid fa-gamepad sideBarIcons`}></i>
-                Games
-              </a>
-            </li>
-            <li>
-              <a href="/library">
-              <i className={`fa-solid fa-book sideBarIcons` }></i>
-                Library
+    <aside className={`sidebar ${isOpen ? "" : "collapsed"}`}>
+      {/* Header */}
+      <div className="sidebar-header">
+        {isOpen && (
+          <span className="sidebar-brand">
+            Game<span className="accent">Store</span>
+          </span>
+        )}
+        <button className="sidebar-toggle" onClick={onToggle}>
+          ☰
+        </button>
+      </div>
+
+      {/* Navigation */}
+      <ul className="sidebar-nav">
+        {navItems.map((item) => (
+          <li key={item.label}>
+            <a href={item.href} className="sidebar-nav-item">
+              <span className="nav-icon">{item.icon}</span>
+              {isOpen && <span>{item.label}</span>}
             </a>
           </li>
-        </ul>
-        <hr style={{ border: "1px solid #6f7174" }} />
-        <span className="quickLaunchTitle">QUICK LAUNCH</span>
-        <div className="quickLaunchContainer open">
-          {games.slice(3, 5).map((game) => (
-            <QuickLaunchItem key={game.id} game={game} />
-          ))}
+        ))}
+      </ul>
+
+      {/* Quick Launch — only visible when sidebar is expanded */}
+      {isOpen && (
+        <div className="quick-launch">
+          <span className="quick-launch-label">Quick Launch</span>
+          <div className="quick-launch-list">
+            {games.slice(0, 3).map((game) => (
+              <div key={game.id} className="quick-launch-item">
+                <img src={game.imageUrl} alt={game.title} />
+                <span>{game.title}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </nav>
+      )}
     </aside>
   );
 }

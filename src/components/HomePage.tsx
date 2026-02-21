@@ -4,7 +4,7 @@ import ListGroup from "./ListGroup";
 import gameData from "../assets/gameData.ts";
 import type { Game } from "../assets/gameData";
 import HeroSection from "./HeroSection.tsx";
-
+import GameGrid from "./GameGrid";
 interface HomePageProps{
     itemData:Game[];
 }
@@ -24,11 +24,12 @@ export default function HomePage({itemData}:HomePageProps){
        <>
         <HeroSection  item={selectedGame}/>
 
-        <ListGroup 
-                items={itemData}         
-                heading="Available Games"
-                onSelectItem={handleSelectGame}
-            />
+        <GameGrid
+        items={itemData}
+        heading="Available Games"
+        selectedGame={selectedGame}
+        onSelectItem={setSelectedGame}
+      />
         </>
 
     )

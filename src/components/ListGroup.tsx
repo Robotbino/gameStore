@@ -6,6 +6,7 @@ interface ListGroupProps {
   heading: string;
   onSelectItem: (item: Game) => void;
 }
+
 function ListGroup({ items, heading, onSelectItem }: ListGroupProps) {
   //This is a hook
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -20,22 +21,28 @@ function ListGroup({ items, heading, onSelectItem }: ListGroupProps) {
   }
 
   const renderStars = (rating: number) => {
-   const fullStars = Math.floor(rating);
-   const hasHalfStar = rating % 1 >= 0.5;
-  
-   return(
-    <div className="starRating">
-    {[...Array(5)].map((_, i) => (
-          <span key={i} className={
-            i < fullStars ? "star filled" : 
-            (i === fullStars && hasHalfStar) ? "star half" : "star"
-          }>
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+
+    return (
+      <div className="starRating">
+        {[...Array(5)].map((_, i) => (
+          <span
+            key={i}
+            className={
+              i < fullStars
+                ? "star filled"
+                : i === fullStars && hasHalfStar
+                  ? "star half"
+                  : "star"
+            }
+          >
             ★
           </span>
         ))}
-      <span className="rating-number">{rating.toFixed(1)}</span>
-    </div>
-   );
+        <span className="rating-number">{rating.toFixed(1)}</span>
+      </div>
+    );
   };
 
   if (items.length === 0)
@@ -58,19 +65,18 @@ function ListGroup({ items, heading, onSelectItem }: ListGroupProps) {
               onSelectItem(item);
             }}
           >
-          <div className={`list-item ${selectedIndex === index ? "selected" : ""} itemContainer`}
-            onClick={selectedGame}>
-
+            <div
+              className={`list-item ${selectedIndex === index ? "selected" : ""} itemContainer`}
+            >
               <span className="game-title" title={item.title}>
                 {item.title}
               </span>
 
               <img src={item.imageUrl} alt={item.title} className="gameImage" />
               <div className="gameInfo">
-                
                 <div className="ratingContainer">
-                    {renderStars(item.rating)}
-                </div> 
+                  {renderStars(item.rating)}
+                </div>
                 <label className="game-price">R {item.price.toFixed(2)}</label>
               </div>
             </div>
