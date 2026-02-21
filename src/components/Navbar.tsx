@@ -10,10 +10,7 @@ export default function NavBar() {
 
       <div className="search-bar">
         <span className="search-icon">⌕</span>
-        <input
-          type="search"
-          placeholder="Search games..."
-        />
+        <input type="search" placeholder="Search games..." />
       </div>
 
       <div className="user-avatar">B</div>

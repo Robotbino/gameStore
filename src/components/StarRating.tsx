@@ -15,8 +15,8 @@ export default function StarRating({ rating }: { rating: number }) {
               i < fullStars
                 ? "#F5C518"
                 : i === fullStars && hasHalf
-                ? "url(#halfGrad)"
-                : "#3a3a3a"
+                  ? "url(#halfGrad)"
+                  : "#3a3a3a"
             }
             stroke={
               i < fullStars || (i === fullStars && hasHalf) ? "#F5C518" : "#555"
@@ -34,5 +34,6 @@ export default function StarRating({ rating }: { rating: number }) {
         </svg>
       ))}
       <span className="rating-value">{rating.toFixed(1)}</span>
-    </div>);
+    </div>
+  );
 }

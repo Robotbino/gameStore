@@ -23,7 +23,6 @@ function App() {
 
       <main className="content">
         <NavBar />
-
         <Routes>
           <Route
             path="/"

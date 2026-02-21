@@ -69,6 +69,8 @@
 
 html {
   font-size: 16px;
+  height: 100%;
+  background: var(--bg-primary);
 }
 
 body {
@@ -77,6 +79,7 @@ body {
   color: var(--text-primary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  height: 100%;
 }
 
 ::-webkit-scrollbar { width: 6px; }
@@ -91,6 +94,7 @@ body {
 .app-layout {
   display: flex;
   min-height: 100vh;
+  background: var(--bg-primary);
 }
 
 .content {
@@ -113,7 +117,8 @@ body {
 .navbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-self: right;
+  gap:var(--space-sm);
   padding: 0 0 var(--space-lg);
   border-bottom: 1px solid var(--border-subtle);
   margin-bottom: var(--space-lg);

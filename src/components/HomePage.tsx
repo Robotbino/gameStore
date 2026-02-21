@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import ListGroup from "./ListGroup";
 import gameData from "../assets/gameData.ts";
 import type { Game } from "../assets/gameData";
 import HeroSection from "./HeroSection.tsx";
