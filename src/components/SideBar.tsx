@@ -8,9 +8,9 @@ interface SideBarProps {
 
 export default function SideBar({ isOpen, onToggle, games }: SideBarProps) {
   const navItems = [
-    { icon: "🔥", label: "What's Hot", href: "/whats-hot" },
-    { icon: "📚", label: "Library", href: "/library" },
-    { icon: "🎯", label: "Discover", href: "/discover" },
+    { icon: "fa-solid fa-fire", label: "What's Hot", href: "/whats-hot" },
+    { icon: "fa-solid fa-book", label: "Library", href: "/library" },
+    { icon: "fa-solid fa-bullseye", label: "Discover", href: "/discover" },
   ];
 
   return (
@@ -32,7 +32,7 @@ export default function SideBar({ isOpen, onToggle, games }: SideBarProps) {
         {navItems.map((item) => (
           <li key={item.label}>
             <a href={item.href} className="sidebar-nav-item">
-              <span className="nav-icon">{item.icon}</span>
+              <i className={`${item.icon} nav-icon`} />
               {isOpen && <span>{item.label}</span>}
             </a>
           </li>

@@ -267,6 +267,7 @@ body {
 
 .sidebar-nav-item .nav-icon {
   font-size: var(--text-lg);
+  color:var(--accent);
   flex-shrink: 0;
   width: 24px;
   text-align: center;
