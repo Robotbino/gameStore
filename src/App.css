@@ -3,17 +3,10 @@
    ============================================ */
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Sora:wght@600;700&display=swap');
 
-/* ============================================
-   DESIGN TOKENS
-   Intentionally constrained. 6 spacing values,
-   3 font sizes for body, 2 for headings.
-   One accent color. Commit to the system.
-   ============================================ */
+
 :root {
-  /* Typography */
   --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Sora', 'DM Sans', sans-serif;
-
   --text-xs: 0.7rem;
   --text-sm: 0.85rem;
   --text-base: 0.95rem;
@@ -56,6 +49,8 @@
 }
 
 
+
+
 /* ============================================
    RESET & BASE
    ============================================ */
@@ -68,9 +63,10 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: var(--text-base);
   height: 100%;
   background: var(--bg-primary);
+  scrollbar-width: none;  
 }
 
 body {
@@ -80,13 +76,12 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   height: 100%;
+  scrollbar-width: none;  
 }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
-
+::-webkit-scrollbar {
+  display: none;                 
+}
 
 /* ============================================
    APP LAYOUT

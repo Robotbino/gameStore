@@ -15,7 +15,6 @@ export default function SideBar({ isOpen, onToggle, games }: SideBarProps) {
 
   return (
     <aside className={`sidebar ${isOpen ? "" : "collapsed"}`}>
-      {/* Header */}
       <div className="sidebar-header">
         {isOpen && (
           <span className="sidebar-brand">
@@ -27,7 +26,7 @@ export default function SideBar({ isOpen, onToggle, games }: SideBarProps) {
         </button>
       </div>
 
-      {/* Navigation */}
+
       <ul className="sidebar-nav">
         {navItems.map((item) => (
           <li key={item.label}>
@@ -39,7 +38,6 @@ export default function SideBar({ isOpen, onToggle, games }: SideBarProps) {
         ))}
       </ul>
 
-      {/* Quick Launch — only visible when sidebar is expanded */}
       {isOpen && (
         <div className="quick-launch">
           <span className="quick-launch-label">Quick Launch</span>
