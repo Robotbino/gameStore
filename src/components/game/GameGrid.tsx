@@ -1,5 +1,5 @@
-import type { Game } from "../assets/gameData";
-import GameCard from "./GameCard";
+import type { Game } from "../../types/game";
+import GameCard from "../GameCard";
 
 interface GameGridProps {
   items: Game[];

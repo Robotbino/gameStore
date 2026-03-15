@@ -20,7 +20,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isLoading: boolean; // true while we check for a stored token on mount
-  login: (data: LoginRequest) => Promise<void>;
+  login: (data: LoginRequest) => Promise<Role>;
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => void;
 }
@@ -36,22 +36,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   // ── Helper: decode a token and update state ──
-  const applyToken = useCallback((jwt: string) => {
+  const applyToken = useCallback((jwt: string): Role => {
     try {
       const decoded = jwtDecode<JwtPayload>(jwt);
 
       // Check expiry
       if (decoded.exp * 1000 < Date.now()) {
         localStorage.removeItem("token");
-        return;
+        return "USER";
       }
 
+      const role: Role = (decoded.role as Role) ?? "USER";
       localStorage.setItem("token", jwt);
       setToken(jwt);
       setUserEmail(decoded.sub);
-      setUserRole((decoded.role as Role) ?? "USER");
+      setUserRole(role);
+      return role;
     } catch {
       localStorage.removeItem("token");
+      return "USER";
     }
   }, []);
 
@@ -65,9 +68,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [applyToken]);
 
   // ── Actions ──
-  const login = async (data: LoginRequest) => {
+  const login = async (data: LoginRequest): Promise<Role> => {
     const res = await authService.login(data);
-    applyToken(res.token);
+    return applyToken(res.token);
   };
 
   const register = async (data: RegisterRequest) => {

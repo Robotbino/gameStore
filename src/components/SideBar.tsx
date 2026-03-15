@@ -1,12 +1,12 @@
-import type { Game } from "../assets/gameData";
+import gameData from "../assets/gameData";
 
 interface SideBarProps {
   isOpen: boolean;
   onToggle: () => void;
-  games: Game[];
 }
 
-export default function SideBar({ isOpen, onToggle, games }: SideBarProps) {
+export default function SideBar({ isOpen, onToggle }: SideBarProps) {
+  const games = gameData.games;
   const navItems = [
     { icon: "fa-solid fa-fire", label: "What's Hot", href: "/whats-hot" },
     { icon: "fa-solid fa-book", label: "Library", href: "/library" },

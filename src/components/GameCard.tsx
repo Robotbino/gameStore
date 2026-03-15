@@ -1,4 +1,4 @@
-import type { Game } from "../assets/gameData";
+import type { Game } from "../types/game";
 import StarRating from "./StarRating.tsx";
 
 
