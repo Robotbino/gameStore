@@ -3,6 +3,7 @@ import type { LoginRequest, RegisterRequest, AuthResponse } from "../types/auth"
 
 export const authService = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
+    console.log("Sending login request with data:", data);
     const res = await api.post<AuthResponse>("/api/v2/auth/authenticate", data);
     return res.data;
   },

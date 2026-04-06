@@ -32,7 +32,13 @@ export default function AppRoutes() {
       {/* ── Public routes ── */}
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to={isAdmin ? "/admin" : "/"} replace /> : <LoginPage />}
+        element={
+          isAuthenticated ? (
+            <Navigate to={isAdmin ? "/admin" : "/"} replace />
+          ) : (
+            <LoginPage />
+          )
+        }
       />
       <Route
         path="/register"

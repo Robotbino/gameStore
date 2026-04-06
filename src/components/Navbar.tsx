@@ -1,8 +1,5 @@
-interface NavBarProps {
-  isSidebarOpen: boolean;
-  setIsSidebarOpen: (isOpen: boolean) => void;
-  isOpen: boolean;
-}
+import UserAvatar from "./UserAvatar";
+
 export default function NavBar() {
   return (
     <nav className="navbar">
@@ -13,7 +10,7 @@ export default function NavBar() {
         <input type="search" placeholder="Search games..." />
       </div>
 
-      <div className="user-avatar">B</div>
+      <UserAvatar />
     </nav>
   );
 }

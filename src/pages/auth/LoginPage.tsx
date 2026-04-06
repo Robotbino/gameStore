@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import type { LoginRequest } from "../../types/auth";
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const navigate = useNavigate();
 
   const [form, setForm] = useState<LoginRequest>({ email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
@@ -20,8 +19,11 @@ export default function LoginPage() {
     setError(null);
     setIsLoading(true);
     try {
-      const role = await login(form);
-      navigate(role === "ADMIN" ? "/admin" : "/");
+      console.log("Request sent successfully");
+      await login(form);
+      // No navigate() needed — the /login route in AppRoutes
+      // automatically redirects when isAuthenticated becomes true
+      console.log("Login successful");
     } catch {
       setError("Invalid email or password.");
     } finally {

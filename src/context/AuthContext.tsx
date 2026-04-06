@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
-import { jwtDecode } from "jwt-decode"; // npm install jwt-decode
+import { jwtDecode } from "jwt-decode";
 import { authService } from "../services/authService";
 import type { LoginRequest, RegisterRequest } from "../types/auth";
 import type { Role } from "../types/user";
@@ -14,7 +14,7 @@ interface JwtPayload {
 
 // ── What AuthContext exposes to consumers ──
 interface AuthContextType {
-  token: string | null;
+  access_token: string | null;
   userEmail: string | null;
   userRole: Role | null;
   isAuthenticated: boolean;
@@ -35,12 +35,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userRole, setUserRole] = useState<Role | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // ── Helper: decode a token and update state ──
   const applyToken = useCallback((jwt: string): Role => {
+    if (!jwt) {
+      console.error("applyToken called with empty/null token");
+      localStorage.removeItem("token");
+      return "USER";
+    }
     try {
       const decoded = jwtDecode<JwtPayload>(jwt);
 
-      // Check expiry
       if (decoded.exp * 1000 < Date.now()) {
         localStorage.removeItem("token");
         return "USER";
@@ -70,12 +73,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ── Actions ──
   const login = async (data: LoginRequest): Promise<Role> => {
     const res = await authService.login(data);
-    return applyToken(res.token);
+    return applyToken(res.access_token);
   };
 
   const register = async (data: RegisterRequest) => {
     const res = await authService.register(data);
-    applyToken(res.token);
+    applyToken(res.access_token);
   };
 
   const logout = () => {
@@ -86,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const value: AuthContextType = {
-    token,
+    access_token: token,
     userEmail,
     userRole,
     isAuthenticated: !!token,
