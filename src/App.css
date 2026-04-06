@@ -110,11 +110,11 @@ body {
   NAVBAR
   ============================================ */
 .navbar {
-  display: flex;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-self: right;
-  gap:var(--space-sm);
-  padding: 0 0 var(--space-lg);
+  padding: var(--space-md) var(--space-2xl);
   border-bottom: 1px solid var(--border-subtle);
   margin-bottom: var(--space-lg);
 }
@@ -130,6 +130,9 @@ body {
   border: 1px solid var(--border-medium);
   transition: border-color 0.2s ease;
 }
+
+
+
 
 .navbar .search-bar:focus-within {
   border-color: var(--accent);
@@ -150,9 +153,17 @@ body {
   width: 100%;
 }
 
-.navbar .user-avatar {
+
+
+.avatar-wrapper {
+  justify-self: end;
+  position: relative;
+}
+
+.user-avatar {
   width: 34px;
   height: 34px;
+  border: none;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
   display: flex;
@@ -162,6 +173,48 @@ body {
   font-weight: 700;
   color: #000;
   cursor: pointer;
+}
+
+.avatar-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-medium);
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  z-index: 50;
+}
+
+.avatar-menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.avatar-menu-item:hover {
+  background: var(--border-medium);
+}
+
+.avatar-menu-item:last-child:hover {
+  color: var(--accent);
+}
+
+.avatar-menu-separator {
+  height: 1px;
+  background: var(--border-medium);
+  margin: 4px 0;
 }
 
 

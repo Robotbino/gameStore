@@ -3,14 +3,16 @@ import UserAvatar from "./UserAvatar";
 export default function NavBar() {
   return (
     <nav className="navbar">
-      <div />
+        <div />
 
-      <div className="search-bar">
-        <span className="search-icon">⌕</span>
-        <input type="search" placeholder="Search games..." />
-      </div>
+          <div className="search-bar">
+            <span className="search-icon">⌕</span>
+            <input type="search" placeholder="Search games..." />
+        </div>
 
-      <UserAvatar />
+      
+        <UserAvatar />
+    
     </nav>
   );
 }

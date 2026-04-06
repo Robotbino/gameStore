@@ -1,18 +1,27 @@
-import {
-  MenuRoot,
-  MenuTrigger,
-  MenuContent,
-  MenuItem,
-  MenuSeparator,
-} from "@chakra-ui/react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 export default function UserAvatar() {
   const { userEmail, logout } = useAuth();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const initial = userEmail ? userEmail.charAt(0).toUpperCase() : "?";
+
+  // Close on click outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
 
   const handleLogout = () => {
     logout();
@@ -20,57 +29,30 @@ export default function UserAvatar() {
   };
 
   return (
-    <MenuRoot>
-      <MenuTrigger asChild>
-        <div className="user-avatar" id="userAvatar">
-          {initial}
-        </div>
-      </MenuTrigger>
-      <MenuContent
-        bg="#1a1a1a"
-        borderColor="#2a2a2a"
-        borderWidth="1px"
-        borderRadius="10px"
-        boxShadow="0 8px 32px rgba(0, 0, 0, 0.5)"
-        p="3"
-        minW="160px"
+    <div className="avatar-wrapper" ref={wrapperRef}>
+      <button
+        className="user-avatar"
+        id="userAvatar"
+        type="button"
+        onClick={() => setOpen(!open)}
       >
-        <MenuItem
-          value="profile"
-          bg="transparent"
-          color="#e8e8e8"
-          borderRadius="6px"
-          p="2"
-          fontSize="0.85rem"
-          _hover={{ bg: "#2a2a2a" }}
-        >
-          Profile
-        </MenuItem>
-        <MenuItem
-          value="settings"
-          bg="transparent"
-          color="#e8e8e8"
-          borderRadius="6px"
-          p="2"
-          fontSize="0.85rem"
-          _hover={{ bg: "#2a2a2a" }}
-        >
-          Settings
-        </MenuItem>
-        <MenuSeparator borderColor="#2a2a2a" />
-        <MenuItem
-          value="logout"
-          onClick={handleLogout}
-          bg="transparent"
-          color="#e8e8e8"
-          p="2"
-          borderRadius="6px"
-          fontSize="0.85rem"
-          _hover={{ bg: "#2a2a2a", color: "#F5C518" }}
-        >
-          Log out
-        </MenuItem>
-      </MenuContent>
-    </MenuRoot>
+        {initial}
+      </button>
+
+      {open && (
+        <div className="avatar-menu">
+          <button className="avatar-menu-item" onClick={() => setOpen(false)}>
+            Profile
+          </button>
+          <button className="avatar-menu-item" onClick={() => setOpen(false)}>
+            Settings
+          </button>
+          <div className="avatar-menu-separator" />
+          <button className="avatar-menu-item" onClick={handleLogout}>
+            Log out
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
