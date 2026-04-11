@@ -104,7 +104,87 @@ body {
 .app-layout:has(.sidebar.collapsed) .content {
   margin-left: var(--sidebar-collapsed);
 }
+.auth-title {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.auth-subtitle {
+  margin-top: var(--space-xs);
+  margin-bottom: var(--space-xl);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
 
+.auth-page{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: var(--bg-sidebar);
+}
+.auth-card{
+  color: var(--text-primary);
+  padding: var(--space-xl);
+  background: var(--bg-raised);
+  padding: var(--space-xl);
+  border-radius: 20px;
+  border: 1px solid var(--border-medium);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 500px;
+}
+.auth-form{
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group label {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding-left: 2px;
+}
+.auth-form input:focus {
+  border-color: var(--accent);
+  background: #161616;
+  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.12);
+}
+.auth-footer {
+  margin-top: var(--space-xl);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.auth-footer .accent {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-footer .accent:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
 
 /* ============================================
   NAVBAR
