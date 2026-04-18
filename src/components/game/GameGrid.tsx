@@ -3,9 +3,10 @@ import GameCard from "../GameCard";
 
 interface GameGridProps {
   items: Game[];
-  heading: string;
+  heading?: string;
   selectedGame: Game | null;
   onSelectItem: (game: Game) => void;
+  onViewAll?: () => void;
 }
 
 export default function GameGrid({
@@ -13,11 +14,12 @@ export default function GameGrid({
   heading,
   selectedGame,
   onSelectItem,
+  onViewAll,
 }: GameGridProps) {
   if (items.length === 0) {
     return (
       <section>
-        <h2 className="game-grid-title">{heading}</h2>
+        {heading && <h2 className="game-grid-title">{heading}</h2>}
         <p style={{ color: "var(--text-muted)" }}>No games found.</p>
       </section>
     );
@@ -25,10 +27,16 @@ export default function GameGrid({
 
   return (
     <section>
-      <div className="game-grid-header">
-        <h2 className="game-grid-title">{heading}</h2>
-        <button className="game-grid-viewall">View All →</button>
-      </div>
+      {heading && (
+        <div className="game-grid-header">
+          <h2 className="game-grid-title">{heading}</h2>
+          {onViewAll && (
+            <button className="game-grid-viewall" onClick={onViewAll}>
+              View All →
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="game-grid">
         {items.map((item) => (

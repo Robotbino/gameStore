@@ -733,3 +733,80 @@ body {
   font-weight: 600;
   color: var(--text-secondary);
 }
+
+
+/* ============================================
+  LOADING SCREEN
+  ============================================ */
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text-muted);
+  background: var(--bg-primary);
+}
+
+
+/* ============================================
+  BROWSE PAGE
+  ============================================ */
+.browse-page {
+  padding-top: var(--space-md);
+}
+
+.browse-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+}
+
+.browse-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.browse-search-bar {
+  display: flex;
+  align-items: center;
+  background: var(--bg-raised);
+  border-radius: 8px;
+  padding: var(--space-sm) var(--space-md);
+  gap: var(--space-sm);
+  width: 320px;
+  border: 1px solid var(--border-medium);
+  transition: border-color 0.2s ease;
+}
+
+.browse-search-bar:focus-within {
+  border-color: var(--accent);
+}
+
+.browse-search-bar .search-icon {
+  color: var(--text-faint);
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+}
+
+.browse-search-bar input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  width: 100%;
+}
+
+.browse-error {
+  margin-top: var(--space-xl);
+  text-align: center;
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
