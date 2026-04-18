@@ -3,7 +3,7 @@ import type { Game, GameInput } from "../types/game";
 
 export const gameService = {
   getAll: async (): Promise<Game[]> => {
-    const res = await api.get<Game[]>("/games");
+    const res = await api.get<Game[]>("/games/all");
     return res.data;
   },
 
