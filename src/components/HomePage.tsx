@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import gameData from "../assets/gameData.ts";
 import type { Game } from "../assets/gameData";
 import HeroSection from "./HeroSection.tsx";
 import GameGrid from "./GameGrid";
@@ -16,9 +15,7 @@ export default function HomePage({itemData}:HomePageProps){
         setSelectedGame(game); 
     }
     
-    if(!gameData){
-        return null
-    }
+
     return(
        <>
         <HeroSection  item={selectedGame}/>
