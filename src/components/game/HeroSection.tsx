@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { Game } from "../assets/gameData";
+import type { Game } from "../../types/game";
 
 interface HeroSectionProps {
   item: Game;
