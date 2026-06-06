@@ -12,6 +12,7 @@ import AdminRoute from "./AdminRoute";
 // Auth pages
 import LoginPage from "../pages/auth/LoginPage.tsx";
 import RegisterPage from "../pages/auth/RegisterPage.tsx";
+import AdminLoginPage from "../pages/auth/AdminLoginPage.tsx";
 
 // User pages
 import HomePage from "../pages/user/HomePage.tsx";
@@ -46,6 +47,9 @@ export default function AppRoutes() {
           isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />
         }
       />
+
+      {/* ── Admin login ── */}
+      <Route path="/admin/login" element={<AdminLoginPage />} />
 
       {/* ── Protected user routes (wrapped in sidebar + navbar layout) ── */}
       <Route element={<ProtectedRoute />}>

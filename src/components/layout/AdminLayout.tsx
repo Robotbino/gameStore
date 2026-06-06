@@ -8,7 +8,7 @@ export default function AdminLayout() {
   const adminNavItems = [
     { icon: "fa-solid fa-chart-line", label: "Dashboard", to: "/admin" },
     { icon: "fa-solid fa-gamepad", label: "Manage Games", to: "/admin/games" },
-    { icon: "fa-solid fa-users", label: "Manage Users", to: "/admin/users" },
+    { icon: "fa-solid fa-user-tie", label: "Manage Employees", to: "/admin/users" },
   ];
 
   return (
