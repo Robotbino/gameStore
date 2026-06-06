@@ -2,14 +2,9 @@ import { useState, useEffect } from "react";
 import { gameService } from "../../services/gameService";
 import type { Game, GameInput } from "../../types/game";
 
-interface GameFormData extends GameInput {
-  genreText: string;
-}
-
-const EMPTY_FORM: GameFormData = {
+const EMPTY_FORM: GameInput = {
   title: "",
-  genre: [],
-  genreText: "",
+  genre: "",
   price: 0,
   rating: 0,
   description: "",
@@ -23,7 +18,7 @@ export default function ManageGamesPage() {
   const [error, setError] = useState<string | null>(null);
   const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
   const [editingGame, setEditingGame] = useState<Game | null>(null);
-  const [form, setForm] = useState<GameFormData>(EMPTY_FORM);
+  const [form, setForm] = useState<GameInput>(EMPTY_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
@@ -53,7 +48,6 @@ export default function ManageGamesPage() {
     setForm({
       title: game.title,
       genre: game.genre,
-      genreText: game.genre.join(", "),
       price: game.price,
       rating: game.rating,
       description: game.description,
@@ -72,15 +66,9 @@ export default function ManageGamesPage() {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
-    if (name === "genreText") {
-      setForm((prev) => ({
-        ...prev,
-        genreText: value,
-        genre: value.split(",").map((g) => g.trim()).filter(Boolean),
-      }));
-    } else if (name === "price" || name === "rating") {
+    if (name === "price" || name === "rating") {
       setForm((prev) => ({ ...prev, [name]: Number(value) }));
-    } else {
+    }else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   }
@@ -88,13 +76,12 @@ export default function ManageGamesPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsSubmitting(true);
-    const { genreText: _gt, ...gameData } = form;
     try {
       if (modalMode === "add") {
-        const created = await gameService.create(gameData);
+        const created = await gameService.create(form);
         setGames((prev) => [...prev, created]);
       } else if (editingGame) {
-        const updated = await gameService.update(editingGame.id, gameData);
+        const updated = await gameService.update(editingGame.id, form);
         setGames((prev) => prev.map((g) => (g.id === updated.id ? updated : g)));
       }
       closeModal();
@@ -148,7 +135,7 @@ export default function ManageGamesPage() {
                 <tr key={game.id}>
                   <td>{game.id}</td>
                   <td>{game.title}</td>
-                  <td>{game.genre.join(", ")}</td>
+                  <td>{game.genre}</td>
                   <td>R {game.price.toFixed(2)}</td>
                   <td>{game.rating}</td>
                   <td className="table-actions">
@@ -189,8 +176,8 @@ export default function ManageGamesPage() {
               <div className="form-field">
                 <label>Genres (comma-separated)</label>
                 <input
-                  name="genreText"
-                  value={form.genreText}
+                  name="genre"
+                  value={form.genre}
                   onChange={handleChange}
                   placeholder="Action, RPG, Adventure"
                 />
