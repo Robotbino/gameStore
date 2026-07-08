@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import type { Game } from "../../types/game";
 import { gameService } from "../../services/gameService";
 import { useAuth } from "../../hooks/useAuth";
@@ -7,9 +8,17 @@ import GameGrid from "../../components/game/GameGrid";
 export default function BrowsePage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
+  const [searchParams] = useSearchParams();
+
   const [games, setGames] = useState<Game[]>([]);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(searchParams.get("search") ?? "");
+
+  // Keep in sync with searches submitted from the navbar
+  useEffect(() => {
+    const search = searchParams.get("search");
+    if (search !== null) setQuery(search);
+  }, [searchParams]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

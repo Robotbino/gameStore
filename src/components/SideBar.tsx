@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import gameData from "../assets/gameData";
 
 interface SideBarProps {
@@ -8,9 +9,9 @@ interface SideBarProps {
 export default function SideBar({ isOpen, onToggle }: SideBarProps) {
   const games = gameData.games;
   const navItems = [
-    { icon: "fa-solid fa-fire", label: "What's Hot", href: "/whats-hot" },
+    { icon: "fa-solid fa-house", label: "Home", href: "/" },
+    { icon: "fa-solid fa-bullseye", label: "Browse", href: "/browse" },
     { icon: "fa-solid fa-book", label: "Library", href: "/library" },
-    { icon: "fa-solid fa-bullseye", label: "Discover", href: "/discover" },
   ];
 
   return (
@@ -30,10 +31,10 @@ export default function SideBar({ isOpen, onToggle }: SideBarProps) {
       <ul className="sidebar-nav">
         {navItems.map((item) => (
           <li key={item.label}>
-            <a href={item.href} className="sidebar-nav-item">
+            <NavLink to={item.href} className="sidebar-nav-item" end>
               <i className={`${item.icon} nav-icon`} />
               {isOpen && <span>{item.label}</span>}
-            </a>
+            </NavLink>
           </li>
         ))}
       </ul>

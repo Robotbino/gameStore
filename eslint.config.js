@@ -6,7 +6,13 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores([
+    'dist',
+    // Legacy components kept for reference; excluded from the app build too
+    'src/components/HomePage.tsx',
+    'src/components/AboutGame.tsx',
+    'src/components/MyButton.tsx',
+  ]),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

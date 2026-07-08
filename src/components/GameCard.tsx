@@ -20,7 +20,7 @@ export default function GameCard({ game, isSelected, onSelect }: GameCardProps) 
       </div>
 
       <div className="game-card-info">
-        <span className="game-card-genre">{game.genre}</span>
+        <span className="game-card-genre">{game.genre.join(", ")}</span>
         <h3 className="game-card-title" title={game.title}>
           {game.title}
         </h3>

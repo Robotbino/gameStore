@@ -19,11 +19,9 @@ export default function LoginPage() {
     setError(null);
     setIsLoading(true);
     try {
-      console.log("Request sent successfully");
       await login(form);
       // No navigate() needed — the /login route in AppRoutes
       // automatically redirects when isAuthenticated becomes true
-      console.log("Login successful");
     } catch {
       setError("Invalid email or password.");
     } finally {

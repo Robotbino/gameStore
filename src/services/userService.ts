@@ -11,17 +11,12 @@ interface CreateUserPayload {
 
 export const userService = {
   getAll: async (): Promise<User[]> => {
-    const res = await api.get<User[]>("/users");
+    const res = await api.get<User[]>("/users/all");
     return res.data;
   },
 
   create: async (data: CreateUserPayload): Promise<User> => {
-    const res = await api.post<User>("/users", data);
-    return res.data;
-  },
-
-  getById: async (id: number): Promise<User> => {
-    const res = await api.get<User>(`/users/${id}`);
+    const res = await api.post<User>("/users/add", data);
     return res.data;
   },
 

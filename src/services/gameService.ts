@@ -8,23 +8,28 @@ export const gameService = {
   },
 
   getById: async (id: number): Promise<Game> => {
-    const res = await api.get<Game>(`/games/${id}`);
+    const res = await api.get<Game>(`/games/find/${id}`);
     return res.data;
   },
 
+  // The backend has no search/genre endpoints, so both filter client-side
   search: async (keyword: string): Promise<Game[]> => {
-    const res = await api.get<Game[]>("/games/search", { params: { keyword } });
-    return res.data;
+    const games = await gameService.getAll();
+    const term = keyword.toLowerCase();
+    return games.filter((game) => game.title.toLowerCase().includes(term));
   },
 
   getByGenre: async (genre: string): Promise<Game[]> => {
-    const res = await api.get<Game[]>(`/games/genre/${genre}`);
-    return res.data;
+    const games = await gameService.getAll();
+    const term = genre.toLowerCase();
+    return games.filter((game) =>
+      game.genre.some((g) => g.toLowerCase() === term)
+    );
   },
 
-  // Admin only 
+  // Admin only
   create: async (game: GameInput): Promise<Game> => {
-    const res = await api.post<Game>("/games", game);
+    const res = await api.post<Game>("/games/add", game);
     return res.data;
   },
 

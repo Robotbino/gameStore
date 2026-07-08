@@ -24,5 +24,11 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  // Legacy components kept for reference; not part of the app build
+  "exclude": [
+    "src/components/HomePage.tsx",
+    "src/components/AboutGame.tsx",
+    "src/components/MyButton.tsx"
+  ]
 }
