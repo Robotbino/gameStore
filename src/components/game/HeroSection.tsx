@@ -32,7 +32,9 @@ export default function HeroSection({ item }: HeroSectionProps) {
       <div className="hero-gradient" />
 
       <div className={`hero-content ${isTransitioning ? "transitioning" : ""}`}>
-        <span className="hero-genre">{displayGame.genre.join(", ")}</span>
+        <span className="hero-genre">
+          {Array.isArray(displayGame.genre) ? displayGame.genre.join(", ") : displayGame.genre}
+        </span>
         <h1 className="hero-title">{displayGame.title}</h1>
         <p className="hero-description">{displayGame.description}</p>
 

@@ -55,7 +55,9 @@ export default function GameDetailsPage() {
       </div>
 
       <div className="game-details-content">
-        <span className="hero-genre">{game.genre.join(", ")}</span>
+        <span className="hero-genre">
+          {Array.isArray(game.genre) ? game.genre.join(", ") : game.genre}
+        </span>
         <h1 className="hero-title">{game.title}</h1>
         <StarRating rating={game.rating} />
         <p className="hero-description">{game.description}</p>

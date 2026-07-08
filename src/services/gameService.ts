@@ -22,9 +22,12 @@ export const gameService = {
   getByGenre: async (genre: string): Promise<Game[]> => {
     const games = await gameService.getAll();
     const term = genre.toLowerCase();
-    return games.filter((game) =>
-      game.genre.some((g) => g.toLowerCase() === term)
-    );
+    return games.filter((game) => {
+      const genres = Array.isArray(game.genre)
+        ? game.genre
+        : game.genre.split(",").map((g) => g.trim());
+      return genres.some((g) => g.toLowerCase() === term);
+    });
   },
 
   // Admin only

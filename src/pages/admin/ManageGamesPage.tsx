@@ -50,10 +50,11 @@ export default function ManageGamesPage() {
   }
 
   function openEdit(game: Game) {
+    const genreText = Array.isArray(game.genre) ? game.genre.join(", ") : game.genre;
     setForm({
       title: game.title,
       genre: game.genre,
-      genreText: game.genre.join(", "),
+      genreText,
       price: game.price,
       rating: game.rating,
       description: game.description,
@@ -148,7 +149,7 @@ export default function ManageGamesPage() {
                 <tr key={game.id}>
                   <td>{game.id}</td>
                   <td>{game.title}</td>
-                  <td>{game.genre.join(", ")}</td>
+                  <td>{Array.isArray(game.genre) ? game.genre.join(", ") : game.genre}</td>
                   <td>R {game.price.toFixed(2)}</td>
                   <td>{game.rating}</td>
                   <td className="table-actions">
