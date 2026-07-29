@@ -1,5 +1,3 @@
-import React, { Children } from "react";
-
 interface Props {
   children?: string;
   colour?: string;

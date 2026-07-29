@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { Game } from "../assets/gameData";
 
 interface AboutGames{
@@ -8,13 +7,13 @@ interface AboutGames{
 export default function AboutGames({items}: AboutGames){
 
   const renderGenre = (genre: string[]) => {
-  
+
    return(
      <div className="aboutGenreContainer">
-    {[...Array(4)].map((_, i) => (
-          <div key={i}
+    {genre.slice(0, 4).map((name) => (
+          <div key={name}
            className="descriptionGenre">
-            #{items.genre[i]}
+            #{name}
           </div>
         ))}
     </div>

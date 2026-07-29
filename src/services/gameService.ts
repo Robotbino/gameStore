@@ -1,6 +1,10 @@
 import api from "./api";
 import type { Game, GameInput } from "../types/game";
 
+// Paths below mirror GamesControllers.java exactly. Two of them are not the
+// REST-conventional shape you'd expect (`/games/find/{id}`, `/games/add`) —
+// that's the contract the backend actually serves today, not a typo.
+
 export const gameService = {
   getAll: async (): Promise<Game[]> => {
     const res = await api.get<Game[]>("/games/all");
@@ -8,23 +12,35 @@ export const gameService = {
   },
 
   getById: async (id: number): Promise<Game> => {
-    const res = await api.get<Game>(`/games/${id}`);
+    const res = await api.get<Game>(`/games/find/${id}`);
     return res.data;
   },
 
+  // GamesService.searchGames() and getGamesByGenre() exist on the backend but
+  // no controller exposes them, so both filters run client-side over /games/all.
+  // When those endpoints land, swap the bodies back to a single api.get and
+  // every caller keeps working unchanged.
   search: async (keyword: string): Promise<Game[]> => {
-    const res = await api.get<Game[]>("/games/search", { params: { keyword } });
-    return res.data;
+    const games = await gameService.getAll();
+    const needle = keyword.trim().toLowerCase();
+    if (!needle) return games;
+    return games.filter((game) =>
+      game.title.toLowerCase().includes(needle),
+    );
   },
 
   getByGenre: async (genre: string): Promise<Game[]> => {
-    const res = await api.get<Game[]>(`/games/genre/${genre}`);
-    return res.data;
+    const games = await gameService.getAll();
+    const needle = genre.trim().toLowerCase();
+    if (!needle) return games;
+    return games.filter((game) =>
+      (game.genre ?? "").toLowerCase().includes(needle),
+    );
   },
 
-  // Admin only 
+  // Admin only
   create: async (game: GameInput): Promise<Game> => {
-    const res = await api.post<Game>("/games", game);
+    const res = await api.post<Game>("/games/add", game);
     return res.data;
   },
 

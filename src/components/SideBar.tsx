@@ -1,17 +1,44 @@
-import gameData from "../assets/gameData";
+import { useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { gameService } from "../services/gameService";
+import type { Game } from "../types/game";
 
 interface SideBarProps {
   isOpen: boolean;
   onToggle: () => void;
 }
 
+// Every entry here must correspond to a route in AppRoutes — anything else
+// falls through to the catch-all and bounces the user somewhere confusing.
+const navItems = [
+  { icon: "fa-solid fa-house", label: "Home", to: "/" },
+  { icon: "fa-solid fa-bullseye", label: "Browse", to: "/browse" },
+  { icon: "fa-solid fa-book", label: "Library", to: "/library" },
+];
+
 export default function SideBar({ isOpen, onToggle }: SideBarProps) {
-  const games = gameData.games;
-  const navItems = [
-    { icon: "fa-solid fa-fire", label: "What's Hot", href: "/whats-hot" },
-    { icon: "fa-solid fa-book", label: "Library", href: "/library" },
-    { icon: "fa-solid fa-bullseye", label: "Discover", href: "/discover" },
-  ];
+  const navigate = useNavigate();
+  const [games, setGames] = useState<Game[]>([]);
+
+  // Quick Launch used to render the bundled gameData.ts fixture, so it showed
+  // games that aren't in the database. Pull the real catalogue instead, and
+  // stay silent on failure — this strip is decorative, not worth an error state.
+  useEffect(() => {
+    let cancelled = false;
+
+    gameService
+      .getAll()
+      .then((data) => {
+        if (!cancelled) setGames(data.slice(0, 3));
+      })
+      .catch(() => {
+        if (!cancelled) setGames([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <aside className={`sidebar ${isOpen ? "" : "collapsed"}`}>
@@ -26,24 +53,29 @@ export default function SideBar({ isOpen, onToggle }: SideBarProps) {
         </button>
       </div>
 
-
       <ul className="sidebar-nav">
         {navItems.map((item) => (
           <li key={item.label}>
-            <a href={item.href} className="sidebar-nav-item">
+            {/* NavLink, not <a href> — a plain anchor triggers a full page
+                reload, which remounts the app and throws away auth state. */}
+            <NavLink to={item.to} className="sidebar-nav-item" end>
               <i className={`${item.icon} nav-icon`} />
               {isOpen && <span>{item.label}</span>}
-            </a>
+            </NavLink>
           </li>
         ))}
       </ul>
 
-      {isOpen && (
+      {isOpen && games.length > 0 && (
         <div className="quick-launch">
           <span className="quick-launch-label">Quick Launch</span>
           <div className="quick-launch-list">
-            {games.slice(0, 3).map((game) => (
-              <div key={game.id} className="quick-launch-item">
+            {games.map((game) => (
+              <div
+                key={game.id}
+                className="quick-launch-item"
+                onClick={() => navigate(`/games/${game.id}`)}
+              >
                 <img src={game.imageUrl} alt={game.title} />
                 <span>{game.title}</span>
               </div>

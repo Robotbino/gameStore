@@ -24,6 +24,9 @@ import AdminDashboard from "../pages/admin/AdminDashBoard.tsx";
 import ManageGamesPage from "../pages/admin/ManageGamesPage.tsx";
 import ManageUsersPage from "../pages/admin/ManageUsersPage.tsx";
 
+// Fallback
+import NotFoundPage from "../pages/NotFoundPage.tsx";
+
 export default function AppRoutes() {
   const { isAuthenticated, isAdmin } = useAuth();
 
@@ -70,7 +73,8 @@ export default function AppRoutes() {
       </Route>
 
       {/* ── Catch-all ── */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Shows the URL was wrong instead of silently bouncing to home. */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

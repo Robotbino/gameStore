@@ -119,7 +119,7 @@ const gameData: GameData = {
       price: 269.95,
       rating: 4.9,
       description: "Build anything you can imagine in this iconic block-based sandbox game. Whether you're surviving your first night against monsters, constructing massive architectural wonders, or exploring endless procedurally generated worlds, Minecraft offers limitless possibilities for players of all ages.",
-      imageUrl: "https://upload.wikimedia.org/wikipedia/en/b/b6/Minecraft_2024_cover_art.png",
+      imageUrl: "https://www.minecraft.net/content/dam/minecraftnet/games/minecraft/key-art/Homepage_Discover-our-games_MC-Vanilla-KeyArt_864x864.jpg",
       heroImage: "https://www.minecraft.net/content/dam/games/minecraft/key-art/MC-Legends-Standard-Background.jpg",
       reviews: [
         {

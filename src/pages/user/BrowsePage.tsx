@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import type { Game } from "../../types/game";
 import { gameService } from "../../services/gameService";
 import { useAuth } from "../../hooks/useAuth";
@@ -7,41 +8,62 @@ import GameGrid from "../../components/game/GameGrid";
 export default function BrowsePage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
+  // The URL is the source of truth for the search term, so a result page can be
+  // linked or refreshed, and the navbar can drive this page by navigating to
+  // /browse?q=… while it is already mounted.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlQuery = searchParams.get("q") ?? "";
+
   const [games, setGames] = useState<Game[]>([]);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(urlQuery);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Mirror URL changes that came from somewhere else (navbar, back button)
+  // into the input.
+  useEffect(() => {
+    setQuery(urlQuery);
+  }, [urlQuery]);
+
+  // Commit typing to the URL after a pause. The equality guard is what stops
+  // this and the effect above from bouncing updates off each other.
+  useEffect(() => {
+    if (query === urlQuery) return;
+
+    const timeout = setTimeout(() => {
+      setSearchParams(query ? { q: query } : {}, { replace: true });
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [query, urlQuery, setSearchParams]);
 
   useEffect(() => {
     if (authLoading || !isAuthenticated) return;
 
-    const delay = query.trim() ? 300 : 0;
+    let cancelled = false;
 
-    if (debounceRef.current) clearTimeout(debounceRef.current);
+    setIsLoading(true);
+    setError(null);
 
-    debounceRef.current = setTimeout(() => {
-      setIsLoading(true);
-      setError(null);
+    const term = urlQuery.trim();
+    const request = term ? gameService.search(term) : gameService.getAll();
 
-      const request = query.trim()
-        ? gameService.search(query.trim())
-        : gameService.getAll();
-
-      request
-        .then((data) => setGames(data))
-        .catch(() => setError("Failed to load games. Please try again."))
-        .finally(() => setIsLoading(false));
-    }, delay);
+    request
+      .then((data) => {
+        if (!cancelled) setGames(data);
+      })
+      .catch(() => {
+        if (!cancelled) setError("Failed to load games. Please try again.");
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
 
     return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
+      cancelled = true;
     };
-  }, [query, authLoading, isAuthenticated]);
-
-  if (isLoading) return <div className="loading-screen">Loading games…</div>;
+  }, [urlQuery, authLoading, isAuthenticated]);
 
   return (
     <div className="browse-page">
@@ -54,17 +76,24 @@ export default function BrowsePage() {
             placeholder="Search games..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            aria-label="Search games"
           />
         </div>
       </div>
 
       {error && <p className="browse-error">{error}</p>}
 
-      <GameGrid
-        items={games}
-        selectedGame={selectedGame}
-        onSelectItem={setSelectedGame}
-      />
+      {/* Only the results swap out while loading. Returning early here instead
+          would unmount the input above and drop focus on every keystroke. */}
+      {isLoading ? (
+        <p className="browse-status">Loading games…</p>
+      ) : (
+        <GameGrid
+          items={games}
+          selectedGame={selectedGame}
+          onSelectItem={setSelectedGame}
+        />
+      )}
     </div>
   );
 }
