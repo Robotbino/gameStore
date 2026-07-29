@@ -1,5 +1,6 @@
 import api from "./api";
 import type { Game, GameInput } from "../types/game";
+import { parseGenres } from "../utils/genre";
 
 // Paths below mirror GamesControllers.java exactly. Two of them are not the
 // REST-conventional shape you'd expect (`/games/find/{id}`, `/games/add`) —
@@ -33,8 +34,10 @@ export const gameService = {
     const games = await gameService.getAll();
     const needle = genre.trim().toLowerCase();
     if (!needle) return games;
+    // Match whole genres, not substrings, so "Action" doesn't pull in
+    // "Action RPG" — the splitting itself lives in parseGenres.
     return games.filter((game) =>
-      (game.genre ?? "").toLowerCase().includes(needle),
+      parseGenres(game.genre).some((g) => g.toLowerCase() === needle),
     );
   },
 
