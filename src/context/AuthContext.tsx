@@ -35,37 +35,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userRole, setUserRole] = useState<Role | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const applyToken = useCallback((jwt: string): Role => {
+  // Throws when the token can't be used. Returning a role we never actually
+  // applied is what made a failed register look like a success: the caller
+  // navigated to a protected route, ProtectedRoute saw isAuthenticated=false,
+  // and bounced the user to /login with nothing explaining why.
+  const applyToken = useCallback((jwt: string | null | undefined): Role => {
     if (!jwt) {
-      console.error("applyToken called with empty/null token");
       localStorage.removeItem("token");
-      return "USER";
+      throw new Error("The server didn't return an access token.");
     }
+
+    let decoded: JwtPayload;
     try {
-      const decoded = jwtDecode<JwtPayload>(jwt);
-
-      if (decoded.exp * 1000 < Date.now()) {
-        localStorage.removeItem("token");
-        return "USER";
-      }
-
-      const role: Role = (decoded.role as Role) ?? "USER";
-      localStorage.setItem("token", jwt);
-      setToken(jwt);
-      setUserEmail(decoded.sub);
-      setUserRole(role);
-      return role;
+      decoded = jwtDecode<JwtPayload>(jwt);
     } catch {
       localStorage.removeItem("token");
-      return "USER";
+      throw new Error("The server returned a token we couldn't read.");
     }
+
+    if (decoded.exp * 1000 < Date.now()) {
+      localStorage.removeItem("token");
+      throw new Error("That session has expired. Please sign in again.");
+    }
+
+    const role: Role = (decoded.role as Role) ?? "USER";
+    localStorage.setItem("token", jwt);
+    setToken(jwt);
+    setUserEmail(decoded.sub);
+    setUserRole(role);
+    return role;
   }, []);
 
   // ── On mount: rehydrate from localStorage ──
   useEffect(() => {
     const stored = localStorage.getItem("token");
     if (stored) {
-      applyToken(stored);
+      try {
+        applyToken(stored);
+      } catch {
+        // An expired or malformed stored token is an ordinary way to arrive
+        // here, not an error worth surfacing — just start logged out.
+      }
     }
     setIsLoading(false);
   }, [applyToken]);

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { getApiErrorMessage } from "../../utils/apiError";
 import type { RegisterRequest } from "../../types/auth";
 
 export default function RegisterPage() {
@@ -26,8 +27,8 @@ export default function RegisterPage() {
     try {
       await register(form);
       navigate("/");
-    } catch {
-      setError("Registration failed. Please try again.");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Registration failed. Please try again."));
     } finally {
       setIsLoading(false);
     }
