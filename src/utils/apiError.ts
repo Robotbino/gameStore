@@ -9,9 +9,15 @@ import axios from "axios";
  */
 export function getApiErrorMessage(error: unknown, fallback: string): string {
   if (axios.isAxiosError(error)) {
-    // No response at all: the request never reached the backend.
+    // No response the browser was willing to hand us. A stopped backend is the
+    // obvious cause, but a CORS rejection looks identical from here — and the
+    // backend allowlists only http://localhost:5173, so a dev server that
+    // drifted to 5174 lands in this branch with the API perfectly healthy.
     if (!error.response) {
-      return "Couldn't reach the server. Is the backend running on port 8181?";
+      return (
+        "Couldn't reach the server. Check the backend is running on port 8181, " +
+        "and that this page is on http://localhost:5173 (the only origin it accepts)."
+      );
     }
 
     const data: unknown = error.response.data;
