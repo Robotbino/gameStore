@@ -1,0 +1,686 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>External Catalog Architecture — Game Store</title>
+
+<style>
+  /* ============================================================
+     Tokens. Components style through these only — never inside a
+     media query — so the theme toggle can override in both
+     directions without touching component rules.
+     ============================================================ */
+  :root {
+    --bg:        #f6f7fb;
+    --surface:   #ffffff;
+    --surface-2: #f0f2f8;
+    --line:      #dde1ec;
+    --line-soft: #e8ebf3;
+    --ink:       #161a24;
+    --ink-soft:  #4d5670;
+    --ink-faint: #79839c;
+
+    --indigo:  #5546e8;
+    --emerald: #0a7d55;
+    --sky:     #0369a1;
+    --amber:   #b45309;
+    --rose:    #d1344f;
+
+    --indigo-wash:  rgba(85,70,232,.07);
+    --emerald-wash: rgba(10,125,85,.07);
+    --sky-wash:     rgba(3,105,161,.07);
+    --amber-wash:   rgba(180,83,9,.07);
+    --rose-wash:    rgba(209,52,79,.07);
+
+    --glow-a: rgba(85,70,232,.10);
+    --glow-b: rgba(10,125,85,.07);
+
+    --radius: 12px;
+    --maxw: 1080px;
+
+    --mono: ui-monospace, "Cascadia Code", "SF Mono", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, "Segoe UI Variable Text", "Segoe UI",
+            -apple-system, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:        #0d1016;
+      --surface:   #151a24;
+      --surface-2: #1b2130;
+      --line:      #262d3d;
+      --line-soft: #1f2532;
+      --ink:       #d6dbe7;
+      --ink-soft:  #98a1b5;
+      --ink-faint: #6b7488;
+
+      --indigo:  #8b7dff;
+      --emerald: #34d399;
+      --sky:     #38bdf8;
+      --amber:   #f5a623;
+      --rose:    #f0637a;
+
+      --indigo-wash:  rgba(139,125,255,.10);
+      --emerald-wash: rgba(52,211,153,.09);
+      --sky-wash:     rgba(56,189,248,.09);
+      --amber-wash:   rgba(245,166,35,.09);
+      --rose-wash:    rgba(240,99,122,.09);
+
+      --glow-a: rgba(109,94,252,.16);
+      --glow-b: rgba(52,211,153,.09);
+    }
+  }
+
+  /* Viewer toggle wins over the OS preference, both directions. */
+  :root[data-theme="light"] {
+    --bg: #f6f7fb; --surface: #ffffff; --surface-2: #f0f2f8;
+    --line: #dde1ec; --line-soft: #e8ebf3;
+    --ink: #161a24; --ink-soft: #4d5670; --ink-faint: #79839c;
+    --indigo: #5546e8; --emerald: #0a7d55; --sky: #0369a1;
+    --amber: #b45309; --rose: #d1344f;
+    --indigo-wash: rgba(85,70,232,.07); --emerald-wash: rgba(10,125,85,.07);
+    --sky-wash: rgba(3,105,161,.07); --amber-wash: rgba(180,83,9,.07);
+    --rose-wash: rgba(209,52,79,.07);
+    --glow-a: rgba(85,70,232,.10); --glow-b: rgba(10,125,85,.07);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1016; --surface: #151a24; --surface-2: #1b2130;
+    --line: #262d3d; --line-soft: #1f2532;
+    --ink: #d6dbe7; --ink-soft: #98a1b5; --ink-faint: #6b7488;
+    --indigo: #8b7dff; --emerald: #34d399; --sky: #38bdf8;
+    --amber: #f5a623; --rose: #f0637a;
+    --indigo-wash: rgba(139,125,255,.10); --emerald-wash: rgba(52,211,153,.09);
+    --sky-wash: rgba(56,189,248,.09); --amber-wash: rgba(245,166,35,.09);
+    --rose-wash: rgba(240,99,122,.09);
+    --glow-a: rgba(109,94,252,.16); --glow-b: rgba(52,211,153,.09);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1100px 520px at 82% -8%, var(--glow-a), transparent 60%),
+      radial-gradient(760px 420px at 6% 108%, var(--glow-b), transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+  code {
+    font-family: var(--mono); font-size: .875em;
+    background: var(--surface-2); border: 1px solid var(--line-soft);
+    border-radius: 4px; padding: .08em .34em;
+  }
+  a { color: var(--indigo); }
+  a:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--indigo); outline-offset: 3px; border-radius: 3px;
+  }
+
+  /* ── Header ── */
+  header { border-bottom: 1px solid var(--line); padding: 72px 0 44px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--indigo); margin: 0 0 20px;
+  }
+  h1 {
+    font-family: var(--sans); font-weight: 700;
+    font-size: clamp(2.05rem, 5vw, 3.3rem); line-height: 1.04;
+    letter-spacing: -.032em; text-wrap: balance; margin: 0 0 20px;
+  }
+  h1 .sub { color: var(--ink-soft); font-weight: 500; letter-spacing: -.02em; }
+  .lede { max-width: 63ch; color: var(--ink-soft); font-size: 1.06rem; margin: 0 0 28px; }
+  .stack { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft);
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 5px 12px;
+  }
+  .chip b { color: var(--indigo); font-weight: 500; }
+  .chip.is-ext b { color: var(--sky); }
+
+  /* ── Sections ── */
+  section { padding: 60px 0; border-bottom: 1px solid var(--line); }
+  .kicker {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--ink-faint);
+    display: flex; align-items: center; gap: 12px; margin: 0 0 10px;
+  }
+  .kicker::before { content: ""; width: 26px; height: 1px; background: var(--indigo); }
+  h2 {
+    font-weight: 650; font-size: clamp(1.45rem, 3vw, 2rem);
+    letter-spacing: -.024em; text-wrap: balance; margin: 0 0 12px;
+  }
+  h3 { font-weight: 650; font-size: 1.06rem; margin: 0; letter-spacing: -.014em; }
+  .section-lede { color: var(--ink-soft); max-width: 64ch; margin: 0 0 34px; }
+
+  /* ── Tier map ── */
+  .scroller { overflow-x: auto; padding-bottom: 4px; }
+  .map {
+    display: grid; grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: stretch; min-width: 760px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 20px;
+  }
+  .tier {
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--surface-2); padding: 15px 14px 17px;
+    display: flex; flex-direction: column; gap: 9px; min-width: 0;
+  }
+  .tier-head {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--ink-faint);
+    display: flex; align-items: center; gap: 7px;
+    padding-bottom: 9px; border-bottom: 1px solid var(--line);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .d-indigo  { background: var(--indigo); }
+  .d-amber   { background: var(--amber); }
+  .d-sky     { background: var(--sky); }
+  .d-emerald { background: var(--emerald); }
+
+  .node {
+    border: 1px solid var(--line); border-left: 2px solid var(--ink-faint);
+    border-radius: 7px; background: var(--surface); padding: 9px 11px;
+  }
+  .node .n-title { font-weight: 650; font-size: .89rem; letter-spacing: -.012em; display: block; }
+  .node .n-sub {
+    font-family: var(--mono); font-size: 10px; color: var(--ink-faint);
+    display: block; margin-top: 4px; line-height: 1.5;
+  }
+  .node.is-core    { border-left-color: var(--indigo);  background: var(--indigo-wash); }
+  .node.is-core .n-title    { color: var(--indigo); }
+  .node.is-new     { border-left-color: var(--emerald); background: var(--emerald-wash); }
+  .node.is-new .n-title     { color: var(--emerald); }
+  .node.is-ext     { border-left-color: var(--sky);     background: var(--sky-wash); }
+  .node.is-ext .n-title     { color: var(--sky); }
+  .node.is-auth    { border-left-color: var(--amber);   background: var(--amber-wash); }
+  .node.is-auth .n-title    { color: var(--amber); }
+
+  .link {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 6px; padding: 0 12px; min-width: 82px;
+  }
+  .link .arrow { font-family: var(--mono); font-size: 17px; line-height: 1; color: var(--ink-faint); }
+  .link .lbl {
+    font-family: var(--mono); font-size: 9px; letter-spacing: .06em;
+    color: var(--ink-faint); text-align: center; line-height: 1.45; text-transform: uppercase;
+  }
+  .link.is-auth .arrow, .link.is-auth .lbl { color: var(--amber); }
+  .link.is-ext  .arrow, .link.is-ext  .lbl { color: var(--sky); }
+
+  /* ── Comparison panels ── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .panel {
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--surface); padding: 22px 20px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .panel.bad  { border-color: color-mix(in srgb, var(--rose) 34%, var(--line)); }
+  .panel.good { border-color: color-mix(in srgb, var(--emerald) 34%, var(--line)); }
+  .panel-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .verdict {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 5px;
+  }
+  .verdict.bad  { color: var(--rose);    border: 1px solid color-mix(in srgb, var(--rose) 40%, transparent);    background: var(--rose-wash); }
+  .verdict.good { color: var(--emerald); border: 1px solid color-mix(in srgb, var(--emerald) 40%, transparent); background: var(--emerald-wash); }
+  .panel p { margin: 0; color: var(--ink-soft); font-size: .93rem; }
+
+  /* Row strips — deliberately echo database rows. */
+  .rows {
+    display: flex; flex-direction: column;
+    font-family: var(--mono); font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+  }
+  .row {
+    padding: 8px 11px; display: flex; justify-content: space-between;
+    align-items: center; gap: 12px; background: var(--surface-2);
+  }
+  .row + .row { border-top: 1px solid var(--line); }
+  .row .k { color: var(--ink-soft); }
+  .row .v { color: var(--ink-faint); text-align: right; }
+  .row.hl-bad  { background: var(--rose-wash); }
+  .row.hl-bad .k,  .row.hl-bad .v  { color: var(--rose); }
+  .row.hl-good { background: var(--emerald-wash); }
+  .row.hl-good .k, .row.hl-good .v { color: var(--emerald); }
+  .fk-note {
+    font-family: var(--mono); font-size: 10.5px; color: var(--ink-faint);
+    display: flex; align-items: center; gap: 8px; margin: 0;
+  }
+
+  /* ── Read-path ladder (ordered: cheapest first) ── */
+  .ladder { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .rung {
+    border: 1px solid var(--line); background: var(--surface);
+    padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .rung:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+  .rung:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
+  .rung + .rung { border-left: none; }
+  .rung .tierno {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--ink-faint);
+  }
+  .rung p { margin: 0; color: var(--ink-soft); font-size: .9rem; }
+  .rung .hit {
+    font-family: var(--mono); font-size: 10.5px; margin-top: auto;
+    padding-top: 10px; border-top: 1px solid var(--line);
+  }
+  .rung.t1 .hit { color: var(--emerald); }
+  .rung.t2 .hit { color: var(--indigo); }
+  .rung.t3 .hit { color: var(--sky); }
+
+  /* ── Walkthrough (genuine sequence, so numbering earns its place) ── */
+  .steps { display: flex; flex-direction: column; counter-reset: s; }
+  .step {
+    display: grid; grid-template-columns: 30px 1fr; gap: 16px;
+    border: 1px solid var(--line); background: var(--surface);
+    padding: 15px 18px; align-items: start;
+  }
+  .step:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+  .step:last-child  { border-radius: 0 0 var(--radius) var(--radius); }
+  .step + .step { border-top: none; }
+  .step .idx {
+    counter-increment: s; font-family: var(--mono); font-size: 11.5px;
+    color: var(--ink-faint); padding-top: 3px; font-variant-numeric: tabular-nums;
+  }
+  .step .idx::before { content: counter(s, decimal-leading-zero); }
+  .step .body { min-width: 0; }
+  .step .body b { font-weight: 650; font-size: .95rem; display: block; margin-bottom: 3px; letter-spacing: -.012em; }
+  .step .body p { margin: 0; color: var(--ink-soft); font-size: .92rem; }
+  .step.pivot { background: var(--emerald-wash); border-color: color-mix(in srgb, var(--emerald) 30%, var(--line)); }
+  .step.pivot .idx { color: var(--emerald); }
+  .step.pivot + .step { border-top: 1px solid var(--line); }
+
+  /* ── Misc ── */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 18px; margin: 22px 0 0;
+    font-size: 13px; color: var(--ink-soft);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .swatch { width: 13px; height: 13px; border-radius: 4px; border: 1px solid; }
+  .sw-core { background: var(--indigo-wash);  border-color: var(--indigo); }
+  .sw-new  { background: var(--emerald-wash); border-color: var(--emerald); }
+  .sw-auth { background: var(--amber-wash);   border-color: var(--amber); }
+  .sw-ext  { background: var(--sky-wash);     border-color: var(--sky); }
+  .caption {
+    font-family: var(--mono); font-size: 11.5px; color: var(--ink-faint);
+    margin: 16px 2px 0; line-height: 1.65; max-width: 76ch;
+  }
+  .callout {
+    border: 1px solid var(--line); border-left: 3px solid var(--indigo);
+    background: var(--indigo-wash); border-radius: 10px;
+    padding: 16px 18px; margin: 26px 0 0; color: var(--ink-soft); font-size: .95rem;
+  }
+  .callout b { color: var(--ink); font-weight: 650; }
+  footer { padding: 40px 0 76px; color: var(--ink-faint); font-size: 12.5px; }
+  footer p { margin: 0 0 8px; max-width: 72ch; }
+
+  @media (max-width: 860px) {
+    .compare, .ladder { grid-template-columns: 1fr; }
+    .rung:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+    .rung:last-child  { border-radius: 0 0 var(--radius) var(--radius); }
+    .rung + .rung { border-left: 1px solid var(--line); border-top: none; }
+    section { padding: 46px 0; }
+    header { padding: 52px 0 36px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Architecture Brief · Catalog Pivot</p>
+    <h1>External Catalog <span class="sub">— owning commerce over data you don’t own</span></h1>
+    <p class="lede">
+      The product catalog moves to RAWG’s live API. Auth, carts, orders and pricing stay in MySQL.
+      That split raises one hard question — <em>how do you foreign-key an order line to a product
+      that lives on someone else’s server?</em> This is the answer.
+    </p>
+    <div class="stack">
+      <span class="chip">React · <b>Vite</b> · TypeScript</span>
+      <span class="chip">Spring Boot <b>:8181</b></span>
+      <span class="chip">Spring Security · <b>JWT</b></span>
+      <span class="chip">Caffeine <b>cache</b></span>
+      <span class="chip">JPA / Hibernate · <b>Flyway</b></span>
+      <span class="chip">MySQL</span>
+      <span class="chip is-ext">RAWG <b>API</b></span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">The System</p>
+    <h2>Four tiers, one owner of truth</h2>
+    <p class="section-lede">
+      RAWG is treated as a <em>source</em>, never as the system of record. Everything the store
+      actually sells — price, ownership, order history — is written and owned locally.
+    </p>
+
+    <div class="scroller">
+      <div class="map">
+        <div class="tier">
+          <div class="tier-head"><span class="dot d-indigo"></span>Client · React SPA</div>
+          <div class="node is-core">
+            <span class="n-title">Browse / Search</span>
+            <span class="n-sub">TanStack Query<br />?search= &amp; page= in URL</span>
+          </div>
+          <div class="node is-new">
+            <span class="n-title">Cart &amp; Checkout</span>
+            <span class="n-sub">useCart() — server cart,<br />no CartContext</span>
+          </div>
+          <div class="node is-auth">
+            <span class="n-title">AuthContext</span>
+            <span class="n-sub">jwt-decode · localStorage<br />client state only</span>
+          </div>
+        </div>
+
+        <div class="link is-auth">
+          <span class="lbl">REST<br />+ Bearer</span>
+          <span class="arrow" aria-hidden="true">⇄</span>
+          <span class="lbl">JSON</span>
+        </div>
+
+        <div class="tier">
+          <div class="tier-head"><span class="dot d-amber"></span>Spring Boot API</div>
+          <div class="node is-auth">
+            <span class="n-title">JWT Filter Chain</span>
+            <span class="n-sub">/api/catalog/** → permitAll<br />/api/cart, /checkout → auth<br />/api/admin/** → ROLE_ADMIN</span>
+          </div>
+          <div class="node is-new">
+            <span class="n-title">CatalogService</span>
+            <span class="n-sub">read-through +<br />batch materialize</span>
+          </div>
+          <div class="node is-new">
+            <span class="n-title">CatalogProvider</span>
+            <span class="n-sub">interface · Rawg | Fixture<br />IGDB drops in later</span>
+          </div>
+          <div class="node is-core">
+            <span class="n-title">Cart · Checkout · Orders</span>
+            <span class="n-sub">@Transactional<br />snapshots price at write</span>
+          </div>
+        </div>
+
+        <div class="link is-ext">
+          <span class="lbl">on cache<br />miss only</span>
+          <span class="arrow" aria-hidden="true">→</span>
+          <span class="lbl">2s / 4s<br />timeout</span>
+        </div>
+
+        <div class="tier">
+          <div class="tier-head"><span class="dot d-sky"></span>Data &amp; Third Party</div>
+          <div class="node is-new">
+            <span class="n-title">Caffeine</span>
+            <span class="n-sub">search 10 min · detail 24 h<br />in-process, dies on restart</span>
+          </div>
+          <div class="node is-ext">
+            <span class="n-title">RAWG API</span>
+            <span class="n-sub">~880k games · no prices<br />20k req / month</span>
+          </div>
+          <div class="node is-core">
+            <span class="n-title">MySQL — games</span>
+            <span class="n-sub">shadow rows + LOCAL rows<br />UNIQUE(source, external_id)</span>
+          </div>
+          <div class="node is-core">
+            <span class="n-title">MySQL — commerce</span>
+            <span class="n-sub">users · carts · cart_items<br />orders · order_items</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span><i class="swatch sw-core"></i> Exists today, expanded</span>
+      <span><i class="swatch sw-new"></i> Net-new in this pivot</span>
+      <span><i class="swatch sw-auth"></i> Auth boundary</span>
+      <span><i class="swatch sw-ext"></i> Third-party boundary</span>
+    </div>
+
+    <p class="caption">
+      The third tier is the whole trick: RAWG and MySQL sit side by side, and MySQL keeps a
+      lazily-populated shadow row for every game anyone has ever looked at.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">The Core Problem</p>
+    <h2>You cannot foreign-key across a network boundary</h2>
+    <p class="section-lede">
+      An <code>order_items</code> row needs to point at a product. If the product only exists as
+      RAWG id <code>3328</code>, the database can enforce nothing — and purchase history is one
+      upstream edit away from lying to the customer.
+    </p>
+
+    <div class="compare">
+      <article class="panel bad">
+        <div class="panel-head">
+          <h3>Naive passthrough</h3>
+          <span class="verdict bad">Rejected</span>
+        </div>
+        <p>
+          Store the remote id as a loose column and resolve it at render time. Nothing is enforced,
+          every cart page becomes N remote calls, and joins move into application loops.
+        </p>
+        <div class="rows">
+          <div class="row"><span class="k">order_items.id</span><span class="v">BIGINT PK</span></div>
+          <div class="row hl-bad"><span class="k">rawg_id</span><span class="v">3328 — no FK</span></div>
+          <div class="row hl-bad"><span class="k">title</span><span class="v">fetched live → may change</span></div>
+          <div class="row hl-bad"><span class="k">price</span><span class="v">recomputed → receipt drifts</span></div>
+        </div>
+        <p class="fk-note"><span class="dot" style="background: var(--rose)"></span> Integrity: none. History: mutable.</p>
+      </article>
+
+      <article class="panel good">
+        <div class="panel-head">
+          <h3>Lazy shadow table + snapshot</h3>
+          <span class="verdict good">Chosen</span>
+        </div>
+        <p>
+          A local <code>games</code> row is upserted the first time a title appears in any search
+          result. The FK is real and database-enforced; the snapshot preserves what was actually sold.
+        </p>
+        <div class="rows">
+          <div class="row"><span class="k">order_items.id</span><span class="v">BIGINT PK</span></div>
+          <div class="row hl-good"><span class="k">game_id</span><span class="v">→ games.id · FK ✓</span></div>
+          <div class="row hl-good"><span class="k">title_snapshot</span><span class="v">frozen at checkout</span></div>
+          <div class="row hl-good"><span class="k">unit_price</span><span class="v">frozen at checkout</span></div>
+        </div>
+        <p class="fk-note"><span class="dot d-emerald"></span> FK for integrity · snapshot for truth.</p>
+      </article>
+    </div>
+
+    <div class="callout">
+      <b>Why both, and not one or the other.</b> The foreign key keeps joins and referential
+      integrity honest — “how many users own this game?” stays a single query. The snapshot keeps
+      history immutable, because a shadow row is a <em>cache</em>, and caches are allowed to change:
+      RAWG retitles games, the price formula will eventually be retuned, titles get delisted. Join
+      live to <code>games</code> and a customer’s March receipt silently rewrites itself.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">Identity</p>
+    <h2>Composite keys, and nothing is ever deleted</h2>
+    <p class="section-lede">
+      Two constraints on the <code>games</code> table carry most of the design’s weight.
+    </p>
+
+    <div class="compare">
+      <article class="panel good">
+        <div class="panel-head"><h3>UNIQUE (source, external_id)</h3></div>
+        <p>
+          Never <code>external_id</code> alone — RAWG id 3498 and IGDB id 3498 are different games.
+          Hand-entered rows carry <code>source='LOCAL'</code> with a null external id, and because
+          MySQL treats nulls as distinct in a unique index, unlimited local rows coexist. This single
+          constraint is what makes “add IGDB later” real rather than aspirational.
+        </p>
+        <div class="rows">
+          <div class="row"><span class="k">RAWG · 3328</span><span class="v">The Witcher 3</span></div>
+          <div class="row"><span class="k">IGDB · 3328</span><span class="v">a different game ✓</span></div>
+          <div class="row"><span class="k">LOCAL · NULL</span><span class="v">indie title, hand-added</span></div>
+          <div class="row"><span class="k">LOCAL · NULL</span><span class="v">also fine ✓</span></div>
+        </div>
+      </article>
+
+      <article class="panel good">
+        <div class="panel-head"><h3>status — flag, never DELETE</h3></div>
+        <p>
+          Deleting a shadow row would break the FK from every historical order containing it. When a
+          refresh 404s, the row is marked <code>UNAVAILABLE</code> instead: libraries still render it,
+          browse and search exclude it, and add-to-cart rejects it with a real message.
+        </p>
+        <div class="rows">
+          <div class="row hl-good"><span class="k">ACTIVE</span><span class="v">browse · search · buy</span></div>
+          <div class="row"><span class="k">UNAVAILABLE</span><span class="v">library only — FK intact</span></div>
+          <div class="row"><span class="k">cached_at</span><span class="v">refresh after 14 days</span></div>
+          <div class="row"><span class="k">price_overridden</span><span class="v">admin wins over formula</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">Read Path</p>
+    <h2>Three tiers, cheapest first</h2>
+    <p class="section-lede">
+      RAWG’s free tier allows 20 000 requests a month — roughly 660 a day. A single afternoon of
+      hot-reloading a search box would eat 500 of them. The ordering below is what makes that a
+      non-issue, and it is also what turns a RAWG outage into a banner instead of an error page.
+    </p>
+
+    <div class="ladder">
+      <div class="rung t1">
+        <span class="tierno">Tier 1 · in-process</span>
+        <h3>Caffeine</h3>
+        <p>Search 10 min, detail 24 h, genres 7 days. Annotated on the <em>provider</em>, not the
+          controller, so the internal materialization path is protected too.</p>
+        <span class="hit">Hit → ~0 ms, 0 quota</span>
+      </div>
+      <div class="rung t2">
+        <span class="tierno">Tier 2 · durable</span>
+        <h3>MySQL shadow row</h3>
+        <p>Survives restarts, which is what actually saves you in development. Serves reads while
+          <code>cached_at</code> is under 14 days old — and serves everything when RAWG is down.</p>
+        <span class="hit">Hit → one local query, 0 quota</span>
+      </div>
+      <div class="rung t3">
+        <span class="tierno">Tier 3 · remote</span>
+        <h3>RAWG API</h3>
+        <p>Reached only on a genuine miss, with explicit 2 s connect and 4 s read timeouts —
+          <code>RestClient</code>’s default factory has no read timeout at all.</p>
+        <span class="hit">Miss → 1 call, then batch-upserted</span>
+      </div>
+    </div>
+
+    <p class="caption">
+      Quota consumption scales with distinct games ever touched — a few thousand — not with RAWG’s
+      ~880 000 title catalog. A full nightly ETL would need ~22 000 requests per pass, exceeding the
+      entire monthly allowance in a single run.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">The Flow</p>
+    <h2>Search to receipt, end to end</h2>
+    <p class="section-lede">
+      Step 04 is the pivot the whole architecture turns on — the moment remote data acquires a local
+      primary key, and every downstream feature gets to be ordinary.
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="idx" aria-hidden="true"></span>
+        <div class="body">
+          <b>Guest searches “witcher”</b>
+          <p>React issues <code>GET /api/catalog/games?q=witcher&amp;page=1</code>. No token required —
+            the catalog is <code>permitAll</code>, so the store is browsable before signup.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="idx" aria-hidden="true"></span>
+        <div class="body">
+          <b>Cache ladder is walked</b>
+          <p>Caffeine miss, then no fresh shadow rows, so <code>RawgCatalogProvider</code> is called.
+            The response maps into provider-neutral <code>CatalogGame</code> records — RAWG’s own DTOs
+            never escape their package.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="idx" aria-hidden="true"></span>
+        <div class="body">
+          <b>Price is synthesized once</b>
+          <p>RAWG ships no prices. A deterministic formula derives one from metacritic score and
+            release age, then it is persisted and never recomputed — otherwise retuning the formula
+            would silently reprice everything sitting in customers’ carts.</p>
+        </div>
+      </div>
+      <div class="step pivot">
+        <span class="idx" aria-hidden="true"></span>
+        <div class="body">
+          <b>Batch upsert — remote data becomes local</b>
+          <p>All 40 results are matched against MySQL in <em>one</em> query keyed on
+            <code>(source, external_id)</code>, then inserted or refreshed via <code>saveAll</code>.
+            Every result now carries a local <code>Long id</code> — so routes, cart calls and foreign
+            keys need no provider-aware URL scheme at all.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="idx" aria-hidden="true"></span>
+        <div class="body">
+          <b>Add to cart</b>
+          <p><code>POST /api/cart/items</code> with a local id.
+            <code>UNIQUE(cart_id, game_id)</code> makes it idempotent, and there is no quantity column
+            — you cannot buy two copies of a digital licence.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="idx" aria-hidden="true"></span>
+        <div class="body">
+          <b>Checkout, inside one transaction</b>
+          <p>Reject empty carts, non-<code>ACTIVE</code> titles, and already-owned games; then write
+            <code>orders</code> and <code>order_items</code> with title, image and price snapshotted,
+            clear the cart, and award loyalty points.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="idx" aria-hidden="true"></span>
+        <div class="body">
+          <b>Library renders from owned rows</b>
+          <p><code>GET /api/library</code> runs a single projection over <code>order_items</code> —
+            not a walk over orders — so it stays one query regardless of purchase count.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <b>When RAWG is unreachable.</b> The provider returns a failure, the service falls back to
+      tier 2, and the response carries a degraded flag — a “showing cached results” banner rather
+      than a 500. After several consecutive failures a short circuit-breaker window stops calling out
+      entirely for 60 seconds. A store that degrades is a better store than one that errors.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>
+      Game data provided by <a href="https://rawg.io" target="_blank" rel="noopener">RAWG</a>.
+      Metadata is cached locally for performance; images are hotlinked, never re-hosted.
+    </p>
+    <p>
+      Companion to the current-state architecture brief. Prices are synthesized for demonstration
+      and do not represent real retail pricing.
+    </p>
+  </div>
+</footer>
