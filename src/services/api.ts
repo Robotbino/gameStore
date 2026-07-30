@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8181";
+// Vite inlines this at BUILD time, not runtime — a deployed bundle has the
+// value baked in, so it must be set before `npm run build`, not on the host.
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8181";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
