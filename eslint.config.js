@@ -9,7 +9,6 @@ export default defineConfig([
   globalIgnores([
     'dist',
     // Legacy components kept for reference; excluded from the app build too
-    'src/components/HomePage.tsx',
     'src/components/AboutGame.tsx',
     'src/components/MyButton.tsx',
   ]),
