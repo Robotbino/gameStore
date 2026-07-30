@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Game Store — Architecture</title>
@@ -1443,7 +1444,7 @@ flowchart TB
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script>
   mermaid.initialize({
-    startOnLoad: true,
+    startOnLoad: false,
     securityLevel: "loose",
     theme: "base",
     themeVariables: {
@@ -1470,6 +1471,25 @@ flowchart TB
       noteTextColor: "#d6dbe7"
     }
   });
+
+  // Mermaid cannot lay out a diagram inside a display:none container — it
+  // fails silently and stamps a misleading "Syntax error" bomb. So we render
+  // by hand: everything visible now, and each hidden flow tab the first time
+  // it is shown (see the tab handler below).
+  function renderMermaid(nodes) {
+    const pending = nodes.filter((n) => !n.dataset.processed);
+    if (pending.length && window.mermaid) {
+      window.mermaid.run({ nodes: pending });
+    }
+  }
+
+  // On load, render every diagram that is NOT inside a hidden flow panel.
+  renderMermaid(
+    [...document.querySelectorAll(".mermaid")].filter((n) => {
+      const panel = n.closest(".flow-panel");
+      return !panel || !panel.hidden;
+    })
+  );
 
   // ── Layer explorer ──────────────────────────────────────────────
   const layerBtns = document.querySelectorAll(".layer-btn");
@@ -1503,21 +1523,11 @@ flowchart TB
       panels.forEach((p) => {
         p.hidden = p.dataset.flowPanel !== key;
       });
-      // Re-render mermaid diagrams that were previously hidden (they render at
-      // 0-width otherwise). Cheap enough to just retrigger for the panel we
-      // just showed.
+      // The panel is now visible, so its diagram can finally be laid out.
+      // renderMermaid skips any node already processed, so this runs once.
       const active = document.querySelector(`.flow-panel[data-flow-panel="${key}"]`);
-      if (active && window.mermaid) {
-        const nodes = active.querySelectorAll(".mermaid");
-        nodes.forEach((n) => {
-          if (!n.dataset.rendered) {
-            // will render on next tick via observer, but nudge it
-            n.removeAttribute("data-processed");
-          }
-        });
-        try {
-          window.mermaid.run({ nodes: Array.from(nodes) });
-        } catch (_) { /* no-op */ }
+      if (active) {
+        renderMermaid([...active.querySelectorAll(".mermaid")]);
       }
     });
   });
