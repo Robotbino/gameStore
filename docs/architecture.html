@@ -1,30 +1,36 @@
+<!DOCTYPE html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Game Store — Architecture</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
 <style>
   :root {
-    /* neutrals — biased cool/indigo, not pure grey */
     --bg:        #0d1016;
     --panel:     #151a24;
     --panel-2:   #1b2130;
+    --panel-3:   #212838;
     --line:      #262d3d;
+    --line-2:    #333c52;
     --ink:       #d6dbe7;
     --ink-soft:  #98a1b5;
     --ink-faint: #6b7488;
-    /* accents */
-    --accent:    #6d5efc;  /* indigo — the product's voice */
+    --accent:    #6d5efc;
+    --accent-2:  #8b7dff;
     --accent-dim:#3a3570;
-    --new:       #34d399;  /* emerald — additions in the extended state */
+    --new:       #34d399;
     --new-dim:   #1f5745;
-    --auth:      #f5a623;  /* amber — the JWT / auth path */
+    --auth:      #f5a623;
+    --auth-dim:  #4a3a12;
     --danger:    #f0637a;
+    --danger-dim:#4a1d27;
+    --info:      #60a5fa;
     --radius: 14px;
-    --maxw: 1080px;
+    --radius-sm: 8px;
+    --maxw: 1140px;
     --mono: "JetBrains Mono", ui-monospace, monospace;
     --display: "Sora", system-ui, sans-serif;
     --body: "Public Sans", system-ui, sans-serif;
@@ -45,11 +51,46 @@
   }
   .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
 
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  code {
+    font-family: var(--mono);
+    font-size: .9em;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    padding: 1px 6px;
+    border-radius: 5px;
+    color: var(--ink);
+  }
+
+  /* ── Sticky nav ── */
+  .subnav {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(13,16,22,.82);
+    backdrop-filter: saturate(140%) blur(10px);
+    -webkit-backdrop-filter: saturate(140%) blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .subnav-inner {
+    max-width: var(--maxw); margin: 0 auto; padding: 10px 24px;
+    display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
+  }
+  .subnav-inner::-webkit-scrollbar { display: none; }
+  .subnav a {
+    font-family: var(--mono); font-size: 12px;
+    letter-spacing: .06em; text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 8px 12px; border-radius: 8px;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .subnav a:hover { color: var(--ink); background: var(--panel-2); }
+
   /* ── Header ── */
-  header {
+  header.hero {
     border-bottom: 1px solid var(--line);
     padding: 64px 0 40px;
-    position: relative;
   }
   .eyebrow {
     font-family: var(--mono);
@@ -70,7 +111,7 @@
   }
   h1 .sub { color: var(--ink-soft); font-weight: 500; }
   .lede {
-    max-width: 60ch;
+    max-width: 62ch;
     color: var(--ink-soft);
     font-size: 1.05rem;
     margin: 0 0 26px;
@@ -87,8 +128,28 @@
   }
   .chip b { color: var(--accent); font-weight: 500; }
 
+  .kpis {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 14px; margin: 34px 0 0;
+  }
+  .kpi {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+  }
+  .kpi .k {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--ink-faint);
+  }
+  .kpi .v {
+    font-family: var(--display); font-weight: 600; font-size: 1.35rem;
+    color: var(--ink); margin-top: 4px;
+  }
+  .kpi .v small { color: var(--ink-soft); font-weight: 500; font-size: .8rem; }
+
   /* ── Sections ── */
-  section { padding: 56px 0; border-bottom: 1px solid var(--line); }
+  section { padding: 64px 0; border-bottom: 1px solid var(--line); }
   .kicker {
     font-family: var(--mono);
     font-size: 12px;
@@ -108,7 +169,11 @@
     letter-spacing: -.015em;
     margin: 0 0 10px;
   }
-  .section-lede { color: var(--ink-soft); max-width: 62ch; margin: 0 0 34px; }
+  h3 {
+    font-family: var(--display); font-weight: 600;
+    font-size: 1.05rem; margin: 0 0 8px; letter-spacing: -.01em;
+  }
+  .section-lede { color: var(--ink-soft); max-width: 64ch; margin: 0 0 30px; }
 
   /* ── Feature cards ── */
   .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
@@ -150,7 +215,7 @@
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 10px;
+    padding: 14px;
     overflow-x: auto;
   }
   .diagram-shell .mermaid { text-align: center; min-width: 640px; }
@@ -167,40 +232,1075 @@
   .sw-base { background: var(--panel-2); }
   .sw-new  { background: var(--new-dim); border-color: var(--new); }
   .sw-chg  { background: var(--accent-dim); border-color: var(--accent); }
-  .sw-auth { background: #4a3a12; border-color: var(--auth); }
+  .sw-auth { background: var(--auth-dim); border-color: var(--auth); }
+  .sw-danger { background: var(--danger-dim); border-color: var(--danger); }
+
+  /* ── Interactive Layer Explorer ── */
+  .layer-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;
+    margin-bottom: 20px;
+  }
+  .layer-btn {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--line-2);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit; color: inherit;
+    transition: border-color .15s, background .15s, transform .15s;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .layer-btn:hover { background: var(--panel-2); transform: translateY(-1px); }
+  .layer-btn.active {
+    background: var(--panel-2);
+    border-left-color: var(--accent);
+  }
+  .layer-btn .label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--ink-faint);
+  }
+  .layer-btn.active .label { color: var(--accent); }
+  .layer-btn .title {
+    font-family: var(--display); font-weight: 600; font-size: 1.1rem;
+  }
+  .layer-btn .hint { color: var(--ink-soft); font-size: .88rem; }
+
+  .layer-detail {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    min-height: 220px;
+  }
+  .layer-detail[hidden] { display: none; }
+  .layer-detail h3 {
+    font-family: var(--display); font-size: 1.1rem; margin: 0 0 10px;
+    color: var(--accent-2);
+  }
+  .layer-detail p { color: var(--ink-soft); margin: 0 0 14px; }
+  .layer-detail .files {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+  }
+  .file-row {
+    font-family: var(--mono); font-size: 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 10px;
+    display: flex; align-items: center; gap: 10px;
+    color: var(--ink-soft);
+  }
+  .file-row .path { color: var(--ink); }
+  .file-row .role { color: var(--ink-faint); margin-left: auto; }
+
+  /* ── Tabs (Flow walkthroughs) ── */
+  .tabs {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 6px;
+    margin-bottom: 18px;
+  }
+  .tab {
+    flex: 1 1 auto;
+    background: transparent; border: 0; cursor: pointer;
+    font-family: var(--mono); font-size: 12px; letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 10px 14px;
+    border-radius: 8px;
+    transition: background .15s, color .15s;
+    text-align: center;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.active {
+    background: var(--panel-2);
+    color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--line-2);
+  }
+  .tab .step { color: var(--accent); font-weight: 600; margin-right: 6px; }
+
+  .flow-panel[hidden] { display: none; }
+  .flow-panel {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 18px;
+  }
+  .flow-panel > .diagram-shell { margin: 0; }
+
+  .steps {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 6px;
+    max-height: 640px;
+    overflow-y: auto;
+  }
+  .step-item {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px 14px;
+    margin: 6px;
+  }
+  .step-item + .step-item { margin-top: 8px; }
+  .step-item .n {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+    color: var(--accent); text-transform: uppercase;
+  }
+  .step-item .title {
+    font-family: var(--display); font-weight: 600; font-size: 1rem;
+    margin: 4px 0 6px;
+  }
+  .step-item .body { color: var(--ink-soft); font-size: .92rem; margin: 0 0 8px; }
+  .step-item pre {
+    margin: 8px 0 0;
+    background: #0a0d13;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: var(--mono); font-size: 12px; line-height: 1.5;
+    color: var(--ink);
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .step-item pre .k { color: #a4b1c8; }
+  .step-item pre .s { color: #7dd3fc; }
+  .step-item pre .n2 { color: #f0abfc; }
+  .step-item pre .c { color: var(--ink-faint); font-style: italic; }
+  .step-item .file {
+    font-family: var(--mono); font-size: 11px; color: var(--ink-faint);
+    margin-top: 6px;
+  }
+  .step-item .file a { color: var(--ink-soft); }
+
+  /* colored step variants */
+  .step-item.auth   { border-left-color: var(--auth); }
+  .step-item.auth .n { color: var(--auth); }
+  .step-item.data   { border-left-color: var(--new); }
+  .step-item.data .n { color: var(--new); }
+  .step-item.error  { border-left-color: var(--danger); }
+  .step-item.error .n { color: var(--danger); }
+
+  /* ── Request anatomy ── */
+  .anatomy {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+  }
+  .req-block {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    overflow-x: auto;
+  }
+  .req-block h4 {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--ink-faint);
+    margin: 0 0 12px;
+  }
+  .req-block pre {
+    margin: 0;
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.6;
+    background: transparent;
+    white-space: pre;
+  }
+  .anno {
+    border-bottom: 1px dashed var(--accent);
+    cursor: help;
+    position: relative;
+  }
+  .anno[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: 0; top: calc(100% + 8px);
+    background: #0a0d13;
+    color: var(--ink);
+    border: 1px solid var(--line-2);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-family: var(--body);
+    font-size: 12px; line-height: 1.5;
+    width: max-content; max-width: 320px;
+    z-index: 30;
+    box-shadow: 0 10px 24px rgba(0,0,0,.5);
+  }
+  .anno.auth  { border-color: var(--auth); }
+  .anno.data  { border-color: var(--new); }
+  .anno.err   { border-color: var(--danger); }
+
+  /* ── Data model cards ── */
+  .entities {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    margin-top: 20px;
+  }
+  .entity {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .entity h4 {
+    font-family: var(--display); font-weight: 600; font-size: 1rem;
+    margin: 0 0 4px; letter-spacing: -.01em;
+  }
+  .entity .desc { color: var(--ink-soft); font-size: .85rem; margin: 0 0 12px; }
+  .entity table {
+    width: 100%; border-collapse: collapse;
+    font-family: var(--mono); font-size: 12px;
+  }
+  .entity td {
+    padding: 4px 0; border-top: 1px solid var(--line);
+    color: var(--ink-soft);
+  }
+  .entity tr:first-child td { border-top: 0; }
+  .entity td.name { color: var(--ink); }
+  .entity td.type { color: var(--accent-2); text-align: right; }
+
+  /* ── Failure envelope ── */
+  .failure-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+    margin-top: 20px;
+  }
+  .failure {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--danger);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .failure h4 {
+    font-family: var(--display); font-size: .98rem; margin: 0 0 4px;
+    color: var(--ink);
+  }
+  .failure .code {
+    font-family: var(--mono); font-size: 11px; color: var(--danger);
+    letter-spacing: .06em;
+  }
+  .failure p { color: var(--ink-soft); font-size: .9rem; margin: 8px 0 0; }
+  .failure.warn { border-left-color: var(--auth); }
+  .failure.warn .code { color: var(--auth); }
+  .failure.info { border-left-color: var(--info); }
+  .failure.info .code { color: var(--info); }
+
+  /* ── Accordion ── */
+  details.acc {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin: 8px 0;
+  }
+  details.acc[open] { background: var(--panel-2); }
+  details.acc summary {
+    cursor: pointer;
+    font-family: var(--display); font-weight: 600;
+    color: var(--ink);
+    list-style: none;
+    display: flex; align-items: center; gap: 10px;
+  }
+  details.acc summary::before {
+    content: "+"; font-family: var(--mono); color: var(--accent);
+    font-size: 18px; line-height: 1;
+    transition: transform .15s;
+  }
+  details.acc[open] summary::before { content: "−"; }
+  details.acc .content {
+    color: var(--ink-soft); margin-top: 10px;
+    padding-left: 28px;
+  }
 
   footer { padding: 40px 0 72px; color: var(--ink-faint); font-size: 13px; }
   footer code { font-family: var(--mono); color: var(--ink-soft); }
 
-  @media (max-width: 760px) {
-    .cards { grid-template-columns: 1fr; }
+  @media (max-width: 900px) {
+    .cards, .layer-grid, .entities, .failure-grid { grid-template-columns: 1fr; }
+    .flow-panel { grid-template-columns: 1fr; }
+    .anatomy { grid-template-columns: 1fr; }
+    .kpis { grid-template-columns: repeat(2, 1fr); }
     section { padding: 44px 0; }
   }
 </style>
 
-<header>
+<nav class="subnav">
+  <div class="subnav-inner">
+    <a href="#overview">Overview</a>
+    <a href="#layers">Layers</a>
+    <a href="#flows">Data Flows</a>
+    <a href="#auth-state">Auth State</a>
+    <a href="#model">Data Model</a>
+    <a href="#anatomy">Request Anatomy</a>
+    <a href="#failure">Failure Modes</a>
+    <a href="#features">Increment</a>
+    <a href="#extended">Extended</a>
+  </div>
+</nav>
+
+<header class="hero">
   <div class="wrap">
     <p class="eyebrow">Full-Stack Architecture Brief</p>
     <h1>Game Store <span class="sub">— React + Spring Boot commerce platform</span></h1>
     <p class="lede">
       A stateless, JWT-secured e-commerce stack: a TypeScript React SPA talking to a
       Spring Boot REST API over role-based access control, persisted in MySQL via JPA/Hibernate.
-      Below: the system as it stands today, and precisely where three lean MVP features plug in.
+      This document walks the system top-to-bottom — components, requests, state, and failures — with
+      interactive layers, sequence diagrams, and traceable code paths.
     </p>
     <div class="stack">
-      <span class="chip">React · <b>Vite</b> · TypeScript</span>
+      <span class="chip">React · <b>Vite 5173</b> · TypeScript</span>
       <span class="chip">Chakra UI</span>
       <span class="chip">Spring Boot <b>:8181</b></span>
       <span class="chip">Spring Security · <b>JWT</b></span>
       <span class="chip">JPA / Hibernate</span>
       <span class="chip">MySQL</span>
     </div>
+
+    <div class="kpis">
+      <div class="kpi">
+        <div class="k">Session</div>
+        <div class="v">Stateless <small>JWT · localStorage</small></div>
+      </div>
+      <div class="kpi">
+        <div class="k">Auth Model</div>
+        <div class="v">RBAC <small>USER · ADMIN</small></div>
+      </div>
+      <div class="kpi">
+        <div class="k">API Contract</div>
+        <div class="v">REST / JSON <small>axios ↔ Spring MVC</small></div>
+      </div>
+      <div class="kpi">
+        <div class="k">Persistence</div>
+        <div class="v">JPA <small>3 entities · MySQL</small></div>
+      </div>
+    </div>
   </div>
 </header>
 
+<!-- ─────────────────────────── OVERVIEW ─────────────────────────── -->
+<section id="overview">
+  <div class="wrap">
+    <p class="kicker">§ 1 · System Overview</p>
+    <h2>The whole system on one page</h2>
+    <p class="section-lede">
+      Three tiers, one boundary. The browser holds the user (and the token). The Spring Boot API
+      holds the rules. MySQL holds the data. Every write crosses the amber auth boundary; every
+      byte on the wire is JSON.
+    </p>
+    <div class="diagram-shell">
+      <pre class="mermaid">
+flowchart TB
+  subgraph Client["🌐 React SPA — Vite · TypeScript · Chakra UI"]
+    direction TB
+    UI["Pages &amp; Components<br/>Browse · GameDetails · Library · Admin"]
+    Ctx["AuthContext<br/>decodes JWT · exposes role"]
+    Axios["axios instance<br/>request + response interceptors"]
+    LS[("localStorage<br/>JWT token")]
+    UI --> Ctx
+    UI --> Axios
+    Ctx <--> LS
+    Axios -->|reads Bearer token| LS
+  end
+
+  subgraph API["⚙️ Spring Boot REST API :8181"]
+    direction TB
+    Filter["JWTAuthenticationFilter"]
+    Chain["SecurityFilterChain<br/>stateless · role-based"]
+    AuthC["/api/v2/auth/**<br/>public"]
+    GamesC["/games<br/>GET public · writes ADMIN"]
+    UsersC["/users<br/>ADMIN only"]
+    Svc["Service layer"]
+    Repo["JPA Repositories · Hibernate"]
+    Filter --> Chain
+    Chain --> AuthC
+    Chain --> GamesC
+    Chain --> UsersC
+    AuthC --> Svc
+    GamesC --> Svc
+    UsersC --> Svc
+    Svc --> Repo
+  end
+
+  DB[("🗄️ MySQL<br/>games · users · purchases")]
+
+  Axios -->|"HTTP · Authorization: Bearer JWT"| Filter
+  AuthC -.->|issues signed JWT| Axios
+  Repo --> DB
+
+  classDef auth stroke:#f5a623,stroke-width:2px;
+  class Filter,AuthC auth;
+      </pre>
+    </div>
+    <p class="caption">Diagram 1 · the request path as it stands today — amber marks the JWT / auth boundary.</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────── LAYERS ─────────────────────────── -->
+<section id="layers">
+  <div class="wrap">
+    <p class="kicker">§ 2 · Interactive Layer Explorer</p>
+    <h2>What lives where</h2>
+    <p class="section-lede">
+      Click a layer to see the files that live inside it and the job each one does.
+      Every request crosses all three, in this order — the browser sends, the API validates and orchestrates,
+      the database answers.
+    </p>
+
+    <div class="layer-grid" role="tablist" aria-label="Architecture layers">
+      <button class="layer-btn active" data-layer="client" role="tab" aria-selected="true">
+        <span class="label">Layer 1 · Presentation</span>
+        <span class="title">React SPA</span>
+        <span class="hint">User-facing UI, routing, local auth state, HTTP client.</span>
+      </button>
+      <button class="layer-btn" data-layer="api" role="tab" aria-selected="false">
+        <span class="label">Layer 2 · Application</span>
+        <span class="title">Spring Boot API</span>
+        <span class="hint">Security filter chain, controllers, services, exception mapping.</span>
+      </button>
+      <button class="layer-btn" data-layer="db" role="tab" aria-selected="false">
+        <span class="label">Layer 3 · Persistence</span>
+        <span class="title">MySQL via JPA</span>
+        <span class="hint">Hibernate-managed entities, derived queries, transactions.</span>
+      </button>
+    </div>
+
+    <div class="layer-detail" id="layer-client">
+      <h3>Layer 1 — React SPA (browser)</h3>
+      <p>
+        Ships from Vite on port <code>5173</code>. React renders pages behind two guards
+        (<code>ProtectedRoute</code>, <code>AdminRoute</code>). All HTTP goes through a single
+        axios instance so the Bearer token is attached in exactly one place. Auth state lives in
+        React context, backed by <code>localStorage</code> for reload survival.
+      </p>
+      <div class="files">
+        <div class="file-row"><span class="path">src/services/api.ts</span><span class="role">axios + interceptors</span></div>
+        <div class="file-row"><span class="path">src/context/AuthContext.tsx</span><span class="role">token · role · rehydrate</span></div>
+        <div class="file-row"><span class="path">src/routes/AppRoutes.tsx</span><span class="role">route table</span></div>
+        <div class="file-row"><span class="path">src/routes/ProtectedRoute.tsx</span><span class="role">login gate</span></div>
+        <div class="file-row"><span class="path">src/routes/AdminRoute.tsx</span><span class="role">role gate</span></div>
+        <div class="file-row"><span class="path">src/services/gameService.ts</span><span class="role">/games client</span></div>
+        <div class="file-row"><span class="path">src/services/authService.ts</span><span class="role">/api/v2/auth client</span></div>
+        <div class="file-row"><span class="path">src/pages/**</span><span class="role">screen components</span></div>
+      </div>
+    </div>
+
+    <div class="layer-detail" id="layer-api" hidden>
+      <h3>Layer 2 — Spring Boot API</h3>
+      <p>
+        Every request hits <code>JWTAuthenticationFilter</code> before touching a controller.
+        On a valid token the filter builds an <code>Authentication</code> and drops it in the
+        SecurityContext; on a missing/invalid one it either lets the request through (if the path
+        is public) or the chain returns <code>401</code>. Controllers stay thin — parse in, delegate to
+        a service, return a DTO. <code>GlobalExceptionHandler</code> converts thrown exceptions
+        into the JSON error envelope the frontend expects.
+      </p>
+      <div class="files">
+        <div class="file-row"><span class="path">SecurityConfig.java</span><span class="role">filter chain · role rules</span></div>
+        <div class="file-row"><span class="path">JWTAuthenticationFilter.java</span><span class="role">token → SecurityContext</span></div>
+        <div class="file-row"><span class="path">AuthController.java</span><span class="role">register · authenticate</span></div>
+        <div class="file-row"><span class="path">GamesController.java</span><span class="role">CRUD for games</span></div>
+        <div class="file-row"><span class="path">UsersController.java</span><span class="role">admin user ops</span></div>
+        <div class="file-row"><span class="path">*Service.java</span><span class="role">business rules</span></div>
+        <div class="file-row"><span class="path">GlobalExceptionHandler.java</span><span class="role">exception → JSON</span></div>
+        <div class="file-row"><span class="path">JwtService.java</span><span class="role">sign · verify · claims</span></div>
+      </div>
+    </div>
+
+    <div class="layer-detail" id="layer-db" hidden>
+      <h3>Layer 3 — MySQL via JPA / Hibernate</h3>
+      <p>
+        Three tables, mapped as JPA entities. Repositories extend <code>JpaRepository</code>, giving
+        us CRUD for free and letting us declare derived queries by method name
+        (<code>findByTitleContainingIgnoreCase</code> is one line of interface). Hibernate manages
+        the schema, runs the SQL, and keeps entities inside a transaction so relationship
+        traversals work inside a service call.
+      </p>
+      <div class="files">
+        <div class="file-row"><span class="path">Game.java</span><span class="role">@Entity → games</span></div>
+        <div class="file-row"><span class="path">User.java</span><span class="role">@Entity → users</span></div>
+        <div class="file-row"><span class="path">Purchase.java</span><span class="role">@Entity → purchases</span></div>
+        <div class="file-row"><span class="path">GameRepository.java</span><span class="role">derived queries</span></div>
+        <div class="file-row"><span class="path">UserRepository.java</span><span class="role">findByEmail</span></div>
+        <div class="file-row"><span class="path">PurchaseRepository.java</span><span class="role">by user / game</span></div>
+        <div class="file-row"><span class="path">application.properties</span><span class="role">datasource · ddl-auto</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── FLOWS ─────────────────────────── -->
+<section id="flows">
+  <div class="wrap">
+    <p class="kicker">§ 3 · Data Flow Walkthroughs</p>
+    <h2>How the code handles a request</h2>
+    <p class="section-lede">
+      Four end-to-end journeys, each with the sequence on the left and the code path on the right.
+      Every step names the file it happens in, so you can jump from a diagram arrow to a real line
+      of code. Amber steps cross the auth boundary; green steps touch the database; red steps
+      raise or handle an error.
+    </p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-flow="login"><span class="step">A</span>User logs in</button>
+      <button class="tab" data-flow="browse"><span class="step">B</span>User browses</button>
+      <button class="tab" data-flow="admin"><span class="step">C</span>Admin creates a game</button>
+      <button class="tab" data-flow="expiry"><span class="step">D</span>Token expires</button>
+    </div>
+
+    <!-- FLOW A: LOGIN -->
+    <div class="flow-panel" data-flow-panel="login">
+      <div class="diagram-shell">
+        <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant U as User
+  participant F as LoginPage
+  participant C as AuthContext
+  participant AX as axios
+  participant API as AuthController
+  participant JS as JwtService
+  participant DB as MySQL
+
+  U->>F: types email/password, submits
+  F->>C: login(form)
+  C->>AX: POST /api/v2/auth/authenticate
+  AX->>API: HTTP request (no Bearer yet)
+  API->>DB: findByEmail(email)
+  DB-->>API: User row + hashed password
+  API->>API: BCrypt matches?
+  API->>JS: sign JWT (sub=email, role, exp)
+  JS-->>API: signed token
+  API-->>AX: 200 { access_token }
+  AX-->>C: response
+  C->>C: jwtDecode → set role & subject
+  C->>C: localStorage.setItem("token")
+  C-->>F: resolve login()
+  F-->>U: AppRoutes redirects to / (or /admin)
+        </pre>
+      </div>
+      <div class="steps">
+        <div class="step-item">
+          <div class="n">Step 1 · Form submit</div>
+          <div class="title">LoginPage collects credentials</div>
+          <p class="body">The page owns the form state locally, then hands the payload to the auth context — no HTTP details leak into the component.</p>
+          <pre><span class="c">// src/pages/auth/LoginPage.tsx</span>
+<span class="k">await</span> login(form);</pre>
+          <div class="file">pages/auth/LoginPage.tsx:23</div>
+        </div>
+
+        <div class="step-item auth">
+          <div class="n">Step 2 · Context calls service</div>
+          <div class="title">AuthContext.login()</div>
+          <p class="body">Context is the only thing that owns the token, so credentials flow through it and it becomes the sole writer of localStorage.</p>
+          <pre><span class="k">const</span> res = <span class="k">await</span> authService.login(data);
+<span class="k">return</span> applyToken(res.access_token);</pre>
+          <div class="file">context/AuthContext.tsx:84</div>
+        </div>
+
+        <div class="step-item">
+          <div class="n">Step 3 · HTTP goes out</div>
+          <div class="title">axios → /api/v2/auth/authenticate</div>
+          <p class="body">The request interceptor <em>would</em> attach a Bearer token if one existed — for login there isn't one yet, so this call is public.</p>
+        </div>
+
+        <div class="step-item auth">
+          <div class="n">Step 4 · Backend authenticates</div>
+          <div class="title">AuthController → BCrypt → JwtService</div>
+          <p class="body">Spring Security's <code>AuthenticationManager</code> re-hashes the input and compares against the stored bcrypt digest. If it matches, <code>JwtService.generateToken()</code> signs a JWT with <em>sub</em>=email, <em>role</em>, and <em>exp</em>.</p>
+        </div>
+
+        <div class="step-item data">
+          <div class="n">Step 5 · Token comes back</div>
+          <div class="title">applyToken() decodes and stores</div>
+          <p class="body">The context decodes the JWT client-side purely to read <code>role</code> and expiry — no signature check on the client; the server is the only trust anchor.</p>
+          <pre><span class="k">const</span> decoded = jwtDecode&lt;JwtPayload&gt;(jwt);
+<span class="k">if</span> (decoded.exp * <span class="n2">1000</span> &lt; Date.now())
+  <span class="k">throw new</span> Error(<span class="s">"That session has expired."</span>);
+localStorage.setItem(<span class="s">"token"</span>, jwt);
+setUserRole(decoded.role);</pre>
+          <div class="file">context/AuthContext.tsx:42</div>
+        </div>
+
+        <div class="step-item">
+          <div class="n">Step 6 · Route redirect</div>
+          <div class="title">/login sees isAuthenticated=true → Navigate</div>
+          <p class="body">The <code>/login</code> route element checks auth and pushes admins to <code>/admin</code>, regular users to <code>/</code> — the page never calls navigate() itself, keeping routing centralized.</p>
+          <div class="file">routes/AppRoutes.tsx:36</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLOW B: BROWSE -->
+    <div class="flow-panel" data-flow-panel="browse" hidden>
+      <div class="diagram-shell">
+        <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant U as User
+  participant BP as BrowsePage
+  participant URL as URL (?q=…)
+  participant GS as gameService
+  participant AX as axios
+  participant Filter as JWTAuthFilter
+  participant Ctrl as GamesController
+  participant Svc as GamesService
+  participant DB as MySQL
+
+  U->>BP: types "wither" (debounced)
+  BP->>URL: setSearchParams({q: "wither"})
+  URL-->>BP: urlQuery changes
+  BP->>GS: search("wither")
+  GS->>AX: GET /games/all
+  AX->>AX: interceptor attaches Bearer JWT
+  AX->>Filter: HTTP + Authorization header
+  Filter->>Filter: verify JWT signature + exp
+  Filter->>Ctrl: continue chain (authenticated)
+  Ctrl->>Svc: getAllGames()
+  Svc->>DB: SELECT * FROM games
+  DB-->>Svc: rows
+  Svc-->>Ctrl: List&lt;Game&gt;
+  Ctrl-->>AX: 200 [ …games ]
+  AX-->>GS: response.data
+  GS->>GS: filter by title (client-side today)
+  GS-->>BP: Game[]
+  BP-->>U: GameGrid renders matches
+        </pre>
+      </div>
+      <div class="steps">
+        <div class="step-item">
+          <div class="n">Step 1 · URL is the source of truth</div>
+          <div class="title">Typing writes to <code>?q=</code></div>
+          <p class="body">A 300 ms debounce commits the input to the URL. That makes a result page shareable and lets the navbar drive the page by navigating to <code>/browse?q=…</code>.</p>
+          <pre><span class="k">const</span> timeout = setTimeout(() =&gt; {
+  setSearchParams(query ? { q: query } : {}, { replace: <span class="k">true</span> });
+}, <span class="n2">300</span>);</pre>
+          <div class="file">pages/user/BrowsePage.tsx:34</div>
+        </div>
+
+        <div class="step-item">
+          <div class="n">Step 2 · URL change triggers fetch</div>
+          <div class="title">useEffect on urlQuery</div>
+          <p class="body">A separate effect owns the network side. It uses a <code>cancelled</code> flag so a stale response from an earlier keystroke can't overwrite the newest results.</p>
+        </div>
+
+        <div class="step-item auth">
+          <div class="n">Step 3 · Interceptor attaches the token</div>
+          <div class="title">axios request interceptor</div>
+          <p class="body">Exactly one place in the codebase reads the token off <code>localStorage</code> for outbound calls — everywhere else is oblivious to auth.</p>
+          <pre>config.headers.Authorization = <span class="s">`Bearer </span>${token}<span class="s">`</span>;</pre>
+          <div class="file">services/api.ts:14</div>
+        </div>
+
+        <div class="step-item auth">
+          <div class="n">Step 4 · Filter validates JWT</div>
+          <div class="title">JWTAuthenticationFilter (server)</div>
+          <p class="body">Parses the header, calls <code>JwtService.isTokenValid</code>, and — on success — puts a <code>UsernamePasswordAuthenticationToken</code> into the SecurityContext. From here on the request is "authenticated".</p>
+        </div>
+
+        <div class="step-item data">
+          <div class="n">Step 5 · Repository query</div>
+          <div class="title">GameRepository.findAll()</div>
+          <p class="body">The service calls the repo, Hibernate emits a single SELECT, and the mapped <code>Game</code> entities flow back up as a <code>List</code> the controller returns as JSON.</p>
+        </div>
+
+        <div class="step-item data">
+          <div class="n">Step 6 · Filter runs client-side (for now)</div>
+          <div class="title">gameService.search()</div>
+          <p class="body">Today, filtering by title happens in the browser after fetching all games — a temporary shape while <code>/games/search</code> lands. The API of <code>gameService</code> is already server-side-ready, so swapping the body flips the whole app without changing callers.</p>
+          <pre><span class="k">return</span> games.filter((g) =&gt;
+  g.title.toLowerCase().includes(needle),
+);</pre>
+          <div class="file">services/gameService.ts:28</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLOW C: ADMIN CREATE -->
+    <div class="flow-panel" data-flow-panel="admin" hidden>
+      <div class="diagram-shell">
+        <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant A as Admin
+  participant MG as ManageGamesPage
+  participant GS as gameService
+  participant AX as axios
+  participant Filter as JWTAuthFilter
+  participant Sec as SecurityFilterChain
+  participant Ctrl as GamesController
+  participant Svc as GamesService
+  participant DB as MySQL
+
+  A->>MG: submits "Add Game" form
+  MG->>GS: create(gameInput)
+  GS->>AX: POST /games/add + JSON body
+  AX->>Filter: Authorization: Bearer JWT
+  Filter->>Filter: valid → SecurityContext.setAuth
+  Filter->>Sec: continue chain
+  Sec->>Sec: require ROLE_ADMIN for POST /games/**
+  Sec->>Ctrl: authorized → dispatch
+  Ctrl->>Svc: addGame(dto)
+  Svc->>DB: INSERT INTO games …
+  DB-->>Svc: generated id
+  Svc-->>Ctrl: Game entity
+  Ctrl-->>AX: 201 { …game with id }
+  AX-->>GS: response.data
+  GS-->>MG: Game
+  MG-->>A: list re-renders with new row
+        </pre>
+      </div>
+      <div class="steps">
+        <div class="step-item">
+          <div class="n">Step 1 · Guard already passed</div>
+          <div class="title">AdminRoute short-circuited earlier</div>
+          <p class="body">By the time the page renders, <code>useAuth().isAdmin</code> was true — otherwise the router would have already redirected the visitor away from <code>/admin/games</code>.</p>
+          <div class="file">routes/AdminRoute.tsx</div>
+        </div>
+
+        <div class="step-item">
+          <div class="n">Step 2 · Optimistic UX, safe reload</div>
+          <div class="title">POST /games/add</div>
+          <p class="body">The service exposes <code>create(gameInput)</code>; the path is intentionally the shape the current backend serves (<code>/games/add</code>, not RESTful <code>/games</code>).</p>
+          <pre><span class="k">const</span> res = <span class="k">await</span> api.post&lt;Game&gt;(<span class="s">"/games/add"</span>, game);
+<span class="k">return</span> res.data;</pre>
+          <div class="file">services/gameService.ts:46</div>
+        </div>
+
+        <div class="step-item auth">
+          <div class="n">Step 3 · Role check on the server</div>
+          <div class="title">SecurityFilterChain rule</div>
+          <p class="body">Client-side <em>hiding</em> of admin links is UX, not security. The real check is here — <code>.requestMatchers(HttpMethod.POST, "/games/**").hasRole("ADMIN")</code>. A logged-in USER hitting this endpoint gets 403.</p>
+        </div>
+
+        <div class="step-item data">
+          <div class="n">Step 4 · Persist</div>
+          <div class="title">JPA insert, id populated</div>
+          <p class="body">The service calls <code>repo.save(entity)</code>. Hibernate emits an INSERT and hydrates the id back onto the entity in place; the controller returns that as JSON with a 2xx.</p>
+        </div>
+
+        <div class="step-item">
+          <div class="n">Step 5 · UI reflects the write</div>
+          <div class="title">ManageGamesPage list refresh</div>
+          <p class="body">The response gives the page a fully-populated <code>Game</code> — including the new id — so it can prepend it to local state without a second round trip.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLOW D: TOKEN EXPIRY -->
+    <div class="flow-panel" data-flow-panel="expiry" hidden>
+      <div class="diagram-shell">
+        <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant U as User (idle 2h)
+  participant P as Any page
+  participant AX as axios
+  participant Filter as JWTAuthFilter
+  participant WIN as window.location
+
+  U->>P: clicks "Library"
+  P->>AX: GET /purchases/user/me
+  AX->>AX: attach stale Bearer
+  AX->>Filter: HTTP + expired JWT
+  Filter->>Filter: exp claim &lt; now
+  Filter-->>AX: 401 Unauthorized
+  AX->>AX: response interceptor catches 401
+  AX->>AX: url is NOT /auth/… → wipe token
+  AX->>WIN: location.href = "/login"
+  Note over U,WIN: Full reload · AuthContext resets<br/>from empty localStorage
+        </pre>
+      </div>
+      <div class="steps">
+        <div class="step-item error">
+          <div class="n">Step 1 · Server rejects</div>
+          <div class="title">401 from JWT filter</div>
+          <p class="body">The filter sees the <code>exp</code> claim is in the past and refuses to authenticate the request. The response leaves the API as 401 before it ever reaches a controller.</p>
+        </div>
+
+        <div class="step-item error">
+          <div class="n">Step 2 · Response interceptor</div>
+          <div class="title">api.ts filters login vs everything else</div>
+          <p class="body">A 401 from <code>/auth/**</code> means "bad credentials"; a 401 anywhere else means "session died". The interceptor treats them differently — it clears storage only for the second case, so the login page can still surface "invalid password" without triggering a logout redirect.</p>
+          <pre><span class="k">if</span> (error.response?.status === <span class="n2">401</span>) {
+  <span class="k">const</span> url = error.config?.url ?? <span class="s">""</span>;
+  <span class="k">if</span> (!url.includes(<span class="s">"/auth/"</span>)) {
+    localStorage.removeItem(<span class="s">"token"</span>);
+    window.location.href = <span class="s">"/login"</span>;
+  }
+}</pre>
+          <div class="file">services/api.ts:22</div>
+        </div>
+
+        <div class="step-item">
+          <div class="n">Step 3 · Hard reload resets everything</div>
+          <div class="title">window.location.href, not navigate()</div>
+          <p class="body">A full reload guarantees every in-memory cache is wiped, not just React state — no stale queries can fire against the dead session.</p>
+        </div>
+
+        <div class="step-item">
+          <div class="n">Step 4 · Rehydrate finds nothing</div>
+          <div class="title">AuthContext startup effect</div>
+          <p class="body">On the fresh page, the mount effect reads <code>localStorage.getItem("token")</code>, finds null, and settles into the logged-out state without noise.</p>
+          <div class="file">context/AuthContext.tsx:70</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch sw-base"></span> Regular step</span>
+      <span><span class="swatch sw-auth"></span> Auth boundary</span>
+      <span><span class="swatch sw-new"></span> Data / DB step</span>
+      <span><span class="swatch sw-danger"></span> Error path</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── AUTH STATE MACHINE ─────────────────────────── -->
+<section id="auth-state">
+  <div class="wrap">
+    <p class="kicker">§ 4 · Client Auth State Machine</p>
+    <h2>Every state <code>AuthContext</code> can be in</h2>
+    <p class="section-lede">
+      Auth is not just "logged in / out". The context has a startup phase where it doesn't yet
+      know, and every transition is triggered by exactly one event. The router waits for
+      <em>Loading</em> to end before deciding where to send anyone.
+    </p>
+    <div class="diagram-shell">
+      <pre class="mermaid">
+stateDiagram-v2
+  [*] --> Loading: app mounts
+  Loading --> AnonymousUser: no token in storage
+  Loading --> AuthenticatedUser: token valid
+  Loading --> AnonymousUser: token expired / malformed
+
+  AnonymousUser --> AuthenticatedUser: login()/register() success
+  AnonymousUser --> AnonymousUser: login() rejected (401)
+
+  AuthenticatedUser --> AdminUser: role claim = ADMIN
+  AuthenticatedUser --> AnonymousUser: logout()
+  AuthenticatedUser --> AnonymousUser: interceptor 401 (session died)
+
+  AdminUser --> AnonymousUser: logout()
+  AdminUser --> AnonymousUser: interceptor 401
+      </pre>
+    </div>
+    <p class="caption">Diagram 3 · <code>isLoading</code> is a distinct state, not a boolean flavor of "logged out" — that's why <code>ProtectedRoute</code> shows a spinner instead of bouncing to /login on first paint.</p>
+
+    <details class="acc">
+      <summary>Why the loading state matters</summary>
+      <div class="content">
+        Without it, a page refresh on <code>/library</code> would run the redirect
+        <em>before</em> the mount effect finished rehydrating the token, and the user would be
+        thrown to <code>/login</code> despite having a perfectly valid session. The gate literally
+        exists to close that window.
+      </div>
+    </details>
+    <details class="acc">
+      <summary>Why decode the JWT on the client at all?</summary>
+      <div class="content">
+        Only to read display data (<code>sub</code>, <code>role</code>) and drop obviously-dead
+        tokens on the floor. Access decisions are re-checked on the server for every call — the
+        client's decoding is UX, not security.
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ─────────────────────────── DATA MODEL ─────────────────────────── -->
+<section id="model">
+  <div class="wrap">
+    <p class="kicker">§ 5 · Data Model</p>
+    <h2>Three entities, one join</h2>
+    <p class="section-lede">
+      A user can own many games; a game can be owned by many users. <code>Purchase</code> is the
+      join table with a timestamp and price-at-purchase — so historical revenue survives price
+      changes on the game itself.
+    </p>
+
+    <div class="diagram-shell">
+      <pre class="mermaid">
+erDiagram
+  USER ||--o{ PURCHASE : "makes"
+  GAME ||--o{ PURCHASE : "is bought in"
+
+  USER {
+    Long id PK
+    String email UK
+    String password "bcrypt hash"
+    Role role "USER | ADMIN"
+    LocalDateTime createdAt
+  }
+  GAME {
+    Long id PK
+    String title
+    String genre "comma-separated"
+    Double price
+    Double rating
+    String description
+    String imageUrl
+    String heroImage
+  }
+  PURCHASE {
+    Long id PK
+    Long userId FK
+    Long gameId FK
+    Double pricePaid "snapshot"
+    LocalDateTime purchasedAt
+  }
+      </pre>
+    </div>
+
+    <div class="entities">
+      <div class="entity">
+        <h4>User</h4>
+        <p class="desc">Identity + role. Email is the natural key and JWT subject.</p>
+        <table>
+          <tr><td class="name">id</td><td class="type">Long · PK</td></tr>
+          <tr><td class="name">email</td><td class="type">String · unique</td></tr>
+          <tr><td class="name">password</td><td class="type">bcrypt</td></tr>
+          <tr><td class="name">role</td><td class="type">enum</td></tr>
+        </table>
+      </div>
+      <div class="entity">
+        <h4>Game</h4>
+        <p class="desc">Catalog item. <code>genre</code> is a single comma-separated string — <code>parseGenres()</code> splits it for the UI.</p>
+        <table>
+          <tr><td class="name">id</td><td class="type">Long · PK</td></tr>
+          <tr><td class="name">title</td><td class="type">String</td></tr>
+          <tr><td class="name">genre</td><td class="type">String</td></tr>
+          <tr><td class="name">price</td><td class="type">Double</td></tr>
+          <tr><td class="name">rating</td><td class="type">Double</td></tr>
+          <tr><td class="name">imageUrl</td><td class="type">String</td></tr>
+        </table>
+      </div>
+      <div class="entity">
+        <h4>Purchase</h4>
+        <p class="desc">Many-to-many join. Snapshots price so a discount later doesn't rewrite history.</p>
+        <table>
+          <tr><td class="name">id</td><td class="type">Long · PK</td></tr>
+          <tr><td class="name">userId</td><td class="type">FK · User</td></tr>
+          <tr><td class="name">gameId</td><td class="type">FK · Game</td></tr>
+          <tr><td class="name">pricePaid</td><td class="type">Double</td></tr>
+          <tr><td class="name">purchasedAt</td><td class="type">timestamp</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── REQUEST ANATOMY ─────────────────────────── -->
+<section id="anatomy">
+  <div class="wrap">
+    <p class="kicker">§ 6 · Request Anatomy</p>
+    <h2>What actually crosses the wire</h2>
+    <p class="section-lede">
+      Hover any <span class="anno" data-tip="Like this — hover the dashed segments below for context.">underlined segment</span>
+      to see what that field means and who reads it. Left is what the browser sends; right is
+      what Spring answers with.
+    </p>
+
+    <div class="anatomy">
+      <div class="req-block">
+        <h4>Request · authenticated read</h4>
+<pre>GET <span class="anno" data-tip="Path routed to GamesController.getById(). Note: /find/{id} not RESTful /games/{id} — that's the current contract.">/games/find/42</span> HTTP/1.1
+Host: localhost:8181
+Accept: application/json
+<span class="anno auth" data-tip="Attached by src/services/api.ts request interceptor. The only place the token leaves localStorage.">Authorization: Bearer eyJhbGciOiJIUzI1NiJ9…</span>
+Origin: <span class="anno" data-tip="Vite is pinned to 5173 in vite.config.ts so CORS on the backend can allowlist a stable origin.">http://localhost:5173</span></pre>
+      </div>
+
+      <div class="req-block">
+        <h4>Response · 200 OK</h4>
+<pre>HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "id": 42,
+  "title": <span class="anno" data-tip="The Game entity, serialized by Jackson from GamesController.">"Hollow Knight"</span>,
+  "genre": <span class="anno data" data-tip="One column in MySQL — split client-side by parseGenres() into an array of chip labels.">"Metroidvania, Action, Indie"</span>,
+  "price": 14.99,
+  "rating": 4.9,
+  "imageUrl": "/img/hk-cover.jpg",
+  "heroImage": "/img/hk-hero.jpg"
+}</pre>
+      </div>
+
+      <div class="req-block">
+        <h4>Request · login</h4>
+<pre>POST <span class="anno" data-tip="Public path — SecurityFilterChain matches /api/v2/auth/** with permitAll(). The interceptor also would not add a token here because none exists yet.">/api/v2/auth/authenticate</span> HTTP/1.1
+Host: localhost:8181
+Content-Type: application/json
+
+{
+  "email": "ada@example.com",
+  "password": <span class="anno err" data-tip="Never logged anywhere on the client — authService is written to keep this out of console output and screen recordings.">"correct-horse-battery-staple"</span>
+}</pre>
+      </div>
+
+      <div class="req-block">
+        <h4>Response · signed JWT</h4>
+<pre>HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "access_token": <span class="anno auth" data-tip="HS256 signed by JwtService. Decoded client-side only for display (sub, role, exp) — auth decisions re-run on the server.">"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZGFAZXhhbXBsZS5jb20iLCJyb2xlIjoiVVNFUiIsImV4cCI6MTc1NDA4MDAwMH0.sig…"</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── FAILURES ─────────────────────────── -->
+<section id="failure">
+  <div class="wrap">
+    <p class="kicker">§ 7 · Failure Modes</p>
+    <h2>What can go wrong, and who catches it</h2>
+    <p class="section-lede">
+      A short catalog of the error paths, mapped to the code that handles each one. The extended
+      state (§ 9) upgrades several of these from "silent console error" to "toast the user sees".
+    </p>
+
+    <div class="failure-grid">
+      <div class="failure">
+        <span class="code">401 · Unauthorized</span>
+        <h4>Bad credentials on login</h4>
+        <p>Path matches <code>/auth/**</code>, so the response interceptor <em>does not</em> log the user out — LoginPage shows the returned message inline.</p>
+      </div>
+      <div class="failure">
+        <span class="code">401 · Session expired</span>
+        <h4>Token dies mid-session</h4>
+        <p>Any non-<code>/auth/</code> 401 clears localStorage and hard-redirects to <code>/login</code>. See Flow D.</p>
+      </div>
+      <div class="failure warn">
+        <span class="code">403 · Forbidden</span>
+        <h4>USER hits an ADMIN endpoint</h4>
+        <p>SecurityFilterChain rejects before the controller runs. UI usually hides these links; the check on the server is the real one.</p>
+      </div>
+      <div class="failure warn">
+        <span class="code">404 · Not found</span>
+        <h4>Client-side unknown route</h4>
+        <p>Catch-all route renders <code>NotFoundPage</code> instead of bouncing to home — surfaces the wrong URL to the user.</p>
+      </div>
+      <div class="failure">
+        <span class="code">5xx · Backend error</span>
+        <h4>Uncaught exception in a service</h4>
+        <p>Bubbles into <code>GlobalExceptionHandler</code>, which returns a consistent JSON error envelope. The extended state wires this to a toast (§ 9 feature 03).</p>
+      </div>
+      <div class="failure info">
+        <span class="code">— · Network dropped</span>
+        <h4>Offline / server down</h4>
+        <p>axios rejects with no <code>response</code>. Callers catch and set a page-local error message; the interceptor leaves the token alone.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── FEATURES ─────────────────────────── -->
 <section id="features">
   <div class="wrap">
-    <p class="kicker">The Increment</p>
+    <p class="kicker">§ 8 · The Increment</p>
     <h2>Three low-effort, high-signal features</h2>
     <p class="section-lede">
       Each plugs into scaffolding that already exists — axios interceptors, a
@@ -212,8 +1312,8 @@
         <span class="num">01 / UX POLISH</span>
         <h3>Skeleton loaders</h3>
         <p>
-          Swap the plain <em>“Loading games…”</em> text for shimmer cards that mirror
-          <code>GameCard</code>’s layout while <code>isLoading</code> is true. Kills layout
+          Swap the plain <em>"Loading games…"</em> text for shimmer cards that mirror
+          <code>GameCard</code>'s layout while <code>isLoading</code> is true. Kills layout
           shift and signals perceived-performance maturity on first paint.
         </p>
         <div class="meta">
@@ -254,74 +1354,15 @@
   </div>
 </section>
 
-<section id="current">
-  <div class="wrap">
-    <p class="kicker">Diagram A</p>
-    <h2>Current state</h2>
-    <p class="section-lede">
-      The React SPA authenticates against <code>/api/v2/auth/**</code>, stores the signed JWT in
-      <code>localStorage</code>, and attaches it as a Bearer token on every request. The
-      <code>JWTAuthenticationFilter</code> validates it ahead of a stateless
-      <code>SecurityFilterChain</code> that enforces role-based access before controllers,
-      services, and JPA repositories reach MySQL.
-    </p>
-    <div class="diagram-shell">
-      <pre class="mermaid">
-flowchart TB
-  subgraph Client["React SPA — Vite · TypeScript · Chakra UI"]
-    direction TB
-    UI["Pages &amp; Components<br/>Browse · GameDetails · Library · Admin"]
-    Ctx["AuthContext<br/>decodes JWT · exposes role"]
-    Axios["axios instance<br/>request + response interceptors"]
-    LS[("localStorage<br/>JWT token")]
-    UI --> Ctx
-    UI --> Axios
-    Ctx <--> LS
-    Axios -->|reads Bearer token| LS
-  end
-
-  subgraph API["Spring Boot REST API :8181"]
-    direction TB
-    Filter["JWTAuthenticationFilter"]
-    Chain["SecurityFilterChain<br/>stateless · role-based"]
-    AuthC["/api/v2/auth/**<br/>public"]
-    GamesC["/games<br/>GET public · writes ADMIN"]
-    UsersC["/users<br/>ADMIN only"]
-    Svc["Service layer"]
-    Repo["JPA Repositories · Hibernate"]
-    Filter --> Chain
-    Chain --> AuthC
-    Chain --> GamesC
-    Chain --> UsersC
-    AuthC --> Svc
-    GamesC --> Svc
-    UsersC --> Svc
-    Svc --> Repo
-  end
-
-  DB[("MySQL<br/>games · users · purchases")]
-
-  Axios -->|"HTTP · Authorization: Bearer JWT"| Filter
-  AuthC -.->|issues signed JWT| Axios
-  Repo --> DB
-
-  classDef auth stroke:#f5a623,stroke-width:2px;
-  class Filter,AuthC auth;
-      </pre>
-    </div>
-    <p class="caption">A · existing request path — auth boundary highlighted in amber.</p>
-  </div>
-</section>
-
+<!-- ─────────────────────────── EXTENDED ─────────────────────────── -->
 <section id="extended">
   <div class="wrap">
-    <p class="kicker">Diagram B</p>
-    <h2>Extended state</h2>
+    <p class="kicker">§ 9 · Extended State</p>
+    <h2>The same backbone, three features overlaid</h2>
     <p class="section-lede">
-      The same backbone, with the three features overlaid. <span style="color:var(--new)">Green</span>
-      nodes are net-new; <span style="color:var(--accent)">indigo</span> nodes are existing pieces
-      that gain responsibility. Note the search path now terminates at the database instead of
-      the browser.
+      <span style="color:var(--new)">Green</span> nodes are net-new; <span style="color:var(--accent)">indigo</span>
+      nodes are existing pieces that gain responsibility. Note the search path now terminates at
+      the database instead of the browser.
     </p>
     <div class="diagram-shell">
       <pre class="mermaid">
@@ -382,7 +1423,7 @@ flowchart TB
   classDef changed stroke:#6d5efc,stroke-width:2px,color:#eae7ff,fill:#1a1830;
       </pre>
     </div>
-    <p class="caption">B · extended request path — new nodes in green, expanded nodes in indigo.</p>
+    <p class="caption">Diagram 4 · extended request path — new nodes in green, expanded nodes in indigo.</p>
 
     <div class="legend">
       <span><span class="swatch sw-base"></span> Existing component</span>
@@ -403,7 +1444,7 @@ flowchart TB
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script>
   mermaid.initialize({
-    startOnLoad: true,
+    startOnLoad: false,
     securityLevel: "loose",
     theme: "base",
     themeVariables: {
@@ -415,7 +1456,79 @@ flowchart TB
       fontFamily: "'JetBrains Mono', ui-monospace, monospace",
       fontSize: "14px",
       clusterBkg: "#12151d",
-      clusterBorder: "#2d3547"
+      clusterBorder: "#2d3547",
+      actorBkg: "#1b2130",
+      actorBorder: "#3a3570",
+      actorTextColor: "#d6dbe7",
+      actorLineColor: "#5b647a",
+      signalColor: "#98a1b5",
+      signalTextColor: "#d6dbe7",
+      labelBoxBkgColor: "#1b2130",
+      labelBoxBorderColor: "#3a3570",
+      labelTextColor: "#d6dbe7",
+      noteBkgColor: "#1a1830",
+      noteBorderColor: "#6d5efc",
+      noteTextColor: "#d6dbe7"
     }
+  });
+
+  // Mermaid cannot lay out a diagram inside a display:none container — it
+  // fails silently and stamps a misleading "Syntax error" bomb. So we render
+  // by hand: everything visible now, and each hidden flow tab the first time
+  // it is shown (see the tab handler below).
+  function renderMermaid(nodes) {
+    const pending = nodes.filter((n) => !n.dataset.processed);
+    if (pending.length && window.mermaid) {
+      window.mermaid.run({ nodes: pending });
+    }
+  }
+
+  // On load, render every diagram that is NOT inside a hidden flow panel.
+  renderMermaid(
+    [...document.querySelectorAll(".mermaid")].filter((n) => {
+      const panel = n.closest(".flow-panel");
+      return !panel || !panel.hidden;
+    })
+  );
+
+  // ── Layer explorer ──────────────────────────────────────────────
+  const layerBtns = document.querySelectorAll(".layer-btn");
+  const layerDetails = {
+    client: document.getElementById("layer-client"),
+    api:    document.getElementById("layer-api"),
+    db:     document.getElementById("layer-db"),
+  };
+  layerBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.layer;
+      layerBtns.forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle("active", active);
+        b.setAttribute("aria-selected", active ? "true" : "false");
+      });
+      Object.entries(layerDetails).forEach(([k, el]) => {
+        if (!el) return;
+        el.hidden = k !== key;
+      });
+    });
+  });
+
+  // ── Flow tabs ───────────────────────────────────────────────────
+  const tabs = document.querySelectorAll(".tab");
+  const panels = document.querySelectorAll(".flow-panel");
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const key = tab.dataset.flow;
+      tabs.forEach((t) => t.classList.toggle("active", t === tab));
+      panels.forEach((p) => {
+        p.hidden = p.dataset.flowPanel !== key;
+      });
+      // The panel is now visible, so its diagram can finally be laid out.
+      // renderMermaid skips any node already processed, so this runs once.
+      const active = document.querySelector(`.flow-panel[data-flow-panel="${key}"]`);
+      if (active) {
+        renderMermaid([...active.querySelectorAll(".mermaid")]);
+      }
+    });
   });
 </script>

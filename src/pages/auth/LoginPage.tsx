@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { getApiErrorMessage } from "../../utils/apiError";
 import type { LoginRequest } from "../../types/auth";
 
 export default function LoginPage() {
@@ -22,8 +23,8 @@ export default function LoginPage() {
       await login(form);
       // No navigate() needed — the /login route in AppRoutes
       // automatically redirects when isAuthenticated becomes true
-    } catch {
-      setError("Invalid email or password.");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Invalid email or password."));
     } finally {
       setIsLoading(false);
     }

@@ -12,7 +12,6 @@ import AdminRoute from "./AdminRoute";
 // Auth pages
 import LoginPage from "../pages/auth/LoginPage.tsx";
 import RegisterPage from "../pages/auth/RegisterPage.tsx";
-import AdminLoginPage from "../pages/auth/AdminLoginPage.tsx";
 
 // User pages
 import HomePage from "../pages/user/HomePage.tsx";
@@ -24,6 +23,9 @@ import LibraryPage from "../pages/user/LibraryPage.tsx";
 import AdminDashboard from "../pages/admin/AdminDashBoard.tsx";
 import ManageGamesPage from "../pages/admin/ManageGamesPage.tsx";
 import ManageUsersPage from "../pages/admin/ManageUsersPage.tsx";
+
+// Fallback
+import NotFoundPage from "../pages/NotFoundPage.tsx";
 
 export default function AppRoutes() {
   const { isAuthenticated, isAdmin } = useAuth();
@@ -48,8 +50,8 @@ export default function AppRoutes() {
         }
       />
 
-      {/* ── Admin login ── */}
-      <Route path="/admin/login" element={<AdminLoginPage />} />
+      {/* ── Redirect old admin login to unified login ── */}
+      <Route path="/admin/login" element={<Navigate to="/login" replace />} />
 
       {/* ── Protected user routes (wrapped in sidebar + navbar layout) ── */}
       <Route element={<ProtectedRoute />}>
@@ -71,7 +73,8 @@ export default function AppRoutes() {
       </Route>
 
       {/* ── Catch-all ── */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Shows the URL was wrong instead of silently bouncing to home. */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

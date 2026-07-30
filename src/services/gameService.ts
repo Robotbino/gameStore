@@ -1,5 +1,10 @@
 import api from "./api";
 import type { Game, GameInput } from "../types/game";
+import { parseGenres } from "../utils/genre";
+
+// Paths below mirror GamesControllers.java exactly. Two of them are not the
+// REST-conventional shape you'd expect (`/games/find/{id}`, `/games/add`) —
+// that's the contract the backend actually serves today, not a typo.
 
 export const gameService = {
   getAll: async (): Promise<Game[]> => {
@@ -12,22 +17,28 @@ export const gameService = {
     return res.data;
   },
 
-  // The backend has no search/genre endpoints, so both filter client-side
+  // GamesService.searchGames() and getGamesByGenre() exist on the backend but
+  // no controller exposes them, so both filters run client-side over /games/all.
+  // When those endpoints land, swap the bodies back to a single api.get and
+  // every caller keeps working unchanged.
   search: async (keyword: string): Promise<Game[]> => {
     const games = await gameService.getAll();
-    const term = keyword.toLowerCase();
-    return games.filter((game) => game.title.toLowerCase().includes(term));
+    const needle = keyword.trim().toLowerCase();
+    if (!needle) return games;
+    return games.filter((game) =>
+      game.title.toLowerCase().includes(needle),
+    );
   },
 
   getByGenre: async (genre: string): Promise<Game[]> => {
     const games = await gameService.getAll();
-    const term = genre.toLowerCase();
-    return games.filter((game) => {
-      const genres = Array.isArray(game.genre)
-        ? game.genre
-        : game.genre.split(",").map((g) => g.trim());
-      return genres.some((g) => g.toLowerCase() === term);
-    });
+    const needle = genre.trim().toLowerCase();
+    if (!needle) return games;
+    // Match whole genres, not substrings, so "Action" doesn't pull in
+    // "Action RPG" — the splitting itself lives in parseGenres.
+    return games.filter((game) =>
+      parseGenres(game.genre).some((g) => g.toLowerCase() === needle),
+    );
   },
 
   // Admin only

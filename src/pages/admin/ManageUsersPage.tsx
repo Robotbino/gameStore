@@ -18,6 +18,18 @@ const EMPTY_FORM: EmployeeFormData = {
   points: 0,
 };
 
+// UsersController's addUser and updateUser both still `return null`, so a
+// "successful" save comes back 200 with an empty body. Pushing that straight
+// into state puts a null in the users array and white-screens the table on the
+// next render. Everything from the API goes through this gate first.
+function isUser(value: unknown): value is User {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as User).id === "number"
+  );
+}
+
 export default function ManageUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,9 +48,15 @@ export default function ManageUsersPage() {
     setIsLoading(true);
     setError(null);
     try {
-      setUsers(await userService.getAll());
+      const data = await userService.getAll();
+      setUsers(Array.isArray(data) ? data.filter(isUser) : []);
     } catch {
-      setError("Failed to load employees.");
+      // GET /users is commented out in UsersController, so this is a 404 rather
+      // than a transient failure — say so instead of implying a retry will help.
+      setError(
+        "Couldn't load employees. GET /users has no controller mapping on the backend yet.",
+      );
+      setUsers([]);
     } finally {
       setIsLoading(false);
     }
@@ -79,9 +97,17 @@ export default function ManageUsersPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
     try {
       if (modalMode === "add") {
         const created = await userService.create(form);
+        if (!isUser(created)) {
+          setError(
+            "The employee was likely saved, but POST /users returned an empty body so the table can't show it. Implement TODO 3 in UsersController.",
+          );
+          closeModal();
+          return;
+        }
         setUsers((prev) => [...prev, created]);
       } else if (editingUser) {
         const updated = await userService.update(editingUser.id, {
@@ -90,6 +116,13 @@ export default function ManageUsersPage() {
           role: form.role,
           points: form.points,
         });
+        if (!isUser(updated)) {
+          setError(
+            "The employee was likely updated, but PUT /users/{id} returned an empty body so the table can't refresh. Implement TODO 4 in UsersController.",
+          );
+          closeModal();
+          return;
+        }
         setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
       }
       closeModal();
@@ -145,8 +178,10 @@ export default function ManageUsersPage() {
                   <td>{user.userName}</td>
                   <td>{user.email}</td>
                   <td>
-                    <span className={`role-badge ${user.role.toLowerCase()}`}>
-                      {user.role}
+                    <span
+                      className={`role-badge ${(user.role ?? "user").toLowerCase()}`}
+                    >
+                      {user.role ?? "—"}
                     </span>
                   </td>
                   <td>{user.points}</td>
