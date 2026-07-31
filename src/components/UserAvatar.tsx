@@ -3,12 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 export default function UserAvatar() {
-  const { userEmail, logout } = useAuth();
+  const { userEmail, currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const initial = userEmail ? userEmail.charAt(0).toUpperCase() : "?";
+  // Prefer the real userName once /users/me lands; fall back to the JWT
+  // email (available synchronously) so the button never briefly renders "?".
+  const displayName = currentUser?.userName ?? userEmail ?? "";
+  const initial = displayName ? displayName.charAt(0).toUpperCase() : "?";
 
   // Close on click outside
   useEffect(() => {

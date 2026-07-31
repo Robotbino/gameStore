@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { gameService } from "../../services/gameService";
 import type { Game, GameInput } from "../../types/game";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 const EMPTY_FORM: GameInput = {
   title: "",
@@ -31,8 +32,8 @@ export default function ManageGamesPage() {
     setError(null);
     try {
       setGames(await gameService.getAll());
-    } catch {
-      setError("Failed to load games.");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to load games."));
     } finally {
       setIsLoading(false);
     }
@@ -85,8 +86,8 @@ export default function ManageGamesPage() {
         setGames((prev) => prev.map((g) => (g.id === updated.id ? updated : g)));
       }
       closeModal();
-    } catch {
-      setError("Failed to save game.");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save game."));
     } finally {
       setIsSubmitting(false);
     }
@@ -97,8 +98,8 @@ export default function ManageGamesPage() {
       await gameService.delete(id);
       setGames((prev) => prev.filter((g) => g.id !== id));
       setDeleteId(null);
-    } catch {
-      setError("Failed to delete game.");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to delete game."));
     }
   }
 
@@ -186,11 +187,11 @@ export default function ManageGamesPage() {
               <div className="form-row">
                 <div className="form-field">
                   <label>Price (R)</label>
-                  <input name="price" type="number" min="0" step="0.01" value={form.price} onChange={handleChange} required />
+                  <input name="price" type="number" min="0.01" step="0.01" value={form.price} onChange={handleChange} required />
                 </div>
                 <div className="form-field">
-                  <label>Rating (0–10)</label>
-                  <input name="rating" type="number" min="0" max="10" step="0.1" value={form.rating} onChange={handleChange} required />
+                  <label>Rating (0–5)</label>
+                  <input name="rating" type="number" min="0" max="5" step="0.1" value={form.rating} onChange={handleChange} required />
                 </div>
               </div>
 

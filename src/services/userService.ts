@@ -15,6 +15,12 @@ export const userService = {
     return res.data;
   },
 
+  // GET /users/me — identity comes from the JWT, never a URL param.
+  getMe: async (): Promise<User> => {
+    const res = await api.get<User>("/users/me");
+    return res.data;
+  },
+
   create: async (data: CreateUserPayload): Promise<User> => {
     const res = await api.post<User>("/users/add", data);
     return res.data;

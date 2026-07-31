@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { userService } from "../../services/userService";
 import type { User, Role } from "../../types/user";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 interface EmployeeFormData {
   userName: string;
@@ -50,12 +51,8 @@ export default function ManageUsersPage() {
     try {
       const data = await userService.getAll();
       setUsers(Array.isArray(data) ? data.filter(isUser) : []);
-    } catch {
-      // GET /users is commented out in UsersController, so this is a 404 rather
-      // than a transient failure — say so instead of implying a retry will help.
-      setError(
-        "Couldn't load employees. GET /users has no controller mapping on the backend yet.",
-      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to load employees."));
       setUsers([]);
     } finally {
       setIsLoading(false);
@@ -126,8 +123,8 @@ export default function ManageUsersPage() {
         setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
       }
       closeModal();
-    } catch {
-      setError("Failed to save employee.");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to save employee."));
     } finally {
       setIsSubmitting(false);
     }
@@ -138,8 +135,8 @@ export default function ManageUsersPage() {
       await userService.delete(id);
       setUsers((prev) => prev.filter((u) => u.id !== id));
       setDeleteId(null);
-    } catch {
-      setError("Failed to delete employee.");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to delete employee."));
     }
   }
 
