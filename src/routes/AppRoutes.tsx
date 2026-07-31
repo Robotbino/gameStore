@@ -24,6 +24,9 @@ import AdminDashboard from "../pages/admin/AdminDashBoard.tsx";
 import ManageGamesPage from "../pages/admin/ManageGamesPage.tsx";
 import ManageUsersPage from "../pages/admin/ManageUsersPage.tsx";
 
+// Demo
+import DemoPage from "../pages/DemoPage.tsx";
+
 // Fallback
 import NotFoundPage from "../pages/NotFoundPage.tsx";
 
@@ -52,6 +55,9 @@ export default function AppRoutes() {
 
       {/* ── Redirect old admin login to unified login ── */}
       <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+
+      {/* ── Public RBAC demo page ── */}
+      <Route path="/demo" element={<DemoPage />} />
 
       {/* ── Protected user routes (wrapped in sidebar + navbar layout) ── */}
       <Route element={<ProtectedRoute />}>

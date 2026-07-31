@@ -55,4 +55,12 @@ export const gameService = {
   delete: async (id: number): Promise<void> => {
     await api.delete(`/games/${id}`);
   },
+
+  // POST /games/sync/rawg — admin-only. Backend currently returns 501 with
+  // {"message": "..."} until the RAWG integration lands. Callers should
+  // catch AxiosError and read err.response?.status / err.response?.data.
+  syncFromRawg: async (): Promise<{ message: string }> => {
+    const res = await api.post<{ message: string }>("/games/sync/rawg");
+    return res.data;
+  },
 };
