@@ -5,7 +5,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
 <style>
   :root {
@@ -32,8 +32,10 @@
     --radius-sm: 8px;
     --maxw: 1140px;
     --mono: "JetBrains Mono", ui-monospace, monospace;
-    --display: "Sora", system-ui, sans-serif;
-    --body: "Public Sans", system-ui, sans-serif;
+    /* Atkinson Hyperlegible — letterforms designed for maximum legibility.
+       Ships only 400/700, so heading weights are normalised to those below. */
+    --display: "Atkinson Hyperlegible", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", system-ui, sans-serif;
   }
 
   * { box-sizing: border-box; }
@@ -109,7 +111,7 @@
     text-wrap: balance;
     margin: 0 0 18px;
   }
-  h1 .sub { color: var(--ink-soft); font-weight: 500; }
+  h1 .sub { color: var(--ink-soft); font-weight: 400; }
   .lede {
     max-width: 62ch;
     color: var(--ink-soft);
@@ -126,7 +128,7 @@
     border-radius: 999px;
     padding: 5px 12px;
   }
-  .chip b { color: var(--accent); font-weight: 500; }
+  .chip b { color: var(--accent); font-weight: 400; }
 
   .kpis {
     display: grid; grid-template-columns: repeat(4, 1fr);
@@ -143,10 +145,10 @@
     text-transform: uppercase; color: var(--ink-faint);
   }
   .kpi .v {
-    font-family: var(--display); font-weight: 600; font-size: 1.35rem;
+    font-family: var(--display); font-weight: 700; font-size: 1.35rem;
     color: var(--ink); margin-top: 4px;
   }
-  .kpi .v small { color: var(--ink-soft); font-weight: 500; font-size: .8rem; }
+  .kpi .v small { color: var(--ink-soft); font-weight: 400; font-size: .8rem; }
 
   /* ── Sections ── */
   section { padding: 64px 0; border-bottom: 1px solid var(--line); }
@@ -164,13 +166,13 @@
   }
   h2 {
     font-family: var(--display);
-    font-weight: 600;
+    font-weight: 700;
     font-size: clamp(1.5rem, 3vw, 2.1rem);
     letter-spacing: -.015em;
     margin: 0 0 10px;
   }
   h3 {
-    font-family: var(--display); font-weight: 600;
+    font-family: var(--display); font-weight: 700;
     font-size: 1.05rem; margin: 0 0 8px; letter-spacing: -.01em;
   }
   .section-lede { color: var(--ink-soft); max-width: 64ch; margin: 0 0 30px; }
@@ -195,7 +197,7 @@
     letter-spacing: .1em;
   }
   .card h3 {
-    font-family: var(--display); font-weight: 600; font-size: 1.12rem;
+    font-family: var(--display); font-weight: 700; font-size: 1.12rem;
     margin: 0; letter-spacing: -.01em;
   }
   .card p { margin: 0; color: var(--ink-soft); font-size: .94rem; }
@@ -263,7 +265,7 @@
   }
   .layer-btn.active .label { color: var(--accent); }
   .layer-btn .title {
-    font-family: var(--display); font-weight: 600; font-size: 1.1rem;
+    font-family: var(--display); font-weight: 700; font-size: 1.1rem;
   }
   .layer-btn .hint { color: var(--ink-soft); font-size: .88rem; }
 
@@ -321,7 +323,7 @@
     color: var(--ink);
     box-shadow: inset 0 0 0 1px var(--line-2);
   }
-  .tab .step { color: var(--accent); font-weight: 600; margin-right: 6px; }
+  .tab .step { color: var(--accent); font-weight: 700; margin-right: 6px; }
 
   .flow-panel[hidden] { display: none; }
   .flow-panel {
@@ -353,7 +355,7 @@
     color: var(--accent); text-transform: uppercase;
   }
   .step-item .title {
-    font-family: var(--display); font-weight: 600; font-size: 1rem;
+    font-family: var(--display); font-weight: 700; font-size: 1rem;
     margin: 4px 0 6px;
   }
   .step-item .body { color: var(--ink-soft); font-size: .92rem; margin: 0 0 8px; }
@@ -444,7 +446,7 @@
     padding: 16px 18px;
   }
   .entity h4 {
-    font-family: var(--display); font-weight: 600; font-size: 1rem;
+    font-family: var(--display); font-weight: 700; font-size: 1rem;
     margin: 0 0 4px; letter-spacing: -.01em;
   }
   .entity .desc { color: var(--ink-soft); font-size: .85rem; margin: 0 0 12px; }
@@ -497,7 +499,7 @@
   details.acc[open] { background: var(--panel-2); }
   details.acc summary {
     cursor: pointer;
-    font-family: var(--display); font-weight: 600;
+    font-family: var(--display); font-weight: 700;
     color: var(--ink);
     list-style: none;
     display: flex; align-items: center; gap: 10px;
@@ -521,9 +523,310 @@
     .flow-panel { grid-template-columns: 1fr; }
     .anatomy { grid-template-columns: 1fr; }
     .kpis { grid-template-columns: repeat(2, 1fr); }
+    .ladder-track, .rm-grid, .check-list { grid-template-columns: 1fr; }
+    .score-row { grid-template-columns: 1fr 42px; }
+    .score-row .s-label { grid-column: 1 / -1; }
     section { padding: 44px 0; }
   }
+
+  /* ── Cross-doc switcher (shared across the four architecture briefs) ── */
+  .doc-switch { border-bottom: 1px solid var(--line); background: var(--panel); }
+  .doc-switch-inner {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 10px 24px; max-width: var(--maxw); margin: 0 auto;
+  }
+  .doc-switch .ds-label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--ink-faint); margin-right: 2px;
+  }
+  .doc-switch a {
+    font-family: var(--mono); font-size: 12px; color: var(--ink-soft);
+    border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px;
+    text-decoration: none; white-space: nowrap;
+  }
+  .doc-switch a:hover { color: var(--ink); background: var(--panel-2); text-decoration: none; }
+  .doc-switch a.is-here {
+    color: var(--accent-2); border-color: var(--accent-dim); background: var(--accent-dim);
+  }
+  .doc-switch .ds-repo {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ink-faint);
+  }
+
+  /* ── §10 Maturity ladder ── */
+  .ladder-track {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 26px;
+  }
+  .rung {
+    background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--line-2);
+    border-radius: var(--radius); padding: 22px 18px 18px; position: relative;
+    display: flex; flex-direction: column; gap: 9px;
+  }
+  .rung.here { border-top-color: var(--accent); background: linear-gradient(180deg, var(--panel-2), var(--panel)); }
+  .rung .stage-no { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--ink-faint); }
+  .rung h3 { margin: 0; font-size: 1.05rem; }
+  .rung .stage-sub { font-family: var(--mono); font-size: 11px; color: var(--accent-2); }
+  .rung ul { margin: 4px 0 0; padding-left: 15px; color: var(--ink-soft); font-size: .88rem; display: flex; flex-direction: column; gap: 4px; }
+  .rung .proves { margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--line); font-size: .82rem; color: var(--ink-faint); }
+  .rung .proves b { color: var(--ink-soft); font-weight: 700; }
+  .here-badge {
+    position: absolute; top: -11px; left: 16px; background: var(--accent); color: #0d1016;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    padding: 2px 9px; border-radius: 999px; font-weight: 700;
+  }
+
+  /* ── §11 Roadmap board ── */
+  .rm-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; }
+  .rm-chip {
+    font-family: var(--mono); font-size: 12px; color: var(--ink-soft);
+    background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 14px; cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+  }
+  .rm-chip:hover { color: var(--ink); border-color: var(--line-2); }
+  .rm-chip.active { color: var(--accent-2); border-color: var(--accent); background: var(--accent-dim); }
+  .rm-chip .c-count { color: var(--ink-faint); }
+  .rm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .rm-card {
+    background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--line-2);
+    border-radius: var(--radius); padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .rm-card.v-do { border-left-color: var(--new); }
+  .rm-card.v-later { border-left-color: var(--auth); }
+  .rm-card.v-skip { border-left-color: var(--danger); }
+  .rm-card[hidden] { display: none; }
+  .rm-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .rm-head h3 { margin: 0; font-size: 1rem; }
+  .rm-verdict {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 6px; white-space: nowrap; font-weight: 700;
+  }
+  .rm-verdict.v-do { color: var(--new); border: 1px solid var(--new-dim); }
+  .rm-verdict.v-later { color: var(--auth); border: 1px solid var(--auth-dim); }
+  .rm-verdict.v-skip { color: var(--danger); border: 1px solid var(--danger-dim); }
+  .rm-card p { margin: 0; color: var(--ink-soft); font-size: .91rem; }
+  .rm-meta { display: flex; flex-wrap: wrap; gap: 16px; margin-top: auto; padding-top: 8px; }
+  .rm-metric { display: flex; flex-direction: column; gap: 2px; }
+  .rm-metric .m-k { font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+  .rm-metric .m-v { font-size: .84rem; color: var(--ink); }
+  .diff-dots { letter-spacing: 2px; font-size: .8rem; }
+  .diff-dots .on { color: var(--accent-2); }
+  .diff-dots .off { color: var(--line-2); }
+
+  /* ── §12 Scorecard ── */
+  .score-toolbar { display: flex; align-items: center; gap: 14px; margin: 0 0 22px; flex-wrap: wrap; }
+  .score-toggle {
+    font-family: var(--mono); font-size: 12px; color: var(--ink); cursor: pointer;
+    background: var(--panel); border: 1px solid var(--line-2); border-radius: 8px; padding: 7px 14px;
+    transition: border-color .15s, background .15s;
+  }
+  .score-toggle:hover { border-color: var(--accent); }
+  .score-toggle.showing-target { color: var(--new); border-color: var(--new-dim); background: rgba(52,211,153,.06); }
+  .score-legend { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); display: flex; gap: 16px; flex-wrap: wrap; }
+  .score-legend .sl-now::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--accent); margin-right: 6px; vertical-align: -1px; }
+  .score-legend .sl-tgt::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--new-dim); border: 1px solid var(--new); margin-right: 6px; vertical-align: -1px; }
+  .score-grid { display: flex; flex-direction: column; gap: 12px; }
+  .score-row { display: grid; grid-template-columns: 190px 1fr 42px; gap: 14px; align-items: center; }
+  .score-row .s-label { font-size: .9rem; }
+  .score-row .s-label small { display: block; font-family: var(--mono); font-size: 10px; color: var(--ink-faint); margin-top: 2px; }
+  .score-bar { position: relative; height: 24px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+  .score-fill { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, var(--accent-dim), var(--accent)); transition: width .9s cubic-bezier(.2,.8,.2,1); }
+  .score-fill.at-target { background: linear-gradient(90deg, var(--new-dim), var(--new)); }
+  .score-num { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); text-align: right; }
+
+  /* ── §13 Recruiter checklist ── */
+  .check-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+  .check-progress { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+  .check-progress b { color: var(--new); font-weight: 700; }
+  .check-reset { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); background: none; border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  .check-reset:hover { color: var(--ink); border-color: var(--line-2); }
+  .check-bar-track { height: 6px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; margin-bottom: 20px; }
+  .check-bar-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--new)); transition: width .4s ease; }
+  .check-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; list-style: none; padding: 0; margin: 0; }
+  .check-item {
+    display: flex; gap: 12px; align-items: flex-start; background: var(--panel);
+    border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 13px 15px; cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .check-item:hover { border-color: var(--line-2); }
+  .check-item input { margin: 2px 0 0; width: 17px; height: 17px; accent-color: var(--new); cursor: pointer; flex: none; }
+  .check-item .ci-body { display: flex; flex-direction: column; gap: 3px; }
+  .check-item .ci-title { font-size: .92rem; color: var(--ink); }
+  .check-item .ci-sub { font-family: var(--mono); font-size: 10.5px; color: var(--ink-faint); }
+  .check-item.done .ci-title { color: var(--ink-faint); text-decoration: line-through; }
+  .check-item.done { border-color: var(--new-dim); background: rgba(52,211,153,.04); }
+
+  /* ══════════════════════════════════════════════════════════════════
+     REFINEMENT LAYER
+     Deliberately last in the stylesheet. Two reasons:
+       1. Media queries add no specificity, so the responsive rules for
+          components defined below the original @media block have to be
+          re-declared here or the desktop rule wins at every width.
+       2. The type scale above was tuned for Sora — a tight geometric
+          display face. Atkinson Hyperlegible is a legibility face with
+          open apertures and generous sidebearings; negative tracking
+          and 1.6 heading leading fight it. Retuned here.
+     ══════════════════════════════════════════════════════════════════ */
+
+  :root {
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.28);
+    --shadow-md: 0 6px 20px -6px rgba(0,0,0,.5);
+    --shadow-lg: 0 20px 52px -14px rgba(0,0,0,.62);
+    --ring: 0 0 0 3px rgba(109,94,252,.4);
+    --ease: cubic-bezier(.2,.7,.3,1);
+    --nav-h: 56px;
+  }
+
+  /* ── Type scale, retuned for Atkinson ── */
+  h1 { line-height: 1.08; letter-spacing: -.018em; }
+  h2 { line-height: 1.18; letter-spacing: -.008em; }
+  h3 { line-height: 1.28; letter-spacing: 0; }
+  .kpi .v,
+  .card h3,
+  .rung h3,
+  .rm-head h3,
+  .layer-btn .name { line-height: 1.25; letter-spacing: 0; }
+  .lede { font-size: 1.09rem; line-height: 1.62; }
+  .section-lede { font-size: 1.01rem; line-height: 1.65; }
+  /* Mono is still JetBrains — keep its tracking tight, it reads better small. */
+  .kicker, .eyebrow { font-feature-settings: "tnum"; }
+
+  /* ── Anchor offset: the subnav is sticky, so jump targets need clearance ── */
+  section[id] { scroll-margin-top: calc(var(--nav-h) + 20px); }
+
+  /* ── Reading progress (injected by script) ── */
+  #readProgress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0;
+    background: linear-gradient(90deg, var(--accent), var(--new));
+    z-index: 40; transition: width .12s linear; pointer-events: none;
+  }
+
+  /* ── Sticky subnav: active-section state ── */
+  .subnav a { transition: color .18s var(--ease), background .18s var(--ease); }
+  .subnav a.active {
+    color: var(--accent-2); background: var(--accent-dim);
+  }
+
+  /* ── Back to top (injected by script) ── */
+  #toTop {
+    position: fixed; right: 22px; bottom: 22px; z-index: 35;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--panel-2); border: 1px solid var(--line-2); color: var(--ink-soft);
+    display: grid; place-items: center; cursor: pointer; font-size: 15px;
+    box-shadow: var(--shadow-md);
+    opacity: 0; visibility: hidden; transform: translateY(8px);
+    transition: opacity .25s var(--ease), transform .25s var(--ease),
+                visibility .25s, color .18s, border-color .18s;
+  }
+  #toTop.show { opacity: 1; visibility: visible; transform: none; }
+  #toTop:hover { color: var(--ink); border-color: var(--accent); }
+
+  /* ── Elevation & hover materials ── */
+  .kpi, .card, .rung, .rm-card, .check-item, .layer-btn,
+  .diagram-shell, .persist-col, .sec-card {
+    box-shadow: var(--shadow-sm);
+    transition: transform .24s var(--ease), box-shadow .24s var(--ease),
+                border-color .24s var(--ease), background .24s var(--ease);
+  }
+  .card:hover, .rung:hover, .rm-card:hover {
+    transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--line-2);
+  }
+  .rm-card.v-do:hover    { border-left-color: var(--new); }
+  .rm-card.v-later:hover { border-left-color: var(--auth); }
+  .rm-card.v-skip:hover  { border-left-color: var(--danger); }
+  .kpi:hover { border-color: var(--line-2); }
+  .diagram-shell { box-shadow: var(--shadow-md); }
+  .layer-btn:hover { box-shadow: var(--shadow-md); }
+  .layer-btn.active { box-shadow: var(--shadow-md); }
+
+  /* Give the hero KPIs a hairline accent so the row reads as a unit */
+  .kpi { position: relative; overflow: hidden; }
+  .kpi::after {
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent 70%);
+    opacity: .55;
+  }
+
+  /* ── Focus visibility (keyboard users) ── */
+  a:focus-visible, button:focus-visible, input:focus-visible,
+  .layer-btn:focus-visible, .tab:focus-visible, summary:focus-visible {
+    outline: none; box-shadow: var(--ring); border-radius: 8px;
+  }
+
+  /* ── Selection & scrollbars ── */
+  ::selection { background: rgba(109,94,252,.4); color: #fff; }
+  html { scrollbar-color: var(--line-2) transparent; scrollbar-width: thin; }
+  ::-webkit-scrollbar { width: 12px; height: 12px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--line-2); border-radius: 99px; border: 3px solid var(--bg);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #46506b; }
+
+  /* ── Scroll reveal (motion-safe only) ── */
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { opacity: 0; transform: translateY(16px); }
+    .reveal.in {
+      opacity: 1; transform: none;
+      transition: opacity .55s var(--ease), transform .55s var(--ease);
+    }
+  }
+
+  /* ══════════════════════════════════════════════
+     RESPONSIVE — re-declared after the components
+     they target (see note at the top of this layer)
+     ══════════════════════════════════════════════ */
+  @media (max-width: 980px) {
+    .rm-grid { grid-template-columns: 1fr; }
+    .ladder-track { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 860px) {
+    .ladder-track, .check-list { grid-template-columns: 1fr; }
+    .score-row { grid-template-columns: 1fr 42px; }
+    .score-row .s-label { grid-column: 1 / -1; }
+    .doc-switch-inner { padding: 9px 18px; gap: 6px; }
+    .doc-switch .ds-repo { display: none; }
+    #toTop { right: 14px; bottom: 14px; }
+  }
+  @media (max-width: 560px) {
+    .kpis { grid-template-columns: 1fr; }
+    .rm-meta { gap: 12px; }
+    h1 { letter-spacing: -.01em; }
+  }
+
+  /* ══════════════════════════════════════════════
+     PRINT — everything styles through tokens, so
+     re-pointing them is the whole light-mode job.
+     ══════════════════════════════════════════════ */
+  @media print {
+    :root {
+      --bg: #fff; --panel: #fff; --panel-2: #f4f6fa; --panel-3: #eceff6;
+      --line: #d3d8e4; --line-2: #b4bccd;
+      --ink: #10131a; --ink-soft: #394154; --ink-faint: #6a7285;
+      --accent: #4c3fd0; --accent-2: #4c3fd0; --accent-dim: #dcd8ff;
+      --new: #0a7d55; --new-dim: #bde8d6; --auth: #a35f06; --auth-dim: #f5e2c2;
+      --danger: #c22e46; --danger-dim: #f6d3da;
+    }
+    body { background: #fff !important; }
+    .subnav, .doc-switch, #readProgress, #toTop,
+    .rm-filters, .score-toolbar, .check-reset { display: none !important; }
+    section { padding: 26px 0; break-inside: avoid; }
+    .card, .rm-card, .rung, .check-item, .diagram-shell, .kpi { break-inside: avoid; box-shadow: none; }
+    .reveal { opacity: 1 !important; transform: none !important; }
+    a { color: #10131a; text-decoration: underline; }
+    .rm-card[hidden] { display: flex !important; }
+  }
 </style>
+
+<nav class="doc-switch" aria-label="Documentation set">
+  <div class="doc-switch-inner">
+    <span class="ds-label">Docs</span>
+    <a href="architecture.html" class="is-here" aria-current="page">Frontend Architecture</a>
+    <a href="catalog-architecture.html">Catalog Pivot</a>
+    <span class="ds-repo">·&nbsp;backend&nbsp;·</span>
+    <a href="../../GameStoreBackEnd/Bino/docs/architecture.html">Backend Architecture</a>
+    <a href="../../GameStoreBackEnd/Bino/docs/architecture-and-learning-guide.html">Learning Guide</a>
+  </div>
+</nav>
 
 <nav class="subnav">
   <div class="subnav-inner">
@@ -536,6 +839,10 @@
     <a href="#failure">Failure Modes</a>
     <a href="#features">Increment</a>
     <a href="#extended">Extended</a>
+    <a href="#maturity">Maturity</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#scorecard">Scorecard</a>
+    <a href="#checklist">Checklist</a>
   </div>
 </nav>
 
@@ -1434,6 +1741,360 @@ flowchart TB
   </div>
 </section>
 
+<!-- ─────────────────────────── MATURITY ─────────────────────────── -->
+<section id="maturity">
+  <div class="wrap">
+    <p class="kicker">§ 10 · Maturity Ladder</p>
+    <h2>Where this project is, and where it's going</h2>
+    <p class="section-lede">
+      Four honest stages from "runs on my machine" to "the version I'd defend in a system-design
+      interview." The marker below is pinned to today. Each rung says what it <em>proves</em> to a
+      reviewer — because a portfolio is judged on the evidence it produces, not the intentions behind it.
+    </p>
+
+    <div class="ladder-track">
+      <div class="rung here">
+        <span class="here-badge">You are here</span>
+        <span class="stage-no">Stage 0</span>
+        <h3>Current State</h3>
+        <span class="stage-sub">local · feature-complete core</span>
+        <ul>
+          <li>Full-stack auth with JWT + RBAC</li>
+          <li>Games/Users CRUD, DTO boundaries</li>
+          <li>H2 integration tests (auth, RBAC)</li>
+          <li>Four interactive architecture docs</li>
+        </ul>
+        <p class="proves"><b>Proves:</b> you can build a correctly-layered secured full-stack app.</p>
+      </div>
+
+      <div class="rung">
+        <span class="stage-no">Stage 1</span>
+        <h3>Next Milestone</h3>
+        <span class="stage-sub">deployed · reachable</span>
+        <ul>
+          <li>Live public URL + published docs</li>
+          <li>Dockerised, one-command run</li>
+          <li>CORS &amp; secrets from env</li>
+          <li>Real ownership (purchases → library)</li>
+        </ul>
+        <p class="proves"><b>Proves:</b> you can ship, not just build. The single biggest gap today.</p>
+      </div>
+
+      <div class="rung">
+        <span class="stage-no">Stage 2</span>
+        <h3>Portfolio Ready</h3>
+        <span class="stage-sub">defensible · maintained</span>
+        <ul>
+          <li>Flyway migrations, prod profile</li>
+          <li>Server-side search/sort + pagination</li>
+          <li>CI on every push (build + test)</li>
+          <li>Trimmed, single-design-system frontend</li>
+        </ul>
+        <p class="proves"><b>Proves:</b> you make the operational decisions a team expects by default.</p>
+      </div>
+
+      <div class="rung">
+        <span class="stage-no">Stage 3</span>
+        <h3>Best-Case Version</h3>
+        <span class="stage-sub">the standout story</span>
+        <ul>
+          <li>RAWG catalog + tiered cache
+            (<a href="catalog-architecture.html">the pivot</a>)</li>
+          <li>Cart, checkout, price snapshots</li>
+          <li>Frontend tests + basic observability</li>
+          <li>Refresh-token rotation</li>
+        </ul>
+        <p class="proves"><b>Proves:</b> you can own commerce over data you don't control — a real design problem.</p>
+      </div>
+    </div>
+    <p class="caption">The distance from Stage 0 to Stage 1 is worth more than any feature in Stage 3.
+      A brilliant app nobody can open scores lower than a modest one with a live link.</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────── ROADMAP ─────────────────────────── -->
+<section id="roadmap">
+  <div class="wrap">
+    <p class="kicker">§ 11 · Roadmap Board</p>
+    <h2>What to build next — and what to deliberately skip</h2>
+    <p class="section-lede">
+      Every candidate improvement scored on <b>difficulty</b>, <b>effort</b> and <b>impact</b>, with a
+      verdict. Filter by stage. The <span style="color:var(--danger)">Skip</span> column is not filler —
+      knowing what <em>not</em> to build is the clearest signal of engineering judgment on this page.
+    </p>
+
+    <div class="rm-filters" role="tablist" aria-label="Roadmap filter">
+      <button class="rm-chip active" data-filter="all" role="tab" aria-selected="true">All <span class="c-count"></span></button>
+      <button class="rm-chip" data-filter="next" role="tab" aria-selected="false">Next Milestone</button>
+      <button class="rm-chip" data-filter="portfolio" role="tab" aria-selected="false">Portfolio Ready</button>
+      <button class="rm-chip" data-filter="best" role="tab" aria-selected="false">Best Case</button>
+      <button class="rm-chip" data-filter="skip" role="tab" aria-selected="false">Deliberately Skip</button>
+    </div>
+
+    <div class="rm-grid">
+      <!-- NEXT -->
+      <article class="rm-card v-do" data-cat="next">
+        <div class="rm-head"><h3>Deploy publicly</h3><span class="rm-verdict v-do">Do it</span></div>
+        <p>Cloudflare Pages (SPA) + an Oracle Cloud Always-Free ARM VM running <code>docker compose</code>.
+          The single highest-impact task in the whole backlog.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~1 day</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">Critical</span></div>
+        </div>
+      </article>
+
+      <article class="rm-card v-do" data-cat="next">
+        <div class="rm-head"><h3>Publish docs to GitHub Pages</h3><span class="rm-verdict v-do">Do it</span></div>
+        <p>These four HTML briefs become a clickable link in the README. Highest leverage-per-minute
+          item on the board — near-zero effort, immediate recruiter payoff.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~1 hr</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">High</span></div>
+        </div>
+      </article>
+
+      <article class="rm-card v-do" data-cat="next">
+        <div class="rm-head"><h3>Dockerise the stack</h3><span class="rm-verdict v-do">Do it</span></div>
+        <p>Backend, frontend, and MySQL as containers behind one <code>docker compose up</code>. The
+          topology is designed in the <a href="../../GameStoreBackEnd/Bino/docs/architecture.html#docker">backend brief §14</a>.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~1 day</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">High</span></div>
+        </div>
+      </article>
+
+      <article class="rm-card v-do" data-cat="next">
+        <div class="rm-head"><h3>CORS &amp; secrets from env</h3><span class="rm-verdict v-do">Do it</span></div>
+        <p><code>CorsConfig</code> hardcodes <code>localhost:5173</code>, which actively blocks
+          deployment. Move the origin, DB creds and JWT secret to environment variables.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~30 min</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">High · unblocks deploy</span></div>
+        </div>
+      </article>
+
+      <article class="rm-card v-do" data-cat="next">
+        <div class="rm-head"><h3>Real ownership</h3><span class="rm-verdict v-do">Do it</span></div>
+        <p>The <code>Purchases</code> entity exists but has no endpoints, so <code>LibraryPage</code>
+          shows <em>every</em> game. Add purchase + library endpoints so ownership becomes real.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~1 day</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">High</span></div>
+        </div>
+      </article>
+
+      <!-- PORTFOLIO -->
+      <article class="rm-card v-do" data-cat="portfolio">
+        <div class="rm-head"><h3>Server-side search, sort &amp; pagination</h3><span class="rm-verdict v-do">Do it</span></div>
+        <p><code>GamesService.searchGames()</code> already exists but no controller exposes it, so
+          filtering runs client-side over the whole table. Expose it and return a <code>Page</code>.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~half day</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">Medium</span></div>
+        </div>
+      </article>
+
+      <article class="rm-card v-do" data-cat="portfolio">
+        <div class="rm-head"><h3>Flyway migrations</h3><span class="rm-verdict v-do">Do it</span></div>
+        <p>Retire <code>ddl-auto=update</code> for versioned SQL migrations. Turns an implicit,
+          unrepeatable schema into a reviewable history — a concrete "I know how teams manage schema" signal.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~3 hrs</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">Medium</span></div>
+        </div>
+      </article>
+
+      <article class="rm-card v-do" data-cat="portfolio">
+        <div class="rm-head"><h3>Production Spring profile</h3><span class="rm-verdict v-do">Do it</span></div>
+        <p>Split <code>show-sql=true</code> and DEBUG logging out of the default profile into
+          <code>application-prod.properties</code>. Cheap, and it reads as operational awareness.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~1 hr</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">Medium</span></div>
+        </div>
+      </article>
+
+      <article class="rm-card v-do" data-cat="portfolio">
+        <div class="rm-head"><h3>Trim frontend dependencies</h3><span class="rm-verdict v-do">Do it</span></div>
+        <p><code>package.json</code> ships Chakra <em>and</em> Bootstrap <em>and</em> react-bootstrap
+          <em>and</em> two icon sets. Pick one design system. A reviewer spots this in ten seconds.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~3 hrs</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">Medium</span></div>
+        </div>
+      </article>
+
+      <article class="rm-card v-do" data-cat="portfolio">
+        <div class="rm-head"><h3>CI with GitHub Actions</h3><span class="rm-verdict v-do">Do it</span></div>
+        <p>Build + <code>mvnw verify</code> + lint on every push. Free for public repos, and a green
+          check badge on the README is a trust signal recruiters recognise instantly.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~half day</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">Medium–High</span></div>
+        </div>
+      </article>
+
+      <!-- BEST CASE -->
+      <article class="rm-card v-do" data-cat="best">
+        <div class="rm-head"><h3>RAWG catalog + tiered cache</h3><span class="rm-verdict v-do">Do it</span></div>
+        <p>The headline feature: a real external-API integration behind a Caffeine → MySQL shadow-row
+          cache. Fully designed in the <a href="catalog-architecture.html">catalog brief</a>.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="on">●</span><span class="on">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">multi-day</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">High · standout</span></div>
+        </div>
+      </article>
+
+      <article class="rm-card v-do" data-cat="best">
+        <div class="rm-head"><h3>Cart, checkout &amp; order snapshots</h3><span class="rm-verdict v-do">Do it</span></div>
+        <p>Complete the commerce loop with a transactional checkout that snapshots title and price at
+          purchase time, so historical receipts never drift. The core problem the catalog brief solves.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="on">●</span><span class="on">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">multi-day</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">High</span></div>
+        </div>
+      </article>
+
+      <article class="rm-card v-later" data-cat="best">
+        <div class="rm-head"><h3>Frontend tests</h3><span class="rm-verdict v-later">Later</span></div>
+        <p>Vitest + React Testing Library on the auth flow and guards. Worth doing, but backend tests
+          already exist — this raises the floor rather than the ceiling, so it waits until after deploy.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">ongoing</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">Medium</span></div>
+        </div>
+      </article>
+
+      <article class="rm-card v-later" data-cat="best">
+        <div class="rm-head"><h3>Refresh-token rotation</h3><span class="rm-verdict v-later">Later</span></div>
+        <p>A short-lived access token + rotating refresh token is the "correct" answer, but the current
+          24h token is a defensible portfolio trade-off. Do it to <em>show</em> you know the pattern.</p>
+        <div class="rm-meta">
+          <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span></span></div>
+          <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~1 day</span></div>
+          <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">Low–Medium</span></div>
+        </div>
+      </article>
+
+      <!-- SKIP -->
+      <article class="rm-card v-skip" data-cat="skip">
+        <div class="rm-head"><h3>Kubernetes</h3><span class="rm-verdict v-skip">Skip</span></div>
+        <p>One container per service on one VM. Compose is the correct tool; k8s here is résumé-driven
+          complexity that a good reviewer reads as a <em>lack</em> of judgment, not a surplus of skill.</p>
+      </article>
+
+      <article class="rm-card v-skip" data-cat="skip">
+        <div class="rm-head"><h3>Redis</h3><span class="rm-verdict v-skip">Skip</span></div>
+        <p>Caffeine (in-process) plus a MySQL shadow table already cover the cache need at this scale.
+          A second datastore to run, secure and back up buys nothing here.</p>
+      </article>
+
+      <article class="rm-card v-skip" data-cat="skip">
+        <div class="rm-head"><h3>Microservices</h3><span class="rm-verdict v-skip">Skip</span></div>
+        <p>This is one bounded context. A well-layered monolith is the <em>right</em> architecture —
+          splitting it would add network calls and deploy pain to solve a problem the app doesn't have.</p>
+      </article>
+
+      <article class="rm-card v-skip" data-cat="skip">
+        <div class="rm-head"><h3>Kafka / event sourcing / CQRS</h3><span class="rm-verdict v-skip">Skip</span></div>
+        <p>No async workload, no audit-log requirement, no read/write asymmetry that a broker or an
+          event store would relieve. These solve problems a store this size never encounters.</p>
+      </article>
+
+      <article class="rm-card v-skip" data-cat="skip">
+        <div class="rm-head"><h3>GraphQL</h3><span class="rm-verdict v-skip">Skip</span></div>
+        <p>The REST surface is small, stable and well-documented. GraphQL's flexibility is a cost with
+          no matching benefit until clients need to shape wildly varied queries.</p>
+      </article>
+
+      <article class="rm-card v-skip" data-cat="skip">
+        <div class="rm-head"><h3>Terraform / IaC</h3><span class="rm-verdict v-skip">Skip</span></div>
+        <p>One VM provisioned once. A documented <code>compose.yml</code> and a short runbook are the
+          right level of "infrastructure as code" for a single-node portfolio deploy.</p>
+      </article>
+    </div>
+    <p class="caption" id="rm-empty" hidden>No items in this stage.</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────── SCORECARD ─────────────────────────── -->
+<section id="scorecard">
+  <div class="wrap">
+    <p class="kicker">§ 12 · Architecture Scorecard</p>
+    <h2>Honest now, with a target to close to</h2>
+    <p class="section-lede">
+      Nine dimensions, scored out of 10. The bars show today; toggle to reveal the Stage-2 target. The
+      <em>gap</em> is the point — a scorecard with everything at 10 is a scorecard nobody believes.
+    </p>
+
+    <div class="score-toolbar">
+      <button class="score-toggle" id="scoreToggle" aria-pressed="false">Show target state →</button>
+      <div class="score-legend">
+        <span class="sl-now">Now</span>
+        <span class="sl-tgt">Target (Portfolio Ready)</span>
+      </div>
+    </div>
+
+    <div class="score-grid">
+      <div class="score-row"><div class="s-label">Layering &amp; structure<small>controller · service · repo · dto</small></div><div class="score-bar"><div class="score-fill" data-now="90" data-target="90"></div></div><div class="score-num" data-now="9" data-target="9">9</div></div>
+      <div class="score-row"><div class="s-label">Security<small>JWT · RBAC · no leaked secrets</small></div><div class="score-bar"><div class="score-fill" data-now="70" data-target="90"></div></div><div class="score-num" data-now="7" data-target="9">7</div></div>
+      <div class="score-row"><div class="s-label">Data integrity<small>constraints · migrations</small></div><div class="score-bar"><div class="score-fill" data-now="50" data-target="85"></div></div><div class="score-num" data-now="5" data-target="8.5">5</div></div>
+      <div class="score-row"><div class="s-label">Testing<small>backend IT · no frontend tests</small></div><div class="score-bar"><div class="score-fill" data-now="55" data-target="80"></div></div><div class="score-num" data-now="5.5" data-target="8">5.5</div></div>
+      <div class="score-row"><div class="s-label">Deployability<small>docker · public URL · CI</small></div><div class="score-bar"><div class="score-fill" data-now="20" data-target="90"></div></div><div class="score-num" data-now="2" data-target="9">2</div></div>
+      <div class="score-row"><div class="s-label">Observability<small>health · logs · metrics</small></div><div class="score-bar"><div class="score-fill" data-now="30" data-target="70"></div></div><div class="score-num" data-now="3" data-target="7">3</div></div>
+      <div class="score-row"><div class="s-label">Documentation<small>these interactive briefs</small></div><div class="score-bar"><div class="score-fill" data-now="95" data-target="95"></div></div><div class="score-num" data-now="9.5" data-target="9.5">9.5</div></div>
+      <div class="score-row"><div class="s-label">Frontend hygiene<small>deps · design-system focus</small></div><div class="score-bar"><div class="score-fill" data-now="55" data-target="85"></div></div><div class="score-num" data-now="5.5" data-target="8.5">5.5</div></div>
+      <div class="score-row"><div class="s-label">API design<small>REST · pagination · errors</small></div><div class="score-bar"><div class="score-fill" data-now="70" data-target="88"></div></div><div class="score-num" data-now="7" data-target="8.8">7</div></div>
+    </div>
+    <p class="caption">Deployability at 2/10 is the load-bearing number — it drags the whole profile down
+      and is also the cheapest to fix. Everything else is already close to portfolio-grade.</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────── CHECKLIST ─────────────────────────── -->
+<section id="checklist">
+  <div class="wrap">
+    <p class="kicker">§ 13 · Recruiter Checklist</p>
+    <h2>The 90-second review, from the other side of the table</h2>
+    <p class="section-lede">
+      This is roughly what a senior engineer checks in the first minute and a half of opening your repo.
+      Tick items off as you land them — your progress is saved in this browser.
+    </p>
+
+    <div class="check-head">
+      <span class="check-progress"><b id="checkDone">0</b> / <span id="checkTotal">0</span> ready for review</span>
+      <button class="check-reset" id="checkReset">Reset</button>
+    </div>
+    <div class="check-bar-track"><div class="check-bar-fill" id="checkBar"></div></div>
+
+    <ul class="check-list" id="checkList">
+      <li><label class="check-item"><input type="checkbox" data-ck="live"><span class="ci-body"><span class="ci-title">README has a live demo link at the top</span><span class="ci-sub">the first thing anyone looks for</span></span></label></li>
+      <li><label class="check-item"><input type="checkbox" data-ck="creds"><span class="ci-body"><span class="ci-title">Demo credentials provided</span><span class="ci-sub">a reviewer will not register an account</span></span></label></li>
+      <li><label class="check-item"><input type="checkbox" data-ck="run"><span class="ci-body"><span class="ci-title">Runs with one command</span><span class="ci-sub">docker compose up — no 12-step setup</span></span></label></li>
+      <li><label class="check-item"><input type="checkbox" data-ck="readme"><span class="ci-body"><span class="ci-title">README explains the what and the why</span><span class="ci-sub">architecture, decisions, trade-offs</span></span></label></li>
+      <li><label class="check-item"><input type="checkbox" data-ck="tests"><span class="ci-body"><span class="ci-title">A test suite exists and is visible</span><span class="ci-sub">backend IT present; frontend still open</span></span></label></li>
+      <li><label class="check-item"><input type="checkbox" data-ck="ci"><span class="ci-body"><span class="ci-title">CI badge is green</span><span class="ci-sub">proves it builds on a clean machine</span></span></label></li>
+      <li><label class="check-item"><input type="checkbox" data-ck="git"><span class="ci-body"><span class="ci-title">Commit history reads cleanly</span><span class="ci-sub">scoped messages, no "fix stuff" noise</span></span></label></li>
+      <li><label class="check-item"><input type="checkbox" data-ck="secrets"><span class="ci-body"><span class="ci-title">No secrets in the repo</span><span class="ci-sub">env vars + .env.example, nothing real</span></span></label></li>
+      <li><label class="check-item"><input type="checkbox" data-ck="docs"><span class="ci-body"><span class="ci-title">Architecture docs are linked &amp; live</span><span class="ci-sub">these briefs, on GitHub Pages</span></span></label></li>
+      <li><label class="check-item"><input type="checkbox" data-ck="responsive"><span class="ci-body"><span class="ci-title">App works on a phone screen</span><span class="ci-sub">reviewers open links on mobile</span></span></label></li>
+    </ul>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     Generated architecture brief · open in any browser · diagrams rendered client-side via
@@ -1531,4 +2192,197 @@ flowchart TB
       }
     });
   });
+
+  // ── §11 Roadmap filter chips ────────────────────────────────────
+  const rmChips = document.querySelectorAll(".rm-chip");
+  const rmCards = [...document.querySelectorAll(".rm-card")];
+  const rmEmpty = document.getElementById("rm-empty");
+  const allChip = document.querySelector('.rm-chip[data-filter="all"] .c-count');
+  if (allChip) allChip.textContent = `(${rmCards.length})`;
+  rmChips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const f = chip.dataset.filter;
+      rmChips.forEach((c) => {
+        const active = c === chip;
+        c.classList.toggle("active", active);
+        c.setAttribute("aria-selected", active ? "true" : "false");
+      });
+      let shown = 0;
+      rmCards.forEach((card) => {
+        const match = f === "all" || card.dataset.cat === f;
+        card.hidden = !match;
+        if (match) shown++;
+      });
+      if (rmEmpty) rmEmpty.hidden = shown !== 0;
+    });
+  });
+
+  // ── §12 Scorecard: render now-state, toggle to target ───────────
+  const scoreFills = [...document.querySelectorAll(".score-fill")];
+  const scoreNums = [...document.querySelectorAll(".score-num")];
+  function paintScores(key) {
+    scoreFills.forEach((f) => {
+      f.style.width = f.dataset[key] + "%";
+      f.classList.toggle("at-target", key === "target");
+    });
+    scoreNums.forEach((n) => { n.textContent = n.dataset[key]; });
+  }
+  // Fill from 0 → now once the section scrolls into view (graceful if no IO).
+  const scoreSection = document.getElementById("scorecard");
+  if ("IntersectionObserver" in window && scoreSection) {
+    const io = new IntersectionObserver((entries, obs) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) { paintScores("now"); obs.disconnect(); }
+      });
+    }, { threshold: 0.25 });
+    io.observe(scoreSection);
+  } else {
+    paintScores("now");
+  }
+  const scoreToggle = document.getElementById("scoreToggle");
+  if (scoreToggle) {
+    let showingTarget = false;
+    scoreToggle.addEventListener("click", () => {
+      showingTarget = !showingTarget;
+      paintScores(showingTarget ? "target" : "now");
+      scoreToggle.classList.toggle("showing-target", showingTarget);
+      scoreToggle.setAttribute("aria-pressed", showingTarget ? "true" : "false");
+      scoreToggle.textContent = showingTarget ? "← Back to current state" : "Show target state →";
+    });
+  }
+
+  // ── §13 Recruiter checklist (persisted in localStorage) ─────────
+  const CK_KEY = "gamestore-recruiter-checklist";
+  const ckBoxes = [...document.querySelectorAll("#checkList input[type=checkbox]")];
+  const ckDone = document.getElementById("checkDone");
+  const ckTotal = document.getElementById("checkTotal");
+  const ckBar = document.getElementById("checkBar");
+  const ckReset = document.getElementById("checkReset");
+  if (ckTotal) ckTotal.textContent = ckBoxes.length;
+
+  function loadCk() {
+    try { return JSON.parse(localStorage.getItem(CK_KEY)) || {}; }
+    catch { return {}; }
+  }
+  function saveCk(state) {
+    try { localStorage.setItem(CK_KEY, JSON.stringify(state)); } catch { /* private mode */ }
+  }
+  function renderCk() {
+    const state = loadCk();
+    let done = 0;
+    ckBoxes.forEach((box) => {
+      const on = !!state[box.dataset.ck];
+      box.checked = on;
+      box.closest(".check-item").classList.toggle("done", on);
+      if (on) done++;
+    });
+    if (ckDone) ckDone.textContent = done;
+    if (ckBar) ckBar.style.width = ckBoxes.length ? (done / ckBoxes.length * 100) + "%" : "0%";
+  }
+  ckBoxes.forEach((box) => {
+    box.addEventListener("change", () => {
+      const state = loadCk();
+      state[box.dataset.ck] = box.checked;
+      saveCk(state);
+      renderCk();
+    });
+  });
+  if (ckReset) {
+    ckReset.addEventListener("click", () => { saveCk({}); renderCk(); });
+  }
+  renderCk();
+
+  /* ══════════════════════════════════════════════════════════════
+     PAGE CHROME — reading progress, scroll-spy, back-to-top, reveal.
+     All progressive enhancement: the document reads fine without it,
+     and every motion effect is gated on prefers-reduced-motion.
+     ══════════════════════════════════════════════════════════════ */
+  const motionOK = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ── Reading progress bar ──
+  const progress = document.createElement("div");
+  progress.id = "readProgress";
+  document.body.appendChild(progress);
+
+  // ── Back to top ──
+  const toTop = document.createElement("button");
+  toTop.id = "toTop";
+  toTop.type = "button";
+  toTop.setAttribute("aria-label", "Back to top");
+  toTop.innerHTML = "&uarr;";
+  toTop.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: motionOK ? "smooth" : "auto" });
+  });
+  document.body.appendChild(toTop);
+
+  // ── Scroll handler: progress width + back-to-top visibility ──
+  let ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - doc.clientHeight;
+      const pct = max > 0 ? (doc.scrollTop / max) * 100 : 0;
+      progress.style.width = pct + "%";
+      toTop.classList.toggle("show", doc.scrollTop > 600);
+      ticking = false;
+    });
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  // ── Scroll-spy: highlight the subnav link for the section in view ──
+  const navLinks = [...document.querySelectorAll(".subnav a")];
+  const linkFor = new Map(navLinks.map((a) => [a.getAttribute("href").slice(1), a]));
+  const spied = [...document.querySelectorAll("section[id]")].filter((s) => linkFor.has(s.id));
+  if ("IntersectionObserver" in window && spied.length) {
+    // Track which sections are on screen; the topmost one wins.
+    const visible = new Set();
+    const spy = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) visible.add(e.target.id);
+          else visible.delete(e.target.id);
+        });
+        const current = spied.find((s) => visible.has(s.id));
+        navLinks.forEach((a) => a.classList.remove("active"));
+        if (current) {
+          const link = linkFor.get(current.id);
+          if (link) link.classList.add("active");
+        }
+      },
+      // Top inset clears the sticky nav; bottom inset stops the last
+      // section claiming focus while you're still reading the one above.
+      { rootMargin: "-76px 0px -55% 0px", threshold: 0 }
+    );
+    spied.forEach((s) => spy.observe(s));
+  }
+
+  // ── Scroll reveal ──
+  if (motionOK && "IntersectionObserver" in window) {
+    const targets = [...document.querySelectorAll("section")];
+    targets.forEach((el) => el.classList.add("reveal"));
+    const revealer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          e.target.classList.add("in");
+          obs.unobserve(e.target);
+        });
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.04 }
+    );
+    targets.forEach((el) => revealer.observe(el));
+    // Anything already in view on load should not wait for a scroll event.
+    requestAnimationFrame(() => {
+      targets.forEach((el) => {
+        if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add("in");
+      });
+    });
+    // Fail-safe: .reveal starts at opacity 0, so if the observer never fires
+    // the document would read as blank. Force everything visible after a beat —
+    // a doc that loses its animation is fine, one that loses its text is not.
+    setTimeout(() => targets.forEach((el) => el.classList.add("in")), 2500);
+  }
 </script>

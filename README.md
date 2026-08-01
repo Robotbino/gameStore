@@ -2,6 +2,20 @@
 
 A game storefront web app with a customer-facing shop and a separate admin portal, built as the frontend for a Spring Boot + JWT backend.
 
+> **Live demo:** _coming soon_ &nbsp;·&nbsp; **Backend repo:** [`GameStoreBackEnd`](../GameStoreBackEnd/Bino) &nbsp;·&nbsp; **Architecture docs:** [Frontend](docs/architecture.html) · [Catalog pivot](docs/catalog-architecture.html)
+
+## Documentation
+
+This project ships an interactive engineering handbook — open the HTML files in any browser (no build needed):
+
+| Doc | What it covers |
+|-----|----------------|
+| [`docs/architecture.html`](docs/architecture.html) | Full-stack architecture, data flows, plus the **maturity ladder, roadmap board, scorecard, and recruiter checklist** (§10–§13) |
+| [`docs/catalog-architecture.html`](docs/catalog-architecture.html) | Proposed RAWG external-catalog pivot with a tiered cache (target architecture, not yet built) |
+| [`GameStoreBackEnd`](../GameStoreBackEnd/Bino/docs/architecture.html) | Backend architecture, **caching strategy, persistence, $0 deployment, Docker topology, and hardening** (§11–§16) |
+
+The two repos' docs cross-link via a switcher strip at the top of each page.
+
 ## Features
 
 - **Authentication** — register, sign in, and JWT session handling with automatic redirect on expiry
