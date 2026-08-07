@@ -784,13 +784,17 @@
         <div class="rm-head">
           <label class="rm-tick"><input type="checkbox" data-ck="F14" /><span class="rm-id">F14</span></label>
           <h3>Make the Library page show the user's actual library</h3>
-          <span class="rm-verdict v-do">Do it</span>
+          <span class="rm-verdict v-do">Shipped ✓</span>
         </div>
-        <p>Right now the page fetches every game in the store and presents it as owned. It is the one place
-          in the app that is actively misleading rather than merely incomplete.</p>
-        <p class="rm-anchor"><code>pages/LibraryPage.tsx:15</code> calls
-          <code>gameService.getAll()</code>. Point it at <code>GET /purchases/me</code> once
-          <code>B9</code> ships.</p>
+        <p><b>Done (2026-08-07), with the full cart flow.</b> The page no longer presents the whole store as
+          owned — it reads <code>GET /purchases/me</code> and maps each purchase's game into the grid. Shipped
+          alongside a new cart (localStorage-backed <code>CartContext</code>, per-user keyed), a
+          <code>CartPage</code> that checks out via <code>POST /purchases</code>, and a
+          <code>GameDetailsPage</code> button that reflects In Library / In Cart / Add to Cart.</p>
+        <p class="rm-anchor"><code>pages/LibraryPage.tsx</code> now calls
+          <code>purchaseService.getMine()</code> against backend <code>B9</code> (also shipped). New:
+          <code>services/purchaseService.ts</code>, <code>context/CartContext.tsx</code>,
+          <code>hooks/useCart.ts</code>, <code>pages/user/CartPage.tsx</code>, <code>types/purchase.ts</code>.</p>
         <div class="rm-meta">
           <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~half day</span></div>
           <div class="rm-metric"><span class="m-k">Depends on</span><span class="m-v">B9</span></div>
@@ -804,6 +808,10 @@
           <h3>Introduce a query cache (TanStack Query)</h3>
           <span class="rm-verdict v-do">Do it</span>
         </div>
+        <p><b>Partially addressed (2026-08-07).</b> A lightweight interim cache now sits behind
+          <code>gameService.getAll()</code>/<code>getById()</code> — a module-level read-through store with a
+          60s TTL, invalidated on create/update/delete. The full TanStack Query migration below still stands;
+          this just stops the worst of the duplicate refetching in the meantime.</p>
         <p>Five pages independently refetch the full games list on mount, with no cache and no dedupe.
           Navigating Home → Browse → Library downloads the same payload three times.</p>
         <p class="rm-anchor">Affects <code>HomePage</code>, <code>BrowsePage</code>,
@@ -1070,8 +1078,14 @@
   if (ckTotal) ckTotal.textContent = ckCounted.length;
 
   function loadCk() {
-    try { return JSON.parse(localStorage.getItem(CK_KEY)) || {}; }
-    catch { return {}; }
+    // Seed defaults for work already shipped, so the checklist reflects reality
+    // on a fresh visit. Once the user toggles anything, their saved state wins.
+    const SEED = { F14: true };
+    try {
+      const saved = localStorage.getItem(CK_KEY);
+      return saved ? JSON.parse(saved) : { ...SEED };
+    }
+    catch { return { ...SEED }; }
   }
   function saveCk(state) {
     try { localStorage.setItem(CK_KEY, JSON.stringify(state)); } catch { /* private mode */ }
