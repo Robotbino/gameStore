@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-07T00:00:00Z",
+  "title": "Design System: GameStore",
+  "extensions": {
+    "colorMeta": {
+      "marquee-gold": {
+        "role": "primary",
+        "displayName": "Marquee Gold",
+        "canonical": "#F5C518",
+        "tonalRamp": ["#2e2404", "#5c4908", "#8a6d0c", "#b89110", "#dcae13", "#F5C518", "#f8d552", "#fbe793"]
+      },
+      "marquee-gold-hover": {
+        "role": "primary",
+        "displayName": "Marquee Gold (Warm)",
+        "canonical": "#e0b200",
+        "tonalRamp": ["#2a2104", "#544107", "#7e620b", "#a8830e", "#c99b11", "#e0b200", "#eec84a", "#f5dd86"]
+      },
+      "bg-primary": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#121212",
+        "tonalRamp": ["#0f0f0f", "#121212", "#161616", "#1a1a1a", "#1e1e1e", "#2a2a2a", "#333333", "#444444"]
+      },
+      "bg-sidebar": {
+        "role": "neutral",
+        "displayName": "Stage Black",
+        "canonical": "#0f0f0f",
+        "tonalRamp": ["#000000", "#080808", "#0f0f0f", "#141414", "#1a1a1a", "#242424", "#2e2e2e", "#3a3a3a"]
+      },
+      "bg-raised": {
+        "role": "neutral",
+        "displayName": "Raised",
+        "canonical": "#1a1a1a",
+        "tonalRamp": ["#0f0f0f", "#141414", "#1a1a1a", "#1e1e1e", "#242424", "#2a2a2a", "#333333", "#444444"]
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Text Primary",
+        "canonical": "#e8e8e8",
+        "tonalRamp": ["#1a1a1a", "#2a2a2a", "#3d3d3d", "#555555", "#6e6e6e", "#8a8a8a", "#b0b0b0", "#e8e8e8"]
+      },
+      "text-muted": {
+        "role": "neutral",
+        "displayName": "Text Muted",
+        "canonical": "#666666",
+        "tonalRamp": ["#1a1a1a", "#2a2a2a", "#3d3d3d", "#4d4d4d", "#555555", "#666666", "#888888", "#aaaaaa"]
+      },
+      "danger": {
+        "role": "danger",
+        "displayName": "Alarm Coral",
+        "canonical": "#ff6b6b",
+        "tonalRamp": ["#3a1414", "#5c1f1f", "#852d2d", "#b83c3c", "#e05252", "#ff6b6b", "#ff9494", "#ffc0c0"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page and section titles: hero title, page titles, 404 headline. Sora 700, tight tracking." },
+      "headline": { "displayName": "Headline", "purpose": "Grid section headings and stat values. Sora 700." },
+      "title": { "displayName": "Title", "purpose": "Modal titles, sidebar brand, smaller structural headings. Sora 700." },
+      "body": { "displayName": "Body", "purpose": "Default reading text, descriptions, table cells. DM Sans 400." },
+      "label": { "displayName": "Label", "purpose": "Uppercase, wide-tracked micro-labels: eyebrows, badges, column headers, form labels. DM Sans 600." }
+    },
+    "shadows": [
+      { "name": "lift", "value": "0 12px 32px rgba(0,0,0,0.5)", "purpose": "Game-card hover and the resting auth card — the 'rose toward you' shadow." },
+      { "name": "menu", "value": "0 8px 32px rgba(0,0,0,0.5)", "purpose": "Floating overlays anchored to a trigger, e.g. the avatar dropdown." },
+      { "name": "modal", "value": "0 24px 60px rgba(0,0,0,0.6)", "purpose": "Centered dialogs over the dimmed, blurred backdrop — the deepest, softest shadow." },
+      { "name": "focus-ring", "value": "0 0 0 3px rgba(245,197,24,0.12)", "purpose": "State cue, not depth: gold glow paired with a gold border on focused inputs." }
+    ],
+    "motion": [
+      { "name": "ease-smooth", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Default easing for sidebar width, card lift, and image zoom (--transition-smooth = 0.3s of this)." },
+      { "name": "card-lift", "value": "transform 0.25s cubic-bezier(0.4,0,0.2,1)", "purpose": "The tactile signature: translateY(-4px) plus warm fill on game-card hover." },
+      { "name": "poster-zoom", "value": "transform 0.4s cubic-bezier(0.4,0,0.2,1)", "purpose": "Poster image scales to 1.05 within its clipped frame on card hover." },
+      { "name": "fade-slide-up", "value": "fadeSlideUp 0.4s ease both", "purpose": "Catalogue entrance: cards rise 16px and fade in, staggered 0.06s per child for the first eight." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single 'act here' control per view — checkout, submit, primary hero action.",
+      "html": "<button class=\"ds-btn-primary\">Buy Now</button>",
+      "css": ".ds-btn-primary { background: #F5C518; color: #000; border: none; padding: 10px 28px; border-radius: 6px; font-family: 'DM Sans Variable', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; transition: background 0.2s ease; } .ds-btn-primary:hover { background: #e0b200; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(245,197,24,0.35); } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Default secondary action — quiet at rest, brightens on hover.",
+      "html": "<button class=\"ds-btn-outline\">View Details</button>",
+      "css": ".ds-btn-outline { background: transparent; color: #aaa; border: 1px solid #444; padding: 10px 24px; border-radius: 6px; font-family: 'DM Sans Variable', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: border-color 0.2s ease, color 0.2s ease; } .ds-btn-outline:hover { border-color: #666; color: #fff; } .ds-btn-outline:focus-visible { outline: none; border-color: #F5C518; box-shadow: 0 0 0 3px rgba(245,197,24,0.12); }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Destructive actions only — delete/remove. Coral on a wash, never a filled block.",
+      "html": "<button class=\"ds-btn-danger\">Delete</button>",
+      "css": ".ds-btn-danger { background: transparent; color: #ff6b6b; border: 1px solid rgba(255,107,107,0.35); padding: 10px 24px; border-radius: 6px; font-family: 'DM Sans Variable', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease; } .ds-btn-danger:hover { background: rgba(255,107,107,0.1); border-color: #ff6b6b; }"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "The store's search pill — icon plus field, whole pill lights gold on focus.",
+      "html": "<div class=\"ds-search\"><svg class=\"ds-search-icon\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"/></svg><input type=\"text\" placeholder=\"Search games\"/></div>",
+      "css": ".ds-search { display: flex; align-items: center; gap: 8px; width: 320px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 8px 16px; transition: border-color 0.2s ease; } .ds-search:focus-within { border-color: #F5C518; } .ds-search-icon { color: #555; flex-shrink: 0; } .ds-search input { flex: 1; background: transparent; border: none; outline: none; color: #aaa; font-family: 'DM Sans Variable', sans-serif; font-size: 0.85rem; }"
+    },
+    {
+      "name": "Game Card",
+      "kind": "card",
+      "refersTo": "game-card",
+      "description": "The signature component: transparent at rest, lifts and warms on hover, poster zooms, 'View Details' reveals.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card-media\"><img src=\"https://placehold.co/300x400/1a1a1a/555?text=Poster\" alt=\"\"/></div><div class=\"ds-card-info\"><p class=\"ds-card-genre\">Action RPG</p><h3 class=\"ds-card-title\">Elden Ring</h3><p class=\"ds-card-price\">R 899.00</p><button class=\"ds-card-view\">View Details</button></div></article>",
+      "css": ".ds-card { width: 200px; border-radius: 8px; overflow: hidden; background: transparent; border: 1px solid transparent; cursor: pointer; transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), background 0.25s, border-color 0.25s, box-shadow 0.25s; } .ds-card:hover { background: #1e1e1e; border-color: #333; transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.5); } .ds-card-media { position: relative; overflow: hidden; } .ds-card-media img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); } .ds-card:hover .ds-card-media img { transform: scale(1.05); } .ds-card-info { padding: 12px 10px 14px; } .ds-card-genre { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #666; } .ds-card-title { margin: 4px 0 8px; font-size: 0.95rem; font-weight: 600; color: #e8e8e8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-card-price { margin: 0; font-size: 1rem; font-weight: 700; color: #f0f0f0; } .ds-card-view { width: 100%; margin-top: 10px; padding: 7px 10px; background: transparent; color: #aaa; border: 1px solid #333; border-radius: 6px; font-family: 'DM Sans Variable', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; cursor: pointer; opacity: 0; transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1), border-color 0.2s, color 0.2s; } .ds-card:hover .ds-card-view, .ds-card:focus-within .ds-card-view { opacity: 1; } .ds-card-view:hover { border-color: #F5C518; color: #F5C518; }"
+    },
+    {
+      "name": "Genre Chip",
+      "kind": "chip",
+      "refersTo": "chip-genre",
+      "description": "Full-pill genre tag drawn from the single accent wash — gold text on a low-alpha gold field.",
+      "html": "<span class=\"ds-chip\">Open World</span>",
+      "css": ".ds-chip { display: inline-block; padding: 3px 10px; border-radius: 999px; background: rgba(245,197,24,0.08); border: 1px solid rgba(245,197,24,0.35); color: #F5C518; font-family: 'DM Sans Variable', sans-serif; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }"
+    },
+    {
+      "name": "Role Badge",
+      "kind": "chip",
+      "refersTo": "chip-genre",
+      "description": "Status badge in the accent-wash family; the admin variant carries gold, the user variant stays neutral.",
+      "html": "<span class=\"ds-badge ds-badge-admin\">Admin</span> <span class=\"ds-badge ds-badge-user\">User</span>",
+      "css": ".ds-badge { display: inline-block; padding: 2px 9px; border-radius: 4px; font-family: 'DM Sans Variable', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; } .ds-badge-admin { background: rgba(245,197,24,0.12); border: 1px solid rgba(245,197,24,0.3); color: #F5C518; } .ds-badge-user { background: rgba(170,170,170,0.08); border: 1px solid #2a2a2a; color: #666; }"
+    },
+    {
+      "name": "Sidebar Nav Item",
+      "kind": "nav",
+      "refersTo": null,
+      "description": "Muted row with a gold icon; hover raises the row, active state turns the icon gold.",
+      "html": "<a class=\"ds-nav-item ds-nav-active\" href=\"#\"><svg class=\"ds-nav-icon\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z\"/></svg><span>Browse</span></a>",
+      "css": ".ds-nav-item { display: flex; align-items: center; gap: 14px; padding: 10px 20px; color: #666; text-decoration: none; font-family: 'DM Sans Variable', sans-serif; font-size: 0.85rem; transition: background 0.15s ease, color 0.15s ease; } .ds-nav-item:hover { background: #1a1a1a; color: #e8e8e8; } .ds-nav-icon { color: #F5C518; flex-shrink: 0; } .ds-nav-active { background: #1a1a1a; color: #e8e8e8; } .ds-nav-active .ds-nav-icon { color: #F5C518; }"
+    },
+    {
+      "name": "Stat Card",
+      "kind": "card",
+      "refersTo": "stat-card",
+      "description": "Admin dashboard tile — flat raised surface (no resting shadow), gold icon, Sora value.",
+      "html": "<div class=\"ds-stat\"><svg class=\"ds-stat-icon\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M3 9h18M9 21V9\"/></svg><div class=\"ds-stat-info\"><span class=\"ds-stat-label\">Total Games</span><span class=\"ds-stat-value\">128</span></div></div>",
+      "css": ".ds-stat { display: flex; align-items: center; gap: 16px; padding: 24px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; } .ds-stat-icon { color: #F5C518; flex-shrink: 0; } .ds-stat-info { display: flex; flex-direction: column; gap: 4px; } .ds-stat-label { font-family: 'DM Sans Variable', sans-serif; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #666; } .ds-stat-value { font-family: 'Sora Variable', sans-serif; font-size: 1.25rem; font-weight: 700; color: #e8e8e8; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Midnight Marquee",
+    "overview": "GameStore is a dark street with a single warm-gold light over the door. Every surface is near-black; the imagery — game posters and cinematic hero art — supplies the color and the heat. Against that quiet ground, one gold (Marquee Gold, #F5C518) does all of the signalling: price, action, active tab, focused field. The discipline is the point. The temperament is premium and tactile — nothing is decorated at rest; the richness lives in response, where a hovered card lifts, warms, zooms its poster, and reveals a control that wasn't there a moment ago. This world explicitly rejects neon-arcade gamer RGB and the light SaaS dashboard; the dark, media-forward ground is core identity, and it holds even across the admin tables.",
+    "keyCharacteristics": [
+      "One accent, one job — Marquee Gold is the entire color voice.",
+      "Flat at rest, alive on interaction — depth and warmth are earned by state, never ambient.",
+      "Near-black surfaces layered by tone (#0f0f0f → #1e1e1e), not by shadow.",
+      "Poster-forward: 3:4 game art and 21:9 hero art lead; the chrome recedes.",
+      "Sora display / DM Sans body, with uppercase wide-tracked labels for micro-structure."
+    ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "Marquee Gold is used on ≤10% of any given screen, and only ever means 'this matters most, or you can act here.' A second saturated hue never joins it; genres, categories, and statuses are not color-coded.", "section": "colors" },
+      { "name": "The Accent Wash Rule", "body": "When the accent appears as anything other than a solid fill or text, it appears as a low-alpha tint of itself: rgba(245,197,24,0.08) backgrounds, 0.30–0.35 borders, 0.10–0.12 focus rings. Never introduce a separate pastel or tint token to stand in for it.", "section": "colors" },
+      { "name": "The Two-Voice Rule", "body": "Sora announces, DM Sans reads. Sora is reserved for titles and headings; body copy, controls, and inputs are always DM Sans.", "section": "typography" },
+      { "name": "The Eyebrow Rule", "body": "Micro-labels are the only text set in uppercase, always tracked out (0.06–0.10em) at the smallest sizes in a muted neutral (or gold on an accent element). Sentence-case everything else.", "section": "typography" },
+      { "name": "The Shadow-As-Response Rule", "body": "Surfaces are flat at rest; a drop shadow appears only as a response to state (hover) or as the signature of a true overlay (modal, menu, dropdown). Depth is earned, never ambient — layer with tone instead.", "section": "elevation" },
+      { "name": "The Growing Radius Rule", "body": "Corner radius tracks surface size — never give a small control a large radius or a large surface a tight one. Pills are reserved for chips; the full circle is reserved for the avatar.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep Marquee Gold to ≤10% of any screen and to a single job — price, primary action, active state, focus.",
+      "Do convey depth by tone at rest and add shadow only on hover or for true overlays.",
+      "Do deliver every accent-that-isn't-a-fill as the low-alpha accent wash.",
+      "Do set titles in Sora and everything readable in DM Sans; reserve uppercase + wide tracking for micro-labels only.",
+      "Do let posters and hero art carry the color; keep the surrounding chrome near-black and quiet.",
+      "Do scale corner radius with surface size, and keep the raised-on-hover lift as the catalogue's tactile signature."
+    ],
+    "donts": [
+      "Don't introduce a second accent hue or color-code genres, statuses, or categories.",
+      "Don't drift toward neon-arcade gamer RGB or a light SaaS dashboard — both are confirmed anti-references, including on the admin pages.",
+      "Don't put resting shadows on cards, tiles, or panels to fake elevation; layer with the tonal surface ladder instead.",
+      "Don't use Alarm Coral for anything but destructive or error states, and never as a filled block.",
+      "Don't set body copy in Sora or headings in DM Sans, and don't uppercase anything larger than a micro-label.",
+      "Don't give a small control a large radius or a large surface a tight one."
+    ]
+  }
+}

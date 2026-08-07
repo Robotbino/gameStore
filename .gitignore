@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Impeccable design-hook cache (transient; design.json IS tracked)
+.impeccable/hook.cache.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

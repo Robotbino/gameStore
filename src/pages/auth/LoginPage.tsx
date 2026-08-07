@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { getApiErrorMessage } from "../../utils/apiError";
 import type { LoginRequest } from "../../types/auth";
+import AuthShell from "../../components/auth/AuthShell";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -31,54 +32,51 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <h1 className="auth-title">
-          Game<span className="accent">Store</span>
-        </h1>
-        <p className="auth-subtitle">Sign in to your account</p>
-
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          {error && <p className="auth-error">{error}</p>}
-
-          <button className="btn-primary" type="submit" disabled={isLoading}>
-            {isLoading ? "Signing in…" : "Sign In"}
-          </button>
-        </form>
-
+    <AuthShell
+      heading="Welcome back"
+      subtitle="Sign in to your account"
+      footer={
         <p className="auth-footer">
           Don't have an account?{" "}
           <Link to="/register" className="accent">
             Register
           </Link>
         </p>
-      </div>
-    </div>
+      }
+    >
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="you@example.com"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+            placeholder="••••••••"
+            required
+          />
+        </div>
+
+        {error && <p className="auth-error">{error}</p>}
+
+        <button className="btn-primary" type="submit" disabled={isLoading}>
+          {isLoading ? "Signing in…" : "Sign In"}
+        </button>
+      </form>
+    </AuthShell>
   );
 }
