@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { Game } from "../../types/game";
-import { gameService } from "../../services/gameService";
+import { purchaseService } from "../../services/purchaseService";
 import GameGrid from "../../components/game/GameGrid";
 
 export default function LibraryPage() {
@@ -10,10 +10,13 @@ export default function LibraryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Only the games this user actually bought — GET /purchases/me returns
+  // Purchase rows, so pull the nested game out of each. Previously this called
+  // gameService.getAll() and showed the entire catalogue as "yours".
   useEffect(() => {
-    gameService
-      .getAll()
-      .then((data) => setGames(data))
+    purchaseService
+      .getMine()
+      .then((purchases) => setGames(purchases.map((p) => p.game)))
       .catch(() => setError("Failed to load your library."))
       .finally(() => setIsLoading(false));
   }, []);

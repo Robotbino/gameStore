@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { gameService } from "../services/gameService";
+import { useCart } from "../hooks/useCart";
 import type { Game } from "../types/game";
 
 interface SideBarProps {
@@ -13,11 +14,13 @@ interface SideBarProps {
 const navItems = [
   { icon: "fa-solid fa-house", label: "Home", to: "/" },
   { icon: "fa-solid fa-bullseye", label: "Browse", to: "/browse" },
+  { icon: "fa-solid fa-cart-shopping", label: "Cart", to: "/cart" },
   { icon: "fa-solid fa-book", label: "Library", to: "/library" },
 ];
 
 export default function SideBar({ isOpen, onToggle }: SideBarProps) {
   const navigate = useNavigate();
+  const { count } = useCart();
   const [games, setGames] = useState<Game[]>([]);
 
   // Quick Launch used to render the bundled gameData.ts fixture, so it showed
@@ -61,6 +64,24 @@ export default function SideBar({ isOpen, onToggle }: SideBarProps) {
             <NavLink to={item.to} className="sidebar-nav-item" end>
               <i className={`${item.icon} nav-icon`} />
               {isOpen && <span>{item.label}</span>}
+              {item.to === "/cart" && count > 0 && (
+                <span
+                  className="cart-badge"
+                  style={{
+                    marginLeft: "auto",
+                    background: "var(--accent, #7c3aed)",
+                    color: "#fff",
+                    borderRadius: "999px",
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    padding: "0.05rem 0.45rem",
+                    minWidth: "1.2rem",
+                    textAlign: "center",
+                  }}
+                >
+                  {count}
+                </span>
+              )}
             </NavLink>
           </li>
         ))}

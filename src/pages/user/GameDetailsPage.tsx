@@ -2,14 +2,18 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import StarRating from "../../components/StarRating.tsx";
 import { gameService } from "../../services/gameService";
+import { purchaseService } from "../../services/purchaseService";
+import { useCart } from "../../hooks/useCart";
 import { parseGenres } from "../../utils/genre";
 import type { Game } from "../../types/game";
 
 export default function GameDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { add, has: inCart } = useCart();
 
   const [game, setGame] = useState<Game | null>(null);
+  const [owned, setOwned] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,6 +32,7 @@ export default function GameDetailsPage() {
 
     setIsLoading(true);
     setError(null);
+    setOwned(false);
 
     gameService
       .getById(gameId)
@@ -42,6 +47,17 @@ export default function GameDetailsPage() {
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
+      });
+
+    // Is this game already in the user's library? Drives the button state.
+    // Best-effort — on failure the button just falls back to "Add to Cart".
+    purchaseService
+      .getMine()
+      .then((purchases) => {
+        if (!cancelled) setOwned(purchases.some((p) => p.game.id === gameId));
+      })
+      .catch(() => {
+        /* leave owned=false */
       });
 
     return () => {
@@ -100,9 +116,19 @@ export default function GameDetailsPage() {
         <p className="hero-description">{game.description}</p>
 
         <div className="hero-actions">
-          <button className="btn-primary">
-            Buy Now — R {game.price.toFixed(2)}
-          </button>
+          {owned ? (
+            <button className="btn-primary" disabled>
+              ✓ In Library
+            </button>
+          ) : inCart(game.id) ? (
+            <button className="btn-primary" onClick={() => navigate("/cart")}>
+              In Cart — View Cart
+            </button>
+          ) : (
+            <button className="btn-primary" onClick={() => add(game)}>
+              Add to Cart — R {game.price.toFixed(2)}
+            </button>
+          )}
           <button className="btn-outline">+ Wishlist</button>
         </div>
       </div>

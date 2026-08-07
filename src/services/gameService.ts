@@ -6,14 +6,46 @@ import { parseGenres } from "../utils/genre";
 // REST-conventional shape you'd expect (`/games/find/{id}`, `/games/add`) —
 // that's the contract the backend actually serves today, not a typo.
 
+// ── Local read-through cache for the catalogue ──
+// The catalogue is read on nearly every navigation — SideBar mounts with the
+// layout, BrowsePage, and search all hit /games/all — but it changes only when
+// an admin edits it. A short TTL collapses that burst of identical requests
+// into one, so browse → details → back is instant instead of re-fetching.
+// Any create/update/delete calls invalidateCache() so admin edits show at once.
+const CATALOG_TTL_MS = 60_000;
+
+let allGamesCache: { data: Game[]; at: number } | null = null;
+const byIdCache = new Map<number, Game>();
+
+function fresh(at: number): boolean {
+  return Date.now() - at < CATALOG_TTL_MS;
+}
+
+function primeById(games: Game[]): void {
+  for (const g of games) byIdCache.set(g.id, g);
+}
+
+function invalidateCache(): void {
+  allGamesCache = null;
+  byIdCache.clear();
+}
+
 export const gameService = {
   getAll: async (): Promise<Game[]> => {
+    if (allGamesCache && fresh(allGamesCache.at)) {
+      return allGamesCache.data;
+    }
     const res = await api.get<Game[]>("/games/all");
+    allGamesCache = { data: res.data, at: Date.now() };
+    primeById(res.data);
     return res.data;
   },
 
   getById: async (id: number): Promise<Game> => {
+    const cached = byIdCache.get(id);
+    if (cached) return cached;
     const res = await api.get<Game>(`/games/find/${id}`);
+    byIdCache.set(id, res.data);
     return res.data;
   },
 
@@ -41,19 +73,23 @@ export const gameService = {
     );
   },
 
-  // Admin only
+  // Admin only. Each mutation clears the cache so the next read reflects it —
+  // otherwise an admin could add a game and not see it for up to a minute.
   create: async (game: GameInput): Promise<Game> => {
     const res = await api.post<Game>("/games/add", game);
+    invalidateCache();
     return res.data;
   },
 
   update: async (id: number, game: GameInput): Promise<Game> => {
     const res = await api.put<Game>(`/games/${id}`, game);
+    invalidateCache();
     return res.data;
   },
 
   delete: async (id: number): Promise<void> => {
     await api.delete(`/games/${id}`);
+    invalidateCache();
   },
 
   // POST /games/sync/rawg — admin-only. Backend currently returns 501 with
