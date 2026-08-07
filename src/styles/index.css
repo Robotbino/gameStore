@@ -1,0 +1,21 @@
+/* =========================================================================
+   Global stylesheet entry — the single CSS import for the whole app.
+
+   Everything is funnelled through here so the cascade order is authored in
+   one place. When Tailwind lands (Phase 2), this file grows a @layer ladder
+   and legacy App.css moves into layer(legacy); for now it is a plain host.
+
+   Do NOT `import "./App.css"` from JSX. A JS-side CSS import cannot be
+   assigned a cascade layer, which will break Tailwind's utility precedence
+   the moment it arrives. Add rules through this file.
+   ========================================================================= */
+
+/* Self-hosted variable fonts (Phase 0 replacement for the render-blocking
+   fonts.googleapis.com @import that used to live at the top of App.css).
+   The `-variable` builds ship a single axis-rich file per family, so the
+   400/500/600/700 requests collapse to one. */
+@import "@fontsource-variable/dm-sans";
+@import "@fontsource-variable/sora";
+
+/* Legacy stylesheet — decomposed and deleted across Phases 4–6. */
+@import "../App.css";
