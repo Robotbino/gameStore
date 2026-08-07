@@ -20,7 +20,7 @@ export default function GameGrid({
     return (
       <section>
         {heading && <h2 className="game-grid-title">{heading}</h2>}
-        <p style={{ color: "var(--text-muted)" }}>No games found.</p>
+        <p className="game-grid-empty">No games found.</p>
       </section>
     );
   }

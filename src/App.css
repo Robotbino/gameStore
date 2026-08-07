@@ -758,6 +758,13 @@ body {
   gap: var(--space-md);
 }
 
+.game-grid-empty {
+  padding: var(--space-2xl) 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-base);
+}
+
 
 /* ============================================
   GAME CARD
@@ -860,9 +867,50 @@ body {
 
 .game-card-price {
   margin: 10px 0 0;
-  font-size: 1rem;
+  font-size: var(--text-base);
   font-weight: 700;
-  color: #f0f0f0;
+  color: var(--text-primary);
+}
+
+
+/* ============================================
+  GAME CARD — LOADING SKELETON
+  Mirrors the card's shape (3:4 poster + two text lines) so the grid holds its
+  arrival composition while the catalogue loads. Tonal only — no accent.
+  ============================================ */
+.game-card-skeleton {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.game-card-skeleton-poster {
+  aspect-ratio: 3 / 4;
+  border-radius: 8px;
+  background: var(--bg-raised);
+}
+
+.game-card-skeleton-line {
+  height: 12px;
+  margin: 14px 10px 0;
+  border-radius: 4px;
+  background: var(--bg-raised);
+}
+
+.game-card-skeleton-line.short {
+  width: 40%;
+  margin-top: 10px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .game-card-skeleton-poster,
+  .game-card-skeleton-line {
+    animation: skeletonPulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
 
@@ -956,11 +1004,28 @@ body {
   width: 100%;
 }
 
+/* Below 640px the fixed-width search would crowd the title; stack the header
+   and let the search bar span the full column. */
+@media (max-width: 640px) {
+  .browse-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+  .browse-search-bar {
+    width: 100%;
+  }
+}
+
 .browse-error {
-  margin-top: var(--space-xl);
-  text-align: center;
-  font-size: var(--text-base);
-  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+  padding: 10px 14px;
+  background: rgba(255, 107, 107, 0.08);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  border-radius: 6px;
+  font-size: var(--text-sm);
+  color: #ff6b6b;
 }
 
 

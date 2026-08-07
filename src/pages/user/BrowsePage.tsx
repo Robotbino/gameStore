@@ -86,7 +86,19 @@ export default function BrowsePage() {
       {/* Only the results swap out while loading. Returning early here instead
           would unmount the input above and drop focus on every keystroke. */}
       {isLoading ? (
-        <p className="browse-status">Loading games…</p>
+        <div
+          className="game-grid"
+          role="status"
+          aria-label="Loading games"
+        >
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="game-card-skeleton" aria-hidden="true">
+              <div className="game-card-skeleton-poster" />
+              <div className="game-card-skeleton-line" />
+              <div className="game-card-skeleton-line short" />
+            </div>
+          ))}
+        </div>
       ) : (
         <GameGrid
           items={games}
