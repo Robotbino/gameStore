@@ -31,20 +31,11 @@ export default function NavBar() {
         />
       </form>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+      <div className="navbar-actions">
         {isAuthenticated && userRole && (
           <span
-            className={`role-badge role-${userRole.toLowerCase()}`}
+            className={`role-badge ${userRole.toLowerCase()}`}
             title={`Signed in as ${userRole}`}
-            style={{
-              fontSize: "0.7rem",
-              fontWeight: 700,
-              letterSpacing: "0.05em",
-              padding: "0.2rem 0.55rem",
-              borderRadius: "999px",
-              background: userRole === "ADMIN" ? "#7c3aed" : "#334155",
-              color: "#fff",
-            }}
           >
             {userRole}
           </span>

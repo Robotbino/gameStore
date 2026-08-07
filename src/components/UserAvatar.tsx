@@ -38,20 +38,36 @@ export default function UserAvatar() {
         id="userAvatar"
         type="button"
         onClick={() => setOpen(!open)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={displayName ? `Account menu for ${displayName}` : "Account menu"}
+        title={displayName}
       >
         {initial}
       </button>
 
       {open && (
-        <div className="avatar-menu">
-          <button className="avatar-menu-item" onClick={() => setOpen(false)}>
+        <div className="avatar-menu" role="menu">
+          <button
+            className="avatar-menu-item"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
             Profile
           </button>
-          <button className="avatar-menu-item" onClick={() => setOpen(false)}>
+          <button
+            className="avatar-menu-item"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
             Settings
           </button>
           <div className="avatar-menu-separator" />
-          <button className="avatar-menu-item" onClick={handleLogout}>
+          <button
+            className="avatar-menu-item"
+            role="menuitem"
+            onClick={handleLogout}
+          >
             Log out
           </button>
         </div>
