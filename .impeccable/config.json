@@ -1,0 +1,11 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [
+      "docs/architecture.html",
+      "docs/catalog-architecture.html",
+      "docs/frontend-roadmap.html"
+    ],
+    "ignoreValues": []
+  }
+}
