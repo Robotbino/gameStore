@@ -1455,6 +1455,48 @@ body {
 
 
 /* ============================================
+  PAGINATION
+  ============================================ */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.pagination-caption {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* The numbers are the signal; the surrounding words are scaffolding. */
+.pagination-caption strong {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.pagination-position {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  /* Fixed minimum so "Page 9 of 9" → "Page 10 of 10" doesn't shove the
+     buttons sideways mid-click. */
+  min-width: 9ch;
+  text-align: center;
+}
+
+
+/* ============================================
   BUTTONS
   ============================================ */
 .btn-danger {

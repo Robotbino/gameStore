@@ -16,6 +16,11 @@ interface Stat {
   note?: string;
 }
 
+// One page, deliberately oversized: enough to make "Avg. Rating" and
+// "Catalogue Value" meaningful for a store this size without going back to
+// downloading the entire table, which is what pagination just fixed.
+const SAMPLE_SIZE = 200;
+
 const CURRENCY = new Intl.NumberFormat("en-ZA", {
   style: "currency",
   currency: "ZAR",
@@ -52,15 +57,30 @@ export default function AdminDashboard() {
   useEffect(() => {
     let cancelled = false;
 
-    // allSettled, not all: GET /users has no controller mapping today, and one
-    // 404 shouldn't blank out the stats that do work.
-    Promise.allSettled([gameService.getAll(), userService.getAll()]).then(
-      ([gamesResult, usersResult]) => {
+    // allSettled, not all: one failing endpoint shouldn't blank out the stats
+    // that do work.
+    //
+    // Both endpoints are paginated now, which splits the four cards in two.
+    // The counts are exact — `totalElements` is the whole table, whatever page
+    // came back. The two derived numbers can only see the rows in hand, so this
+    // asks for one oversized page and says so on the card when the catalogue
+    // outgrows it. Better a labelled sample than a confidently wrong average.
+    Promise.allSettled([
+      gameService.getPage({ size: SAMPLE_SIZE }),
+      userService.getPage({ size: 1 }),
+    ]).then(([gamesResult, usersResult]) => {
         if (cancelled) return;
 
-        const games = gamesResult.status === "fulfilled" ? gamesResult.value : [];
         const gamesFailed = gamesResult.status === "rejected";
         const usersFailed = usersResult.status === "rejected";
+
+        const gamesPage = gamesResult.status === "fulfilled" ? gamesResult.value : null;
+        const games = gamesPage?.content ?? [];
+        const totalGames = gamesPage?.totalElements ?? 0;
+        const partial = totalGames > games.length;
+        const sampleNote = partial
+          ? `across the first ${games.length} of ${totalGames}`
+          : undefined;
 
         const catalogueValue = games.reduce((sum, g) => sum + (g.price ?? 0), 0);
         const rated = games.filter((g) => typeof g.rating === "number");
@@ -72,14 +92,14 @@ export default function AdminDashboard() {
           {
             icon: "fa-solid fa-gamepad",
             label: "Total Games",
-            value: gamesFailed ? "—" : String(games.length),
+            value: gamesFailed ? "—" : String(totalGames),
             note: gamesFailed ? "Couldn't reach /games/all" : undefined,
           },
           {
             icon: "fa-solid fa-users",
             label: "Total Users",
-            value: usersFailed ? "—" : String(usersResult.value.length),
-            note: usersFailed ? "GET /users not implemented yet" : undefined,
+            value: usersFailed ? "—" : String(usersResult.value.totalElements),
+            note: usersFailed ? "Couldn't reach /users/all" : undefined,
           },
           // "Orders Today" and "Revenue" both need purchase data, and no
           // purchase endpoint exists yet. These two are derived from the
@@ -88,17 +108,18 @@ export default function AdminDashboard() {
             icon: "fa-solid fa-star",
             label: "Avg. Rating",
             value: gamesFailed || !rated.length ? "—" : avgRating.toFixed(1),
+            note: gamesFailed ? undefined : sampleNote,
           },
           {
             icon: "fa-solid fa-coins",
             label: "Catalogue Value",
             value: gamesFailed ? "—" : CURRENCY.format(catalogueValue),
+            note: gamesFailed ? undefined : sampleNote,
           },
         ]);
 
         setIsLoading(false);
-      },
-    );
+      });
 
     return () => {
       cancelled = true;

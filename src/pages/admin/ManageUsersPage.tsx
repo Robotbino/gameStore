@@ -1,7 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { userService } from "../../services/userService";
 import type { User, Role } from "../../types/user";
+import type { Page } from "../../types/pagination";
+import { emptyPage } from "../../types/pagination";
 import { getApiErrorMessage } from "../../utils/apiError";
+import Pagination from "../../components/Pagination";
+
+const PAGE_SIZE = 20;
 
 interface EmployeeFormData {
   userName: string;
@@ -19,10 +24,9 @@ const EMPTY_FORM: EmployeeFormData = {
   points: 0,
 };
 
-// UsersController's addUser and updateUser both still `return null`, so a
-// "successful" save comes back 200 with an empty body. Pushing that straight
-// into state puts a null in the users array and white-screens the table on the
-// next render. Everything from the API goes through this gate first.
+// UsersController now returns a UserResponse from addUser/updateUser, but this
+// gate stays: it also filters anything malformed out of a page's `content`, and
+// a null slipping into the users array white-screens the table on next render.
 function isUser(value: unknown): value is User {
   return (
     typeof value === "object" &&
@@ -32,7 +36,8 @@ function isUser(value: unknown): value is User {
 }
 
 export default function ManageUsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [result, setResult] = useState<Page<User>>(emptyPage(PAGE_SIZE));
+  const [pageIndex, setPageIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
@@ -41,23 +46,28 @@ export default function ManageUsersPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  useEffect(() => {
-    load();
-  }, []);
+  const users = result.content;
 
-  async function load() {
+  // Re-reads the page after every write rather than splicing local state: with
+  // a paginated table, a spliced row doesn't push the last row onto the next
+  // page and a spliced-out one doesn't pull a row up from behind it.
+  const load = useCallback(async (page: number) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await userService.getAll();
-      setUsers(Array.isArray(data) ? data.filter(isUser) : []);
+      const data = await userService.getPage({ page, size: PAGE_SIZE });
+      setResult({ ...data, content: data.content.filter(isUser) });
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to load employees."));
-      setUsers([]);
+      setResult(emptyPage(PAGE_SIZE));
     } finally {
       setIsLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    load(pageIndex);
+  }, [pageIndex, load]);
 
   function openAdd() {
     setForm(EMPTY_FORM);
@@ -96,32 +106,41 @@ export default function ManageUsersPage() {
     setIsSubmitting(true);
     setError(null);
     try {
+      // Warnings are raised AFTER the reload, never before: load() clears the
+      // error banner on entry, so setting one first would wipe it out.
       if (modalMode === "add") {
         const created = await userService.create(form);
+        closeModal();
+        // Sorted by id ASC, so a new employee lands on the last page — reload
+        // there, otherwise the admin adds someone and sees nothing change.
+        const last = Math.max(0, Math.ceil((result.totalElements + 1) / PAGE_SIZE) - 1);
+        if (last === pageIndex) await load(pageIndex);
+        else setPageIndex(last);
         if (!isUser(created)) {
           setError(
-            "The employee was likely saved, but POST /users returned an empty body so the table can't show it. Implement TODO 3 in UsersController.",
+            "The employee was likely saved, but POST /users returned an empty body, so the table below may not reflect it.",
           );
-          closeModal();
-          return;
         }
-        setUsers((prev) => [...prev, created]);
-      } else if (editingUser) {
+        return;
+      }
+
+      if (editingUser) {
         const updated = await userService.update(editingUser.id, {
           userName: form.userName,
           email: form.email,
           role: form.role,
           points: form.points,
         });
+        closeModal();
+        await load(pageIndex);
         if (!isUser(updated)) {
           setError(
-            "The employee was likely updated, but PUT /users/{id} returned an empty body so the table can't refresh. Implement TODO 4 in UsersController.",
+            "The employee was likely updated, but PUT /users/{id} returned an empty body, so the table below may not reflect it.",
           );
-          closeModal();
-          return;
         }
-        setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+        return;
       }
+
       closeModal();
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to save employee."));
@@ -133,8 +152,11 @@ export default function ManageUsersPage() {
   async function handleDelete(id: number) {
     try {
       await userService.delete(id);
-      setUsers((prev) => prev.filter((u) => u.id !== id));
       setDeleteId(null);
+      // Removing the last row on the last page would strand the admin on a page
+      // that no longer exists, so step back instead of reloading an empty one.
+      if (users.length === 1 && pageIndex > 0) setPageIndex(pageIndex - 1);
+      else await load(pageIndex);
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to delete employee."));
     }
@@ -152,55 +174,59 @@ export default function ManageUsersPage() {
       {isLoading ? (
         <p className="table-loading">Loading employees…</p>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Points</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.length === 0 ? (
+        <>
+          <table className="admin-table">
+            <thead>
               <tr>
-                <td colSpan={6} className="table-empty">No employees found.</td>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Points</th>
+                <th>Actions</th>
               </tr>
-            ) : (
-              users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.id}</td>
-                  <td>{user.userName}</td>
-                  <td>{user.email}</td>
-                  <td>
-                    <span
-                      className={`role-badge ${(user.role ?? "user").toLowerCase()}`}
-                    >
-                      {user.role ?? "—"}
-                    </span>
-                  </td>
-                  <td>{user.points}</td>
-                  <td className="table-actions">
-                    {deleteId === user.id ? (
-                      <span className="confirm-delete">
-                        <span className="confirm-label">Confirm?</span>
-                        <button className="btn-danger btn-sm" onClick={() => handleDelete(user.id)}>Yes</button>
-                        <button className="btn-outline btn-sm" onClick={() => setDeleteId(null)}>No</button>
-                      </span>
-                    ) : (
-                      <>
-                        <button className="btn-outline btn-sm" onClick={() => openEdit(user)}>Edit</button>
-                        <button className="btn-danger btn-sm" onClick={() => setDeleteId(user.id)}>Delete</button>
-                      </>
-                    )}
-                  </td>
+            </thead>
+            <tbody>
+              {users.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="table-empty">No employees found.</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                users.map((user) => (
+                  <tr key={user.id}>
+                    <td>{user.id}</td>
+                    <td>{user.userName}</td>
+                    <td>{user.email}</td>
+                    <td>
+                      <span
+                        className={`role-badge ${(user.role ?? "user").toLowerCase()}`}
+                      >
+                        {user.role ?? "—"}
+                      </span>
+                    </td>
+                    <td>{user.points}</td>
+                    <td className="table-actions">
+                      {deleteId === user.id ? (
+                        <span className="confirm-delete">
+                          <span className="confirm-label">Confirm?</span>
+                          <button className="btn-danger btn-sm" onClick={() => handleDelete(user.id)}>Yes</button>
+                          <button className="btn-outline btn-sm" onClick={() => setDeleteId(null)}>No</button>
+                        </span>
+                      ) : (
+                        <>
+                          <button className="btn-outline btn-sm" onClick={() => openEdit(user)}>Edit</button>
+                          <button className="btn-danger btn-sm" onClick={() => setDeleteId(user.id)}>Delete</button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+
+          <Pagination page={result} onPageChange={setPageIndex} label="employees" />
+        </>
       )}
 
       {modalMode && (
