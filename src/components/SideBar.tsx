@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { gameService } from "../services/gameService";
+import type { CSSProperties } from "react";
 import { useAuth } from "../hooks/useAuth";
-import type { Game } from "../types/game";
+import { useQuickLaunch } from "../hooks/useQuickLaunch";
 
 interface SideBarProps {
   isOpen: boolean;
@@ -22,27 +21,12 @@ const navItems = [
 export default function SideBar({ isOpen, onToggle }: SideBarProps) {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
-  const [games, setGames] = useState<Game[]>([]);
 
-  // Quick Launch used to render the bundled gameData.ts fixture, so it showed
-  // games that aren't in the database. Pull the real catalogue instead, and
-  // stay silent on failure — this strip is decorative, not worth an error state.
-  useEffect(() => {
-    let cancelled = false;
-
-    gameService
-      .getAll()
-      .then((data) => {
-        if (!cancelled) setGames(data.slice(0, 3));
-      })
-      .catch(() => {
-        if (!cancelled) setGames([]);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // Quick Launch is the user's own shelf, not the store: the list comes from
+  // GET /purchases/me via QuickLaunchProvider, so an unowned game can't appear
+  // here. It used to render the catalogue's first few rows, which meant the
+  // strip was offering games the user hadn't bought.
+  const { library, activeId, cycle, cycleMs } = useQuickLaunch();
 
   return (
     <aside className={`sidebar ${isOpen ? "" : "collapsed"}`}>
@@ -70,20 +54,35 @@ export default function SideBar({ isOpen, onToggle }: SideBarProps) {
         ))}
       </ul>
 
-      {isOpen && games.length > 0 && (
+      {isOpen && library.length > 0 && (
         <div className="quick-launch">
           <span className="quick-launch-label">Quick Launch</span>
           <div className="quick-launch-list">
-            {games.map((game) => (
-              <div
-                key={game.id}
-                className="quick-launch-item"
-                onClick={() => navigate(`/games/${game.id}`)}
-              >
-                <img src={game.imageUrl} alt={game.title} />
-                <span>{game.title}</span>
-              </div>
-            ))}
+            {library.map((game) => {
+              const isFilling = game.id === activeId;
+
+              return (
+                <div
+                  key={game.id}
+                  className={`quick-launch-item ${isFilling ? "is-filling" : ""}`}
+                  // Two identical keyframes alternating by turn. A CSS animation
+                  // only restarts when its NAME changes, and on a one-game
+                  // library the class never leaves this row — so without the
+                  // flip the fill would play once and stay full forever. This
+                  // beats the usual remove-class/force-reflow/re-add trick:
+                  // no imperative DOM, no remount, no image flash.
+                  data-phase={cycle % 2 === 0 ? "a" : "b"}
+                  // The 8s lives in one place (CYCLE_MS) and is handed to CSS
+                  // here, so the fill and the timer cannot drift apart by
+                  // someone editing one and forgetting the other.
+                  style={{ "--ql-cycle": `${cycleMs}ms` } as CSSProperties}
+                  onClick={() => navigate(`/games/${game.id}`)}
+                >
+                  <img src={game.imageUrl} alt={game.title} />
+                  <span>{game.title}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

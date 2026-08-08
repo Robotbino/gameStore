@@ -27,6 +27,9 @@
   --bg-raised: #1a1a1a;
   --bg-card-hover: #1e1e1e;
   --bg-sidebar: #0f0f0f;
+  /* Idle-carousel fill. One step above the hover tone (--bg-raised) so the
+     sweep still reads while the pointer is resting on the row it's filling. */
+  --bg-sidebar-fill: #232323;
   --border-subtle: #1e1e1e;
   --border-medium: #2a2a2a;
   --border-strong: #333;
@@ -750,11 +753,65 @@ body {
   padding: 6px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  /* background-color, not the `background` shorthand: the idle carousel paints
+     its fill into background-image, and transitioning the shorthand would drag
+     that layer into the hover transition. */
+  transition: background-color 0.15s ease;
 }
 
+/* Likewise longhand — `background: …` here would reset background-image to
+   none and blank the fill the moment the pointer crossed the active row. */
 .quick-launch-item:hover {
-  background: var(--bg-raised);
+  background-color: var(--bg-raised);
+}
+
+/* ── Idle carousel fill ──
+   The active row's own background fills left to right across one turn. This is
+   a background layer, not a progress bar layered over the row: a single-colour
+   gradient painted as a band whose width grows from 0% to 100%, so there's no
+   extra element and nothing to keep positioned.
+
+   Two identical keyframes, alternated per turn via data-phase, are what make it
+   repeat. A CSS animation restarts only when its name changes; on a one-game
+   library the class never moves to a different row, so a single keyframe would
+   play once and freeze full. */
+.quick-launch-item.is-filling {
+  background-image: linear-gradient(
+    to right,
+    var(--bg-sidebar-fill) 0 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  animation-duration: var(--ql-cycle, 8000ms);
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.quick-launch-item.is-filling[data-phase="a"] {
+  animation-name: ql-fill-a;
+}
+
+.quick-launch-item.is-filling[data-phase="b"] {
+  animation-name: ql-fill-b;
+}
+
+@keyframes ql-fill-a {
+  from { background-size: 0% 100%; }
+  to   { background-size: 100% 100%; }
+}
+
+@keyframes ql-fill-b {
+  from { background-size: 0% 100%; }
+  to   { background-size: 100% 100%; }
+}
+
+/* Reduced motion still needs to answer "which one is playing?" — keep the
+   highlight, drop the sweep. */
+@media (prefers-reduced-motion: reduce) {
+  .quick-launch-item.is-filling {
+    animation: none;
+    background-size: 100% 100%;
+  }
 }
 
 .quick-launch-item img {
