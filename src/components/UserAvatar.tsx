@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 export default function UserAvatar() {
-  const { userEmail, currentUser, logout } = useAuth();
+  const { userEmail, currentUser, userRole, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -48,6 +48,17 @@ export default function UserAvatar() {
 
       {open && (
         <div className="avatar-menu" role="menu">
+          {/* Identity header — name + role live here now that the navbar no
+              longer carries a standalone welcome text or role badge. */}
+          <div className="avatar-menu-identity">
+            <span className="avatar-menu-name">{displayName || "Account"}</span>
+            {userRole && (
+              <span className={`role-badge ${userRole.toLowerCase()}`}>
+                {userRole}
+              </span>
+            )}
+          </div>
+          <div className="avatar-menu-separator" />
           <button
             className="avatar-menu-item"
             role="menuitem"

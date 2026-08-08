@@ -1,12 +1,19 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import UserAvatar from "./UserAvatar";
-import { useAuth } from "../hooks/useAuth";
+import { useCart } from "../hooks/useCart";
 
-export default function NavBar() {
+interface NavBarProps {
+  // The cart is a customer-store affordance. AppLayout leaves this default;
+  // AdminLayout passes false so the back-office console stays cart-free —
+  // gating on layout, not role, because an admin browsing the store still shops.
+  showCart?: boolean;
+}
+
+export default function NavBar({ showCart = true }: NavBarProps) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
-  const { userRole, isAuthenticated } = useAuth();
+  const { count } = useCart();
 
   // BrowsePage owns the actual searching; the navbar just hands it a term via
   // the URL so the result is linkable and survives a refresh.
@@ -18,8 +25,6 @@ export default function NavBar() {
 
   return (
     <nav className="navbar">
-      <div />
-
       <form className="search-bar" onSubmit={handleSubmit} role="search">
         <span className="search-icon">⌕</span>
         <input
@@ -31,14 +36,23 @@ export default function NavBar() {
         />
       </form>
 
+      {/* Right cluster: the cart (a store action) and the profile — the two
+          things a signed-in shopper reaches for. Identity (name + role) lives
+          inside the avatar's dropdown, so the bar stays uncluttered. */}
       <div className="navbar-actions">
-        {isAuthenticated && userRole && (
-          <span
-            className={`role-badge ${userRole.toLowerCase()}`}
-            title={`Signed in as ${userRole}`}
+        {showCart && (
+          <NavLink
+            to="/cart"
+            className="nav-cart"
+            aria-label={count > 0 ? `Cart, ${count} items` : "Cart"}
           >
-            {userRole}
-          </span>
+            <i className="fa-solid fa-cart-shopping" />
+            {count > 0 && (
+              <span className="nav-cart-badge" aria-hidden="true">
+                {count > 99 ? "99+" : count}
+              </span>
+            )}
+          </NavLink>
         )}
         <UserAvatar />
       </div>

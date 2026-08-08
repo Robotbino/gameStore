@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { gameService } from "../services/gameService";
-import { useCart } from "../hooks/useCart";
+import { useAuth } from "../hooks/useAuth";
 import type { Game } from "../types/game";
 
 interface SideBarProps {
@@ -11,16 +11,17 @@ interface SideBarProps {
 
 // Every entry here must correspond to a route in AppRoutes — anything else
 // falls through to the catch-all and bounces the user somewhere confusing.
+// Cart deliberately isn't here: it's a user-scoped action, not a place, so it
+// lives in the navbar action cluster where it survives a collapsed sidebar.
 const navItems = [
   { icon: "fa-solid fa-house", label: "Home", to: "/" },
   { icon: "fa-solid fa-bullseye", label: "Browse", to: "/browse" },
-  { icon: "fa-solid fa-cart-shopping", label: "Cart", to: "/cart" },
   { icon: "fa-solid fa-book", label: "Library", to: "/library" },
 ];
 
 export default function SideBar({ isOpen, onToggle }: SideBarProps) {
   const navigate = useNavigate();
-  const { count } = useCart();
+  const { isAdmin } = useAuth();
   const [games, setGames] = useState<Game[]>([]);
 
   // Quick Launch used to render the bundled gameData.ts fixture, so it showed
@@ -64,24 +65,6 @@ export default function SideBar({ isOpen, onToggle }: SideBarProps) {
             <NavLink to={item.to} className="sidebar-nav-item" end>
               <i className={`${item.icon} nav-icon`} />
               {isOpen && <span>{item.label}</span>}
-              {item.to === "/cart" && count > 0 && (
-                <span
-                  className="cart-badge"
-                  style={{
-                    marginLeft: "auto",
-                    background: "var(--accent, #7c3aed)",
-                    color: "#fff",
-                    borderRadius: "999px",
-                    fontSize: "0.7rem",
-                    fontWeight: 700,
-                    padding: "0.05rem 0.45rem",
-                    minWidth: "1.2rem",
-                    textAlign: "center",
-                  }}
-                >
-                  {count}
-                </span>
-              )}
             </NavLink>
           </li>
         ))}
@@ -102,6 +85,22 @@ export default function SideBar({ isOpen, onToggle }: SideBarProps) {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Surface switch — only admins can cross into the console, so it only
+          shows for them. Pinned to the bottom so it reads as "leave this
+          surface", not another store destination. */}
+      {isAdmin && (
+        <div className="sidebar-footer">
+          <Link
+            to="/admin"
+            className="sidebar-switch"
+            title="Switch to the admin console"
+          >
+            <i className="fa-solid fa-gauge-high nav-icon" />
+            {isOpen && <span>Admin console</span>}
+          </Link>
         </div>
       )}
     </aside>

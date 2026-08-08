@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, Link } from "react-router-dom";
 import Navbar from "../Navbar";
 
 export default function AdminLayout() {
@@ -39,10 +39,23 @@ export default function AdminLayout() {
             </li>
           ))}
         </ul>
+
+        {/* Surface switch — the return trip to the customer store, mirroring
+            the "Admin console" link the store sidebar shows admins. */}
+        <div className="sidebar-footer">
+          <Link
+            to="/"
+            className="sidebar-switch"
+            title="Switch to the customer store"
+          >
+            <i className="fa-solid fa-store nav-icon" />
+            {isSidebarOpen && <span>Back to store</span>}
+          </Link>
+        </div>
       </aside>
 
       <main className="content">
-        <Navbar />
+        <Navbar showCart={false} />
         <Outlet />
       </main>
     </div>
