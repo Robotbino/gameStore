@@ -24,8 +24,11 @@ export default function HeroSection({ item }: HeroSectionProps) {
 
   return (
     <div className="hero-container">
+      {/* heroImage, not imageUrl — imageUrl is the 2:3 portrait capsule the
+          card grid uses, and cropping that into a 21:9 banner leaves a thin
+          strip of the middle. GameDetailsPage picks the same way. */}
       <img
-        src={displayGame.imageUrl}
+        src={displayGame.heroImage || displayGame.imageUrl}
         alt={displayGame.title}
         className={`hero-image ${isTransitioning ? "transitioning" : ""}`}
       />

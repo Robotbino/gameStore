@@ -1025,9 +1025,13 @@ body {
   overflow: hidden;
 }
 
+/* 2 / 3 matches Steam's library_600x900 capsule exactly, so `cover` has
+   nothing left to crop and the character art arrives intact. At the old
+   3 / 4 the same source lost ~11% off the top and bottom, which clipped
+   the wordmark on capsules that sit theirs low. */
 .game-card-image-wrapper img {
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 2 / 3;
   object-fit: cover;
   display: block;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1090,8 +1094,10 @@ body {
   overflow: hidden;
 }
 
+/* Tracks .game-card-image-wrapper img, so the grid doesn't reflow when the
+   real posters land. */
 .game-card-skeleton-poster {
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 2 / 3;
   border-radius: 8px;
   background: var(--bg-raised);
 }

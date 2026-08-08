@@ -35,8 +35,8 @@ const gameData: GameData = {
       price: 899.99,
       rating: 4.8,
       description: "Embark on an epic journey as Geralt of Rivia, a monster hunter searching for his adopted daughter in a war-torn fantasy world. Make impactful choices that shape the narrative across hundreds of hours of gameplay, featuring rich characters, morally complex quests, and breathtaking landscapes.",
-      imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgOPtH8lO6v8aRGGNpdEpaJgtR5GEO1UlnPv33E4-9hyPDQHa7",
-      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/292030/header.jpg",
+      imageUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/292030/library_600x900.jpg",
+      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/292030/library_hero.jpg",
       reviews: [
         {
           id: 1,
@@ -77,8 +77,8 @@ const gameData: GameData = {
       price: 599.99,
       rating: 4.2,
       description: "Enter the dark future of Night City, a sprawling megalopolis obsessed with power and body modification. As V, a mercenary outlaw, you'll acquire a cybernetic implant that grants access to the memories of a legendary rockerboy, setting off a dangerous quest for immortality.",
-      imageUrl: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcS1dtbBhNNHqyHAUugdokcqjmfvEZgr46h6oVQsLayl0K880gCw",
-      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg",
+      imageUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/library_600x900.jpg",
+      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/library_hero.jpg",
       reviews: [
         {
           id: 4,
@@ -120,7 +120,7 @@ const gameData: GameData = {
       rating: 4.9,
       description: "Build anything you can imagine in this iconic block-based sandbox game. Whether you're surviving your first night against monsters, constructing massive architectural wonders, or exploring endless procedurally generated worlds, Minecraft offers limitless possibilities for players of all ages.",
       imageUrl: "https://www.minecraft.net/content/dam/minecraftnet/games/minecraft/key-art/Homepage_Discover-our-games_MC-Vanilla-KeyArt_864x864.jpg",
-      heroImage: "https://www.minecraft.net/content/dam/games/minecraft/key-art/MC-Legends-Standard-Background.jpg",
+      heroImage: "https://www.minecraft.net/content/dam/minecraftnet/games/minecraft/key-art/Homepage_Discover-our-games_MC-Vanilla-KeyArt_864x864.jpg",
       reviews: [
         {
           id: 7,
@@ -161,8 +161,8 @@ const gameData: GameData = {
       price: 46.99,
       rating: 4.5,
       description: "Work together with your crewmates to prepare your spaceship for departure — but beware, as impostors lurk among you. Complete tasks, call emergency meetings, and vote to eject suspected impostors before they eliminate everyone. Trust no one in this thrilling game of deception.",
-      imageUrl: "https://upload.wikimedia.org/wikipedia/en/9/9a/Among_Us_cover_art.jpg",
-      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/945360/header.jpg",
+      imageUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/945360/library_600x900.jpg",
+      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/945360/library_hero.jpg",
       reviews: [
         {
           id: 10,
@@ -203,8 +203,8 @@ const gameData: GameData = {
       price: 545.99,
       rating: 4.9,
       description: "Defy the god of the dead as you fight your way out of the Underworld in this award-winning roguelike. Wield the powers of Olympian gods, uncover the story with each escape attempt, and forge bonds with a memorable cast of characters in this beautifully crafted action game.",
-      imageUrl: "https://f4.bcbits.com/img/a2368914893_10.jpg",
-      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/1145360/header.jpg",
+      imageUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/1145360/library_600x900.jpg",
+      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/1145360/library_hero.jpg",
       reviews: [
         {
           id: 13,
@@ -245,8 +245,8 @@ const gameData: GameData = {
       price: 214.99,
       rating: 4.0,
       description: "Join the resistance as an ARC Raider in this free-to-play cooperative shooter. Scavenge for resources, craft gear, and team up with other raiders to take on the mechanized threat from space. Survive hostile environments and outsmart deadly machines in intense squad-based combat.",
-      imageUrl: "https://4kwallpapers.com/images/walls/thumbs_3t/19874.jpg",
-      heroImage: "https://images.igdb.com/igdb/image/upload/t_1080p/co4byb.jpg",
+      imageUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/2183900/library_600x900.jpg",
+      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/2183900/library_hero.jpg",
       reviews: [
         {
           id: 16,
@@ -287,8 +287,8 @@ const gameData: GameData = {
       price: 424.99,
       rating: 4.6,
       description: "Compete in one of the most complex and rewarding competitive games ever created. Choose from over 120 unique heroes, each with distinct abilities, and battle in 5v5 matches to destroy the enemy Ancient. Master deep strategic gameplay and climb the ranks in this legendary MOBA.",
-      imageUrl: "https://upload.wikimedia.org/wikipedia/en/3/31/Dota_2_Steam_artwork.jpg",
-      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/570/header.jpg",
+      imageUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/570/library_600x900.jpg",
+      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/570/library_hero.jpg",
       reviews: [
         {
           id: 19,
@@ -329,8 +329,8 @@ const gameData: GameData = {
       price: 524.99,
       rating: 4.9,
       description: "Escape to the countryside and build the farm of your dreams. Grow crops, raise animals, fish, forage, and mine as you restore your grandfather's old farm to glory. Make friends with the townsfolk, find love, and uncover the secrets of Stardew Valley at your own peaceful pace.",
-      imageUrl: "https://eastside-online.org/wp-content/uploads/2022/03/stardewfeatureimage.jpg",
-      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/413150/header.jpg",
+      imageUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/413150/library_600x900.jpg",
+      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/413150/library_hero.jpg",
       reviews: [
         {
           id: 22,
@@ -366,13 +366,13 @@ const gameData: GameData = {
     },
     {
       id: 9,
-      title: "NARAKA:BLADEPOINT",
+      title: "NARAKA: BLADEPOINT",
       genre: ["Battle Royale", "Martial Arts", "Action", "Multiplayer"],
       price: 824.99,
       rating: 4.3,
       description: "Experience a revolutionary battle royale featuring martial arts combat and gravity-defying mobility. Master the art of parkour, grappling hooks, and melee weapons as you battle 60 players on a mythical Eastern-inspired battlefield. Unlock legendary heroes with unique abilities and dominate the arena.",
-      imageUrl: "https://upload.wikimedia.org/wikipedia/en/5/57/Naraka_Bladepoint_cover_art_full.jpg",
-      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/1203220/header.jpg",
+      imageUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/1203220/library_600x900.jpg",
+      heroImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/1203220/library_hero.jpg",
       reviews: [
         {
           id: 25,
