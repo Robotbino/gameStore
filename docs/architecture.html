@@ -268,6 +268,25 @@
   .sw-auth { background: var(--auth-dim); border-color: var(--auth); }
   .sw-danger { background: var(--danger-dim); border-color: var(--danger); }
 
+  /* ── Auto-generated diagram key ──
+     Built from the classes each diagram actually uses (see buildLegend), so it
+     can't drift out of step with the diagram the way a hand-written one does.
+     Nothing is emitted for a diagram that colours nothing. */
+  .dg-legend {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin: 12px 2px 0; padding: 0; list-style: none;
+  }
+  .dg-legend li {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--mono); font-size: 11px; color: var(--ink-soft);
+    background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 999px; padding: 3px 10px 3px 7px;
+  }
+  .dg-key {
+    width: 10px; height: 10px; border-radius: 3px;
+    border: 1.5px solid currentColor; flex: none;
+  }
+
   /* ── Interactive Layer Explorer ── */
   .layer-grid {
     display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;
@@ -639,6 +658,12 @@
     border-radius: var(--radius); padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
   }
   .rm-card.v-do { border-left-color: var(--new); }
+  /* Shipped work used to reuse .v-do, so a finished item and an untouched one
+     were the same colour and the same weight — the one thing a roadmap has to
+     tell you at a glance. Done reads as settled: indigo rail, dimmed body, and
+     the title struck through only on the heading, not the explanation under it. */
+  .rm-card.v-done { border-left-color: var(--accent); }
+  .rm-card.v-done .rm-head h3 { color: var(--ink-soft); }
   .rm-card.v-later { border-left-color: var(--auth); }
   .rm-card.v-skip { border-left-color: var(--danger); }
   .rm-card[hidden] { display: none; }
@@ -649,6 +674,7 @@
     padding: 3px 9px; border-radius: 6px; white-space: nowrap; font-weight: 700;
   }
   .rm-verdict.v-do { color: var(--new); border: 1px solid var(--new-dim); }
+  .rm-verdict.v-done { color: var(--accent-2); border: 1px solid var(--accent-dim); background: var(--accent-dim); }
   .rm-verdict.v-later { color: var(--auth); border: 1px solid var(--auth-dim); }
   .rm-verdict.v-skip { color: var(--danger); border: 1px solid var(--danger-dim); }
   .rm-card p { margin: 0; color: var(--ink-soft); font-size: .91rem; }
@@ -779,6 +805,7 @@
     transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--line-2);
   }
   .rm-card.v-do:hover    { border-left-color: var(--new); }
+  .rm-card.v-done:hover  { border-left-color: var(--accent); }
   .rm-card.v-later:hover { border-left-color: var(--auth); }
   .rm-card.v-skip:hover  { border-left-color: var(--danger); }
   .kpi:hover { border-color: var(--line-2); }
@@ -1039,12 +1066,15 @@
 flowchart TB
   subgraph Client["🌐 React SPA — Vite · TypeScript · Chakra UI"]
     direction TB
-    UI["Pages &amp; Components<br/>Browse · GameDetails · Library · Admin"]
-    Ctx["AuthContext<br/>decodes JWT · exposes role"]
-    Axios["axios instance<br/>request + response interceptors"]
-    LS[("localStorage<br/>JWT token")]
+    UI["Pages &amp; Components&lt;br/&gt;Browse · GameDetails · Library · Cart · Admin"]
+    Ctx["AuthContext&lt;br/&gt;decodes JWT · exposes role"]
+    QL["QuickLaunchProvider&lt;br/&gt;idle carousel over the user's library"]
+    Axios["axios instance&lt;br/&gt;request + response interceptors"]
+    LS[("localStorage&lt;br/&gt;JWT · cart, keyed per user")]
     UI --> Ctx
+    UI --> QL
     UI --> Axios
+    QL --> Axios
     Ctx <--> LS
     Axios -->|reads Bearer token| LS
   end
@@ -1052,30 +1082,33 @@ flowchart TB
   subgraph API["⚙️ Spring Boot REST API :8181"]
     direction TB
     Filter["JWTAuthenticationFilter"]
-    Chain["SecurityFilterChain<br/>stateless · role-based"]
-    AuthC["/api/v2/auth/**<br/>public"]
-    GamesC["/games<br/>GET public · writes ADMIN"]
-    UsersC["/users<br/>ADMIN only"]
+    Chain["SecurityFilterChain&lt;br/&gt;stateless · role-based"]
+    AuthC["/api/v2/auth/**&lt;br/&gt;public"]
+    GamesC["/games&lt;br/&gt;GET public · paginated&lt;br/&gt;writes ADMIN"]
+    PurchC["/purchases&lt;br/&gt;authenticated · own rows only"]
+    UsersC["/users&lt;br/&gt;ADMIN only · paginated"]
     Svc["Service layer"]
     Repo["JPA Repositories · Hibernate"]
     Filter --> Chain
     Chain --> AuthC
     Chain --> GamesC
+    Chain --> PurchC
     Chain --> UsersC
     AuthC --> Svc
     GamesC --> Svc
+    PurchC --> Svc
     UsersC --> Svc
     Svc --> Repo
   end
 
-  DB[("🗄️ MySQL<br/>games · users · purchases")]
+  DB[("🗄️ MySQL&lt;br/&gt;games · users · purchases")]
 
   Axios -->|"HTTP · Authorization: Bearer JWT"| Filter
   AuthC -.->|issues signed JWT| Axios
   Repo --> DB
 
-  classDef auth stroke:#f5a623,stroke-width:2px;
-  class Filter,AuthC auth;
+  class Filter,AuthC auth
+  class LS,DB data
       </pre>
     </div>
     <p class="caption">Diagram 1 · the request path as it stands today — amber marks the JWT / auth boundary.</p>
@@ -1125,8 +1158,13 @@ flowchart TB
         <div class="file-row"><span class="path">src/routes/AppRoutes.tsx</span><span class="role">route table</span></div>
         <div class="file-row"><span class="path">src/routes/ProtectedRoute.tsx</span><span class="role">login gate</span></div>
         <div class="file-row"><span class="path">src/routes/AdminRoute.tsx</span><span class="role">role gate</span></div>
-        <div class="file-row"><span class="path">src/services/gameService.ts</span><span class="role">/games client</span></div>
+        <div class="file-row"><span class="path">src/services/gameService.ts</span><span class="role">/games client · paged + cached</span></div>
         <div class="file-row"><span class="path">src/services/authService.ts</span><span class="role">/api/v2/auth client</span></div>
+        <div class="file-row"><span class="path">src/services/purchaseService.ts</span><span class="role">/purchases client</span></div>
+        <div class="file-row"><span class="path">src/types/pagination.ts</span><span class="role">PagedResponse mirror · toPage</span></div>
+        <div class="file-row"><span class="path">src/components/Pagination.tsx</span><span class="role">shared pager control</span></div>
+        <div class="file-row"><span class="path">src/context/CartContext.tsx</span><span class="role">cart · per-user localStorage</span></div>
+        <div class="file-row"><span class="path">src/context/QuickLaunchProvider.tsx</span><span class="role">idle carousel state</span></div>
         <div class="file-row"><span class="path">src/pages/**</span><span class="role">screen components</span></div>
       </div>
     </div>
@@ -1142,11 +1180,13 @@ flowchart TB
         into the JSON error envelope the frontend expects.
       </p>
       <div class="files">
-        <div class="file-row"><span class="path">SecurityConfig.java</span><span class="role">filter chain · role rules</span></div>
+        <div class="file-row"><span class="path">SecurityConfiguration.java</span><span class="role">filter chain · role rules</span></div>
         <div class="file-row"><span class="path">JWTAuthenticationFilter.java</span><span class="role">token → SecurityContext</span></div>
-        <div class="file-row"><span class="path">AuthController.java</span><span class="role">register · authenticate</span></div>
-        <div class="file-row"><span class="path">GamesController.java</span><span class="role">CRUD for games</span></div>
+        <div class="file-row"><span class="path">AuthenticationController.java</span><span class="role">register · authenticate</span></div>
+        <div class="file-row"><span class="path">GamesControllers.java</span><span class="role">CRUD + paged search</span></div>
+        <div class="file-row"><span class="path">PurchaseController.java</span><span class="role">checkout · my purchases</span></div>
         <div class="file-row"><span class="path">UsersController.java</span><span class="role">admin user ops</span></div>
+        <div class="file-row"><span class="path">dto/PagedResponse.java</span><span class="role">the paging envelope</span></div>
         <div class="file-row"><span class="path">*Service.java</span><span class="role">business rules</span></div>
         <div class="file-row"><span class="path">GlobalExceptionHandler.java</span><span class="role">exception → JSON</span></div>
         <div class="file-row"><span class="path">JwtService.java</span><span class="role">sign · verify · claims</span></div>
@@ -1157,19 +1197,25 @@ flowchart TB
       <h3>Layer 3 — MySQL via JPA / Hibernate</h3>
       <p>
         Three tables, mapped as JPA entities. Repositories extend <code>JpaRepository</code>, giving
-        us CRUD for free and letting us declare derived queries by method name
-        (<code>findByTitleContainingIgnoreCase</code> is one line of interface). Hibernate manages
-        the schema, runs the SQL, and keeps entities inside a transaction so relationship
-        traversals work inside a service call.
+        CRUD for free. The catalogue read is one explicit <code>@Query</code> taking an optional
+        <code>q</code>, an optional <code>genre</code> and a <code>Pageable</code> — it replaced a
+        pair of derived finders that no controller ever reached.
+      </p>
+      <p>
+        Hibernate no longer owns the schema: Flyway does. <code>ddl-auto=validate</code> means
+        Hibernate only checks that every <code>@Entity</code> matches the tables the migrations
+        built, and refuses to start when they diverge — which is why <code>price</code> carries an
+        explicit <code>precision = 10, scale = 2</code>.
       </p>
       <div class="files">
-        <div class="file-row"><span class="path">Game.java</span><span class="role">@Entity → games</span></div>
-        <div class="file-row"><span class="path">User.java</span><span class="role">@Entity → users</span></div>
-        <div class="file-row"><span class="path">Purchase.java</span><span class="role">@Entity → purchases</span></div>
-        <div class="file-row"><span class="path">GameRepository.java</span><span class="role">derived queries</span></div>
+        <div class="file-row"><span class="path">Games.java</span><span class="role">@Entity → games</span></div>
+        <div class="file-row"><span class="path">Users.java</span><span class="role">@Entity → users</span></div>
+        <div class="file-row"><span class="path">Purchases.java</span><span class="role">@Entity → purchases</span></div>
+        <div class="file-row"><span class="path">GamesRepository.java</span><span class="role">one @Query, paged</span></div>
         <div class="file-row"><span class="path">UserRepository.java</span><span class="role">findByEmail</span></div>
         <div class="file-row"><span class="path">PurchaseRepository.java</span><span class="role">by user / game</span></div>
-        <div class="file-row"><span class="path">application.properties</span><span class="role">datasource · ddl-auto</span></div>
+        <div class="file-row"><span class="path">db/migration/V*.sql</span><span class="role">Flyway owns the schema</span></div>
+        <div class="file-row"><span class="path">application.properties</span><span class="role">datasource · ddl-auto=validate</span></div>
       </div>
     </div>
   </div>
@@ -1285,7 +1331,7 @@ sequenceDiagram
   autonumber
   participant U as User
   participant BP as BrowsePage
-  participant URL as URL (?q=…)
+  participant URL as URL (?q=…&amp;page=…)
   participant GS as gameService
   participant AX as axios
   participant Filter as JWTAuthFilter
@@ -1293,24 +1339,24 @@ sequenceDiagram
   participant Svc as GamesService
   participant DB as MySQL
 
-  U->>BP: types "wither" (debounced)
-  BP->>URL: setSearchParams({q: "wither"})
-  URL-->>BP: urlQuery changes
-  BP->>GS: search("wither")
-  GS->>AX: GET /games/all
+  U->>BP: types "witcher" (debounced)
+  BP->>URL: setSearchParams({q: "witcher"})
+  URL-->>BP: urlQuery / urlPage change
+  BP->>GS: getPage({ q, page, size: 12 })
+  GS->>AX: GET /games/all?q=witcher&amp;page=0&amp;size=12
   AX->>AX: interceptor attaches Bearer JWT
   AX->>Filter: HTTP + Authorization header
   Filter->>Filter: verify JWT signature + exp
   Filter->>Ctrl: continue chain (authenticated)
-  Ctrl->>Svc: getAllGames()
-  Svc->>DB: SELECT * FROM games
-  DB-->>Svc: rows
-  Svc-->>Ctrl: List&lt;Game&gt;
-  Ctrl-->>AX: 200 [ …games ]
+  Ctrl->>Svc: search(q, genre, pageable)
+  Svc->>DB: SELECT … WHERE LOWER(title) LIKE ? LIMIT 12
+  DB-->>Svc: Page&lt;Games&gt; + total count
+  Svc-->>Ctrl: Page&lt;Games&gt;
+  Ctrl-->>AX: 200 PagedResponse&lt;GameResponse&gt;
   AX-->>GS: response.data
-  GS->>GS: filter by title (client-side today)
-  GS-->>BP: Game[]
-  BP-->>U: GameGrid renders matches
+  GS->>GS: toPage() — coerce envelope, skip cache for q
+  GS-->>BP: Page&lt;Game&gt;
+  BP-->>U: GameGrid + Pagination render
         </pre>
       </div>
       <div class="steps">
@@ -1345,19 +1391,20 @@ sequenceDiagram
         </div>
 
         <div class="step-item data">
-          <div class="n">Step 5 · Repository query</div>
-          <div class="title">GameRepository.findAll()</div>
-          <p class="body">The service calls the repo, Hibernate emits a single SELECT, and the mapped <code>Game</code> entities flow back up as a <code>List</code> the controller returns as JSON.</p>
+          <div class="n">Step 5 · One query, three UX modes</div>
+          <div class="title">GamesRepository.search()</div>
+          <p class="body">A single <code>@Query</code> backs the plain list, keyword search and genre browse. Both filters are optional — null <em>or</em> empty string skips the clause — so the same method serves <code>/games/all</code> with no params, with <code>?q=</code>, with <code>?genre=</code>, or with both. Hibernate emits the SELECT plus a COUNT, and returns a <code>Page</code>.</p>
+          <pre><span class="k">WHERE</span> (:q <span class="k">IS NULL OR</span> :q = <span class="s">''</span>
+   <span class="k">OR</span> LOWER(g.title) <span class="k">LIKE</span> LOWER(CONCAT(<span class="s">'%'</span>, :q, <span class="s">'%'</span>)))</pre>
+          <div class="file">repositories/GamesRepository.java</div>
         </div>
 
         <div class="step-item data">
-          <div class="n">Step 6 · Filter runs client-side (for now)</div>
-          <div class="title">gameService.search()</div>
-          <p class="body">Today, filtering by title happens in the browser after fetching all games — a temporary shape while <code>/games/search</code> lands. The API of <code>gameService</code> is already server-side-ready, so swapping the body flips the whole app without changing callers.</p>
-          <pre><span class="k">return</span> games.filter((g) =&gt;
-  g.title.toLowerCase().includes(needle),
-);</pre>
-          <div class="file">services/gameService.ts:28</div>
+          <div class="n">Step 6 · The envelope, and what gets cached</div>
+          <div class="title">gameService.getPage()</div>
+          <p class="body">The controller returns <code>PagedResponse</code>, not Spring's <code>Page</code> — Boot 3.3 warns that <code>PageImpl</code>'s JSON isn't a stable contract. <code>toPage()</code> coerces that envelope and also tolerates a bare array, so an older server degrades to the old behaviour instead of blanking the grid. Filter-only pages are cached for 60 s; keyword searches deliberately are not.</p>
+          <pre><span class="k">const</span> cacheable = !params.q; <span class="c">// every keystroke is a distinct key</span></pre>
+          <div class="file">services/gameService.ts</div>
         </div>
       </div>
     </div>
@@ -1454,7 +1501,7 @@ sequenceDiagram
   AX->>AX: response interceptor catches 401
   AX->>AX: url is NOT /auth/… → wipe token
   AX->>WIN: location.href = "/login"
-  Note over U,WIN: Full reload · AuthContext resets<br/>from empty localStorage
+  Note over U,WIN: Full reload · AuthContext resets&lt;br/&gt;from empty localStorage
         </pre>
       </div>
       <div class="steps">
@@ -1515,20 +1562,18 @@ sequenceDiagram
     <div class="diagram-shell">
       <pre class="mermaid">
 stateDiagram-v2
+  direction TB
   [*] --> Loading: app mounts
-  Loading --> AnonymousUser: no token in storage
-  Loading --> AuthenticatedUser: token valid
-  Loading --> AnonymousUser: token expired / malformed
 
-  AnonymousUser --> AuthenticatedUser: login()/register() success
+  Loading --> AuthenticatedUser: token valid
+  Loading --> AnonymousUser: no token · expired · malformed
+
+  AnonymousUser --> AuthenticatedUser: login() / register() success
   AnonymousUser --> AnonymousUser: login() rejected (401)
 
   AuthenticatedUser --> AdminUser: role claim = ADMIN
-  AuthenticatedUser --> AnonymousUser: logout()
-  AuthenticatedUser --> AnonymousUser: interceptor 401 (session died)
-
-  AdminUser --> AnonymousUser: logout()
-  AdminUser --> AnonymousUser: interceptor 401
+  AuthenticatedUser --> AnonymousUser: logout() · interceptor 401
+  AdminUser --> AnonymousUser: logout() · interceptor 401
       </pre>
     </div>
     <p class="caption">Diagram 3 · <code>isLoading</code> is a distinct state, not a boolean flavor of "logged out" — that's why <code>ProtectedRoute</code> shows a spinner instead of bouncing to /login on first paint.</p>
@@ -1560,8 +1605,11 @@ stateDiagram-v2
     <h2>Three entities, one join</h2>
     <p class="section-lede">
       A user can own many games; a game can be owned by many users. <code>Purchase</code> is the
-      join table with a timestamp and price-at-purchase — so historical revenue survives price
-      changes on the game itself.
+      join table, carrying the timestamp and nothing else. It does <em>not</em> snapshot the price
+      yet — so editing a game's price silently rewrites what past revenue looks like. The backend
+      brief argues the fix in
+      <a href="../../GameStoreBackEnd/Bino/docs/architecture.html#persistence">§ 12 · Persistence Strategy</a>:
+      a purchase is history, so price and title belong on the row, not behind a join.
     </p>
 
     <div class="diagram-shell">
@@ -1571,28 +1619,29 @@ erDiagram
   GAME ||--o{ PURCHASE : "is bought in"
 
   USER {
-    Long id PK
+    Integer id PK
+    String userName UK
     String email UK
     String password "bcrypt hash"
     Role role "USER | ADMIN"
-    LocalDateTime createdAt
+    Integer points
+    boolean enabled "is_enabled"
   }
   GAME {
     Long id PK
     String title
     String genre "comma-separated"
-    Double price
+    BigDecimal price "decimal(10,2)"
     Double rating
     String description
-    String imageUrl
-    String heroImage
+    String imageUrl "600x900 capsule"
+    String heroImage "21:9 banner"
   }
   PURCHASE {
     Long id PK
-    Long userId FK
-    Long gameId FK
-    Double pricePaid "snapshot"
-    LocalDateTime purchasedAt
+    Long user_id FK
+    Long game_id FK
+    LocalDateTime purchase_date
   }
       </pre>
     </div>
@@ -1600,12 +1649,15 @@ erDiagram
     <div class="entities">
       <div class="entity">
         <h4>User</h4>
-        <p class="desc">Identity + role. Email is the natural key and JWT subject.</p>
+        <p class="desc">Identity + role. Email is the JWT subject; <code>userName</code> is unique too, and is what the admin table searches on.</p>
         <table>
-          <tr><td class="name">id</td><td class="type">Long · PK</td></tr>
+          <tr><td class="name">id</td><td class="type">Integer · PK</td></tr>
+          <tr><td class="name">userName</td><td class="type">String · unique</td></tr>
           <tr><td class="name">email</td><td class="type">String · unique</td></tr>
           <tr><td class="name">password</td><td class="type">bcrypt</td></tr>
           <tr><td class="name">role</td><td class="type">enum</td></tr>
+          <tr><td class="name">points</td><td class="type">Integer</td></tr>
+          <tr><td class="name">enabled</td><td class="type">boolean</td></tr>
         </table>
       </div>
       <div class="entity">
@@ -1615,20 +1667,20 @@ erDiagram
           <tr><td class="name">id</td><td class="type">Long · PK</td></tr>
           <tr><td class="name">title</td><td class="type">String</td></tr>
           <tr><td class="name">genre</td><td class="type">String</td></tr>
-          <tr><td class="name">price</td><td class="type">Double</td></tr>
+          <tr><td class="name">price</td><td class="type">BigDecimal(10,2)</td></tr>
           <tr><td class="name">rating</td><td class="type">Double</td></tr>
-          <tr><td class="name">imageUrl</td><td class="type">String</td></tr>
+          <tr><td class="name">imageUrl</td><td class="type">String · capsule</td></tr>
+          <tr><td class="name">heroImage</td><td class="type">String · banner</td></tr>
         </table>
       </div>
       <div class="entity">
         <h4>Purchase</h4>
-        <p class="desc">Many-to-many join. Snapshots price so a discount later doesn't rewrite history.</p>
+        <p class="desc">Many-to-many join, timestamp only. No price snapshot yet — see the note above.</p>
         <table>
           <tr><td class="name">id</td><td class="type">Long · PK</td></tr>
-          <tr><td class="name">userId</td><td class="type">FK · User</td></tr>
-          <tr><td class="name">gameId</td><td class="type">FK · Game</td></tr>
-          <tr><td class="name">pricePaid</td><td class="type">Double</td></tr>
-          <tr><td class="name">purchasedAt</td><td class="type">timestamp</td></tr>
+          <tr><td class="name">user_id</td><td class="type">FK · User</td></tr>
+          <tr><td class="name">game_id</td><td class="type">FK · Game</td></tr>
+          <tr><td class="name">purchase_date</td><td class="type">timestamp</td></tr>
         </table>
       </div>
     </div>
@@ -1769,11 +1821,12 @@ Content-Type: application/json
       </article>
       <article class="card">
         <span class="num">02 / DATA FLOW</span>
-        <h3>Server-side search &amp; sort</h3>
+        <h3>Server-side search &amp; sort <span class="tag effort">shipped</span></h3>
         <p>
-          Replace the client-side full-catalog filter with a Spring Data derived query —
-          <code>findByTitleContainingIgnoreCase</code> behind <code>GET /games/search</code>
-          plus a <code>Sort</code> dropdown (price · rating · title).
+          Done. <code>GET /games/all?q=&amp;genre=&amp;page=&amp;size=&amp;sort=</code> replaced the
+          client-side full-catalogue filter: one <code>@Query</code> serves list, search and genre
+          browse, and the browser now downloads a page instead of a table. What is still open is the
+          <em>sort</em> half — the parameter reaches the backend, but no UI sets it yet.
         </p>
         <div class="meta">
           <span class="tag effort">~2–3 hrs</span>
@@ -1809,19 +1862,20 @@ Content-Type: application/json
       nodes are existing pieces that gain responsibility. Note the search path now terminates at
       the database instead of the browser.
     </p>
-    <div class="diagram-shell">
+    <div class="diagram-shell"
+         data-legend='{"ok":"New in this increment","work":"Existing, gains responsibility"}'>
       <pre class="mermaid">
 flowchart TB
   subgraph Client["React SPA — Vite · TypeScript · Chakra UI"]
     direction TB
     UI["Pages &amp; Components"]
-    Skel["Skeleton loaders<br/>shimmer while isLoading"]:::new
-    Boundary["ErrorBoundary<br/>fallback UI on render crash"]:::new
-    Toast["Toast system<br/>global error surface"]:::new
-    SortUI["Sort control<br/>price · rating · title"]:::new
+    Skel["Skeleton loaders&lt;br/&gt;shimmer while isLoading"]:::ok
+    Boundary["ErrorBoundary&lt;br/&gt;fallback UI on render crash"]:::ok
+    Toast["Toast system&lt;br/&gt;global error surface"]:::ok
+    SortUI["Sort control&lt;br/&gt;price · rating · title"]:::ok
     Ctx["AuthContext"]
-    Axios["axios interceptors<br/>401 redirect + 5xx toast"]:::changed
-    LS[("localStorage<br/>JWT token")]
+    Axios["axios interceptors&lt;br/&gt;401 redirect + 5xx toast"]:::work
+    LS[("localStorage&lt;br/&gt;JWT token")]
     Boundary --> UI
     UI --> Skel
     UI --> SortUI
@@ -1835,14 +1889,14 @@ flowchart TB
   subgraph API["Spring Boot REST API :8181"]
     direction TB
     Filter["JWTAuthenticationFilter"]
-    Chain["SecurityFilterChain<br/>stateless · role-based"]
+    Chain["SecurityFilterChain&lt;br/&gt;stateless · role-based"]
     AuthC["/api/v2/auth/**"]
     GamesC["/games — GET public · writes ADMIN"]
-    SearchC["/games/search?keyword=&amp;sort=<br/>derived query + Sort"]:::new
+    SearchC["/games/all?q=&amp;genre=&amp;page=&amp;size=&amp;sort=&lt;br/&gt;one @Query · paged"]:::ok
     UsersC["/users — ADMIN only"]
     Svc["Service layer"]
-    Repo["JPA Repositories · Hibernate<br/>findByTitleContainingIgnoreCase"]:::changed
-    GEH["GlobalExceptionHandler<br/>consistent error JSON"]:::changed
+    Repo["JPA Repositories · Hibernate&lt;br/&gt;GamesRepository.search(q, genre, pageable)"]:::work
+    GEH["GlobalExceptionHandler&lt;br/&gt;consistent error JSON"]:::work
     Filter --> Chain
     Chain --> AuthC
     Chain --> GamesC
@@ -1856,26 +1910,17 @@ flowchart TB
     Svc -.->|throws| GEH
   end
 
-  DB[("MySQL<br/>games · users · purchases")]
+  DB[("MySQL&lt;br/&gt;games · users · purchases")]
 
   Axios -->|"HTTP · Bearer JWT"| Filter
   SortUI -->|"query params"| Axios
   AuthC -.->|issues signed JWT| Axios
   GEH -.->|"error JSON → toast"| Toast
   Repo --> DB
-
-  classDef new stroke:#34d399,stroke-width:2px,color:#eafff6,fill:#12241d;
-  classDef changed stroke:#6d5efc,stroke-width:2px,color:#eae7ff,fill:#1a1830;
-      </pre>
+</pre>
     </div>
-    <p class="caption">Diagram 4 · extended request path — new nodes in green, expanded nodes in indigo.</p>
-
-    <div class="legend">
-      <span><span class="swatch sw-base"></span> Existing component</span>
-      <span><span class="swatch sw-new"></span> New (this increment)</span>
-      <span><span class="swatch sw-chg"></span> Existing, gains responsibility</span>
-      <span><span class="swatch sw-auth"></span> Auth / JWT boundary</span>
-    </div>
+    <p class="caption">Diagram 4 · the extended request path. Unmarked nodes already exist and are
+      untouched; the key below is generated from what the diagram actually colours.</p>
   </div>
 </section>
 
@@ -2015,10 +2060,11 @@ flowchart TB
         </div>
       </article>
 
-      <article class="rm-card v-do" data-cat="next">
-        <div class="rm-head"><h3>Real ownership</h3><span class="rm-verdict v-do">Do it</span></div>
-        <p>The <code>Purchases</code> entity exists but has no endpoints, so <code>LibraryPage</code>
-          shows <em>every</em> game. Add purchase + library endpoints so ownership becomes real.</p>
+      <article class="rm-card v-done" data-cat="next">
+        <div class="rm-head"><h3>Real ownership</h3><span class="rm-verdict v-done">Shipped</span></div>
+        <p><b>Done (2026-08-07).</b> <code>POST /purchases</code> and <code>GET /purchases/me</code>
+          landed, so <code>LibraryPage</code> shows what the user actually bought instead of the whole
+          store — and the Quick Launch strip reads the same endpoint.</p>
         <div class="rm-meta">
           <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span></span></div>
           <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~1 day</span></div>
@@ -2027,10 +2073,12 @@ flowchart TB
       </article>
 
       <!-- PORTFOLIO -->
-      <article class="rm-card v-do" data-cat="portfolio">
-        <div class="rm-head"><h3>Server-side search, sort &amp; pagination</h3><span class="rm-verdict v-do">Do it</span></div>
-        <p><code>GamesService.searchGames()</code> already exists but no controller exposes it, so
-          filtering runs client-side over the whole table. Expose it and return a <code>Page</code>.</p>
+      <article class="rm-card v-done" data-cat="portfolio">
+        <div class="rm-head"><h3>Server-side search &amp; pagination</h3><span class="rm-verdict v-done">Shipped</span></div>
+        <p><b>Done (2026-08-08).</b> <code>/games/all</code> and <code>/users/all</code> take
+          <code>q</code>, <code>genre</code>, <code>page</code>, <code>size</code> and <code>sort</code>,
+          and return a <code>PagedResponse</code> envelope. Sort is plumbed end to end but no UI sets it
+          yet — that half is still open.</p>
         <div class="rm-meta">
           <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
           <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~half day</span></div>
@@ -2038,10 +2086,12 @@ flowchart TB
         </div>
       </article>
 
-      <article class="rm-card v-do" data-cat="portfolio">
-        <div class="rm-head"><h3>Flyway migrations</h3><span class="rm-verdict v-do">Do it</span></div>
-        <p>Retire <code>ddl-auto=update</code> for versioned SQL migrations. Turns an implicit,
-          unrepeatable schema into a reviewable history — a concrete "I know how teams manage schema" signal.</p>
+      <article class="rm-card v-done" data-cat="portfolio">
+        <div class="rm-head"><h3>Flyway migrations</h3><span class="rm-verdict v-done">Shipped</span></div>
+        <p><b>Done.</b> <code>ddl-auto=update</code> retired for versioned SQL under
+          <code>db/migration/</code>, with <code>baseline-on-migrate</code> so the existing database
+          adopted V1 without re-running it. Hibernate is now on <code>validate</code> — it checks the
+          mapping and refuses to start on drift, rather than quietly reshaping tables.</p>
         <div class="rm-meta">
           <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
           <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~3 hrs</span></div>
@@ -2189,13 +2239,13 @@ flowchart TB
     <div class="score-grid">
       <div class="score-row"><div class="s-label">Layering &amp; structure<small>controller · service · repo · dto</small></div><div class="score-bar"><div class="score-fill" data-now="90" data-target="90"></div></div><div class="score-num" data-now="9" data-target="9">9</div></div>
       <div class="score-row"><div class="s-label">Security<small>JWT · RBAC · no leaked secrets</small></div><div class="score-bar"><div class="score-fill" data-now="70" data-target="90"></div></div><div class="score-num" data-now="7" data-target="9">7</div></div>
-      <div class="score-row"><div class="s-label">Data integrity<small>constraints · migrations</small></div><div class="score-bar"><div class="score-fill" data-now="50" data-target="85"></div></div><div class="score-num" data-now="5" data-target="8.5">5</div></div>
+      <div class="score-row"><div class="s-label">Data integrity<small>Flyway owns schema · validate · no price snapshot</small></div><div class="score-bar"><div class="score-fill" data-now="70" data-target="85"></div></div><div class="score-num" data-now="7" data-target="8.5">7</div></div>
       <div class="score-row"><div class="s-label">Testing<small>backend IT · no frontend tests</small></div><div class="score-bar"><div class="score-fill" data-now="55" data-target="80"></div></div><div class="score-num" data-now="5.5" data-target="8">5.5</div></div>
       <div class="score-row"><div class="s-label">Deployability<small>docker · public URL · CI</small></div><div class="score-bar"><div class="score-fill" data-now="20" data-target="90"></div></div><div class="score-num" data-now="2" data-target="9">2</div></div>
       <div class="score-row"><div class="s-label">Observability<small>health · logs · metrics</small></div><div class="score-bar"><div class="score-fill" data-now="30" data-target="70"></div></div><div class="score-num" data-now="3" data-target="7">3</div></div>
       <div class="score-row"><div class="s-label">Documentation<small>these interactive briefs</small></div><div class="score-bar"><div class="score-fill" data-now="95" data-target="95"></div></div><div class="score-num" data-now="9.5" data-target="9.5">9.5</div></div>
       <div class="score-row"><div class="s-label">Frontend hygiene<small>deps · design-system focus</small></div><div class="score-bar"><div class="score-fill" data-now="55" data-target="85"></div></div><div class="score-num" data-now="5.5" data-target="8.5">5.5</div></div>
-      <div class="score-row"><div class="s-label">API design<small>REST · pagination · errors</small></div><div class="score-bar"><div class="score-fill" data-now="70" data-target="88"></div></div><div class="score-num" data-now="7" data-target="8.8">7</div></div>
+      <div class="score-row"><div class="s-label">API design<small>paged DTO envelope · non-REST paths remain</small></div><div class="score-bar"><div class="score-fill" data-now="80" data-target="88"></div></div><div class="score-num" data-now="8" data-target="8.8">8</div></div>
     </div>
     <p class="caption">Deployability at 2/10 is the load-bearing number — it drags the whole profile down
       and is also the cheapest to fix. Everything else is already close to portfolio-grade.</p>
@@ -2295,6 +2345,12 @@ flowchart TB
     startOnLoad: false,
     securityLevel: "loose",
     theme: "base",
+    // Rounded edges read as flow rather than circuitry, and the extra rank
+    // spacing is what stops edge labels from sitting on top of the arrowheads.
+    flowchart: { curve: "basis", nodeSpacing: 46, rankSpacing: 62, padding: 14 },
+    // mirrorActors doubles every participant along the bottom, which on these
+    // diagrams is a second row of names and no extra information.
+    sequence: { mirrorActors: false, boxMargin: 8, noteMargin: 12, messageAlign: "center" },
     themeVariables: prefersLight ? {
       background: "#ffffff",
       primaryColor: "#f4f6fa",
@@ -2342,19 +2398,59 @@ flowchart TB
     }
   });
 
-  // classDef fills inside the diagram sources are authored dark; remap them
-  // to their light equivalents before Mermaid ever reads the text.
-  if (prefersLight) {
-    const swap = {
-      "#12241d": "#e7f6ef", "#eafff6": "#0a5c3f",
-      "#1a1830": "#edeaff", "#eae7ff": "#3f33ad"
-    };
-    document.querySelectorAll(".mermaid").forEach((el) => {
-      el.textContent = el.textContent.replace(
-        /#(?:12241d|eafff6|1a1830|eae7ff)/g, (m) => swap[m]
-      );
-    });
-  }
+  // ── Diagram palette ─────────────────────────────────────────────
+  // One vocabulary for every diagram in the doc set: a class name means the
+  // same thing, and renders the same colour, in all of them. [stroke, fill,
+  // text] per class, per scheme.
+  //
+  // Generated and injected at render time rather than written into each
+  // diagram. Mermaid resolves colours while laying a diagram out and cannot
+  // read the CSS variables the rest of the page themes with, so the values
+  // have to be handed to it either way. Doing it from one table also removes
+  // a whole bug class: the previous approach authored dark hexes inline and
+  // string-replaced them for light mode, which only ever covered the hexes
+  // someone remembered to add to the map.
+  const PALETTE = {
+    dark: {
+      auth:   ["#f5a623", "#2e2410", "#ffdfa6"],
+      spring: ["#6db33f", "#16240f", "#cdeeb4"],
+      ok:     ["#34d399", "#10261f", "#9bf0cf"],
+      work:   ["#8b7dff", "#1c1a33", "#cfc8ff"],
+      data:   ["#22b8cf", "#0e2429", "#9fe6f2"],
+      ext:    ["#d946ef", "#271033", "#f0bdfa"],
+      async:  ["#60a5fa", "#101f33", "#bcd9ff"],
+      fail:   ["#f0637a", "#2b1119", "#ffc2cd"],
+      muted:  ["#8b94a9", "#1b2130", "#d6dbe7"]
+    },
+    light: {
+      auth:   ["#b8770c", "#fdf3e0", "#6b4205"],
+      spring: ["#4d8f24", "#eef7e6", "#2c5410"],
+      ok:     ["#0f9d70", "#e6f7f0", "#08543a"],
+      work:   ["#4c3fd0", "#eeebff", "#33269e"],
+      data:   ["#0e7490", "#e3f6fa", "#0b4d5f"],
+      ext:    ["#a21caf", "#fbeafd", "#6b127a"],
+      async:  ["#2563eb", "#e8f0fe", "#1a3f8f"],
+      fail:   ["#be123c", "#fdeaee", "#8a0f2c"],
+      muted:  ["#64748b", "#f1f3f8", "#333c4e"]
+    }
+  };
+
+  const PRELUDE = Object.entries(PALETTE[prefersLight ? "light" : "dark"])
+    .map(([name, [stroke, fill, text]]) =>
+      `  classDef ${name} stroke:${stroke},stroke-width:2px,fill:${fill},color:${text};`)
+    .join("\n");
+
+  // classDef is a flowchart/state-diagram feature — a sequence or ER diagram
+  // rejects it outright, so only those two get the prelude, and it goes after
+  // the type declaration because nothing may precede that line.
+  document.querySelectorAll(".mermaid").forEach((el) => {
+    const lines = el.textContent.split("\n");
+    const head = lines.findIndex((l) => l.trim());
+    if (head === -1) return;
+    if (!/^(flowchart|graph|stateDiagram)/.test(lines[head].trim())) return;
+    lines.splice(head + 1, 0, PRELUDE);
+    el.textContent = lines.join("\n");
+  });
 
   // The stylesheet flips live when the OS scheme changes, but Mermaid bakes
   // its palette at render time — reload once so the diagrams match again.
@@ -2369,10 +2465,64 @@ flowchart TB
   // fails silently and stamps a misleading "Syntax error" bomb. So we render
   // by hand: everything visible now, and each hidden flow tab the first time
   // it is shown (see the tab handler below).
+  // What each palette class means, in words. Shared vocabulary, so these read
+  // the same across every diagram and both architecture docs.
+  const LEGEND_TEXT = {
+    auth:   "auth / trust boundary",
+    spring: "Spring machinery",
+    ok:     "fast path · already correct",
+    work:   "write · added by this design",
+    data:   "persistent store",
+    ext:    "third party",
+    async:  "background · scheduled",
+    fail:   "failure path · guard",
+    muted:  "unchanged infrastructure"
+  };
+
+  // Read the classes off the rendered SVG rather than the source text, so the
+  // key lists exactly what the reader can see — no entry for a class that was
+  // defined but never applied.
+  function buildLegend(el) {
+    const shell = el.closest(".diagram-shell");
+    if (!shell || shell.nextElementSibling?.classList.contains("dg-legend")) return;
+
+    // A diagram may relabel a colour for its own context — §9 uses green for
+    // "new in this increment", not the default "already correct". The colour
+    // still means one thing per diagram; only the wording is local.
+    let local = {};
+    try { local = JSON.parse(shell.dataset.legend || "{}"); } catch (e) {}
+
+    const used = new Set();
+    el.querySelectorAll(".node").forEach((n) => {
+      n.getAttribute("class").split(/\s+/).forEach((c) => {
+        if (LEGEND_TEXT[c]) used.add(c);
+      });
+    });
+    if (!used.size) return;
+
+    const pal = PALETTE[prefersLight ? "light" : "dark"];
+    const ul = document.createElement("ul");
+    ul.className = "dg-legend";
+    ul.setAttribute("aria-label", "Diagram key");
+    // Emit in PALETTE order, not Set-insertion order, so two diagrams sharing
+    // a class always list it in the same place.
+    Object.keys(pal).filter((c) => used.has(c)).forEach((c) => {
+      const [stroke, fill] = pal[c];
+      const li = document.createElement("li");
+      const sw = document.createElement("span");
+      sw.className = "dg-key";
+      sw.style.color = stroke;
+      sw.style.background = fill;
+      li.append(sw, document.createTextNode(local[c] || LEGEND_TEXT[c]));
+      ul.appendChild(li);
+    });
+    shell.after(ul);
+  }
+
   function renderMermaid(nodes) {
     const pending = nodes.filter((n) => !n.dataset.processed);
     if (pending.length && window.mermaid) {
-      window.mermaid.run({ nodes: pending });
+      window.mermaid.run({ nodes: pending }).then(() => pending.forEach(buildLegend));
     }
   }
 
