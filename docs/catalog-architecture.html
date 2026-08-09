@@ -20,104 +20,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
 
+<link rel="stylesheet" href="docs-theme.css" />
+
 <style>
-  /* ============================================================
-     Tokens. Components style through these only — never inside a
-     media query — so the theme toggle can override in both
-     directions without touching component rules.
-     ============================================================ */
-  :root {
-    /* Which scheme is actually rendering. Declared in every theme block so JS
-       can read the resolved answer with one getComputedStyle call instead of
-       re-deriving the OS-preference / data-theme precedence rules. */
-    --scheme: light;
-    --bg:        #f6f7fb;
-    --surface:   #ffffff;
-    --surface-2: #f0f2f8;
-    --line:      #dde1ec;
-    --line-soft: #e8ebf3;
-    --ink:       #161a24;
-    --ink-soft:  #4d5670;
-    --ink-faint: #79839c;
-
-    --indigo:  #5546e8;
-    --emerald: #0a7d55;
-    --sky:     #0369a1;
-    --amber:   #b45309;
-    --rose:    #d1344f;
-
-    --indigo-wash:  rgba(85,70,232,.07);
-    --emerald-wash: rgba(10,125,85,.07);
-    --sky-wash:     rgba(3,105,161,.07);
-    --amber-wash:   rgba(180,83,9,.07);
-    --rose-wash:    rgba(209,52,79,.07);
-
-    --glow-a: rgba(85,70,232,.10);
-    --glow-b: rgba(10,125,85,.07);
-
-    --radius: 12px;
-    --maxw: 1080px;
-
-    --mono: ui-monospace, "Cascadia Code", "SF Mono", "Roboto Mono", Menlo, Consolas, monospace;
-    --sans: "Atkinson Hyperlegible", ui-sans-serif, system-ui, "Segoe UI Variable Text",
-            "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --scheme: dark;
-      --bg:        #0d1016;
-      --surface:   #151a24;
-      --surface-2: #1b2130;
-      --line:      #262d3d;
-      --line-soft: #1f2532;
-      --ink:       #d6dbe7;
-      --ink-soft:  #98a1b5;
-      --ink-faint: #6b7488;
-
-      --indigo:  #8b7dff;
-      --emerald: #34d399;
-      --sky:     #38bdf8;
-      --amber:   #f5a623;
-      --rose:    #f0637a;
-
-      --indigo-wash:  rgba(139,125,255,.10);
-      --emerald-wash: rgba(52,211,153,.09);
-      --sky-wash:     rgba(56,189,248,.09);
-      --amber-wash:   rgba(245,166,35,.09);
-      --rose-wash:    rgba(240,99,122,.09);
-
-      --glow-a: rgba(109,94,252,.16);
-      --glow-b: rgba(52,211,153,.09);
-    }
-  }
-
-  /* Viewer toggle wins over the OS preference, both directions. */
-  :root[data-theme="light"] {
-    --scheme: light;
-    --bg: #f6f7fb; --surface: #ffffff; --surface-2: #f0f2f8;
-    --line: #dde1ec; --line-soft: #e8ebf3;
-    --ink: #161a24; --ink-soft: #4d5670; --ink-faint: #79839c;
-    --indigo: #5546e8; --emerald: #0a7d55; --sky: #0369a1;
-    --amber: #b45309; --rose: #d1344f;
-    --indigo-wash: rgba(85,70,232,.07); --emerald-wash: rgba(10,125,85,.07);
-    --sky-wash: rgba(3,105,161,.07); --amber-wash: rgba(180,83,9,.07);
-    --rose-wash: rgba(209,52,79,.07);
-    --glow-a: rgba(85,70,232,.10); --glow-b: rgba(10,125,85,.07);
-  }
-  :root[data-theme="dark"] {
-    --scheme: dark;
-    --bg: #0d1016; --surface: #151a24; --surface-2: #1b2130;
-    --line: #262d3d; --line-soft: #1f2532;
-    --ink: #d6dbe7; --ink-soft: #98a1b5; --ink-faint: #6b7488;
-    --indigo: #8b7dff; --emerald: #34d399; --sky: #38bdf8;
-    --amber: #f5a623; --rose: #f0637a;
-    --indigo-wash: rgba(139,125,255,.10); --emerald-wash: rgba(52,211,153,.09);
-    --sky-wash: rgba(56,189,248,.09); --amber-wash: rgba(245,166,35,.09);
-    --rose-wash: rgba(240,99,122,.09);
-    --glow-a: rgba(109,94,252,.16); --glow-b: rgba(52,211,153,.09);
-  }
-
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -419,26 +324,6 @@
      the negative letter-spacing is relaxed and headings get their own
      leading instead of inheriting the 1.62 body value.
      ══════════════════════════════════════════════════════════════════ */
-
-  :root {
-    --shadow-sm: 0 1px 2px rgba(16,20,32,.06);
-    --shadow-md: 0 8px 24px -8px rgba(16,20,32,.16);
-    --ease: cubic-bezier(.2,.7,.3,1);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --shadow-sm: 0 1px 2px rgba(0,0,0,.28);
-      --shadow-md: 0 8px 24px -8px rgba(0,0,0,.5);
-    }
-  }
-  :root[data-theme="dark"] {
-    --shadow-sm: 0 1px 2px rgba(0,0,0,.28);
-    --shadow-md: 0 8px 24px -8px rgba(0,0,0,.5);
-  }
-  :root[data-theme="light"] {
-    --shadow-sm: 0 1px 2px rgba(16,20,32,.06);
-    --shadow-md: 0 8px 24px -8px rgba(16,20,32,.16);
-  }
 
   /* ── Type scale, retuned for Atkinson ── */
   h1 { line-height: 1.08; letter-spacing: -.018em; }

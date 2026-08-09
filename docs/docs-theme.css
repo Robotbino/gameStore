@@ -1,0 +1,386 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Game Store — shared documentation theme
+   ═══════════════════════════════════════════════════════════════════════════
+
+   ONE stylesheet for the whole doc set, across both repos:
+
+     GameStore/docs/architecture.html
+     GameStore/docs/catalog-architecture.html
+     GameStore/docs/frontend-roadmap.html
+     GameStoreBackEnd/Bino/docs/architecture.html
+     GameStoreBackEnd/Bino/docs/architecture-and-learning-guide.html
+     GameStoreBackEnd/Bino/docs/backend-roadmap.html
+
+   The backend docs already reach across the repo boundary with relative
+   links (../../../GameStore/docs/...), so this file lives with the frontend
+   docs and is linked the same way. Editing a colour here changes all six.
+
+   ── How the theming contract works ────────────────────────────────────────
+   Every colour is declared ONCE with light-dark(). `color-scheme` decides
+   which half wins, so a theme switch is a one-property change instead of a
+   parallel table of overrides that drift apart. The previous arrangement
+   restated ~45 tokens in four places per file — 6 files × 4 blocks was the
+   real reason the docs had quietly diverged from each other.
+
+     :root                     → color-scheme: light dark  (follows the OS)
+     :root[data-theme="light"] → pinned light  (viewer's explicit choice)
+     :root[data-theme="dark"]  → pinned dark
+
+   --scheme stays a plain string token because light-dark() only accepts
+   <color> values, and the Mermaid bootstrap reads it with one
+   getComputedStyle call to pick its matching diagram palette.
+
+   ── Palette note ──────────────────────────────────────────────────────────
+   The surfaces are neutral graphite, not the old #0d1016 navy. The navy sat
+   only ~25° away from the indigo accent, so the brand colour never actually
+   read as a colour — it dissolved into its own background. Pulling the
+   ground to a near-neutral (blue channel never more than ~4 points above
+   red) leaves indigo the only real hue on the page above the semantic
+   diagram colours, which is what an accent is for.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   1. TOKENS
+   ─────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  color-scheme: light dark;
+  --scheme: dark;
+
+  /* ── Surfaces: graphite ramp ──
+     Even steps in lightness so nesting a panel inside a panel inside a
+     shell stays legible without borders doing all the work. */
+  --bg:        light-dark(#f7f7f8, #0e0e10);
+  --panel:     light-dark(#ffffff, #16161a);
+  --panel-2:   light-dark(#f2f2f4, #1d1d22);
+  --panel-3:   light-dark(#eaeaee, #24242a);
+  --line:      light-dark(#dcdce1, #2a2a31);
+  --line-2:    light-dark(#b9b9c2, #3a3a44);
+  --line-soft: light-dark(#eeeef1, #212127);
+
+  /* catalog-architecture.html speaks "surface"; everything else says
+     "panel". Same ramp, both names, so either vocabulary resolves. */
+  --surface:   var(--panel);
+  --surface-2: var(--panel-2);
+
+  /* ── Ink ──
+     --ink-faint carries captions, micro-labels and step eyebrows, so both
+     values are set against --panel-3 — the lowest-contrast neutral ground it
+     actually lands on, not --panel — and clear 4.5:1 there: 5.2:1 light,
+     4.65:1 dark. The old #6b7488 ran at ~4.2:1. Anything faint sitting on a
+     *tinted* chip is a separate case and needs the chip's own colour — see
+     .rm-chip.active .c-count. */
+  --ink:       light-dark(#131316, #e7e7ea);
+  --ink-soft:  light-dark(#43434e, #a2a2ac);
+  --ink-faint: light-dark(#5f5f6a, #8c8c98);
+
+  /* ── Accent: indigo, the app's voice ──
+     --accent is not purely decorative here: it carries the step eyebrows and
+     layer labels, which are small text. The dark value is therefore set to
+     clear 4.5:1 on --panel-3 (4.7:1) rather than to the most saturated indigo
+     that still looked good as a border — #7b6cff dropped to 4.3:1 on a panel. */
+  --accent:      light-dark(#5546e8, #8b7dff);
+  --accent-2:    light-dark(#4c3fd0, #a094ff);
+  --accent-dim:  light-dark(#dedaff, #363154);
+  --accent-wash: light-dark(#eeecff, #1a1826);
+  --on-accent:   light-dark(#ffffff, #0e0e10);
+
+  /* ── Semantic hues ──
+     The hue of each is unchanged — they are load-bearing in the diagrams
+     and the legend text names them. Only the -dim / -wash companions moved,
+     because they were mixed toward navy and now mix toward graphite. */
+  /* Spring green also labels stage headings and JWT segments, so like amber
+     its light value is set for small text on --spring-wash (5.1:1); the
+     inherited #4d8b28 sat at 3.7:1 there. */
+  --spring:      light-dark(#3f7420, #7cc44a);   /* Spring framework      */
+  --spring-dim:  light-dark(#cfe0bf, #2e4520);
+  --spring-wash: light-dark(#eef5e7, #161c11);
+
+  --new:      light-dark(#0a7d55, #35d399);      /* added / fast path     */
+  --new-dim:  light-dark(#bde8d6, #1e5442);
+  --new-wash: light-dark(#e7f6ef, #0f1f19);
+
+  /* Amber is the one semantic hue that also carries small text (the step
+     eyebrows), so the light value is nudged darker to clear 4.5:1 on
+     --panel-2; #a35f06 landed at 4.47. */
+  --auth:      light-dark(#9c5a05, #f5a623);     /* JWT / trust boundary  */
+  --auth-dim:  light-dark(#f5e2c2, #4a3a15);
+  --auth-wash: light-dark(#faf0dd, #241c0d);
+
+  --danger:      light-dark(#c22e46, #f2687e);   /* failure path / guard  */
+  --danger-dim:  light-dark(#f6d3da, #4a2029);
+  --danger-wash: light-dark(#fbe9ec, #291217);
+
+  --info:      light-dark(#1d4ed8, #60a5fa);
+  --info-dim:  light-dark(#d3e0fb, #1d3557);
+  --info-wash: light-dark(#e9f0fe, #101a29);
+
+  --sky:      light-dark(#0369a1, #7dd3fc);      /* HTTP GET / 2xx        */
+  --sky-dim:  light-dark(#bcd9ec, #23495e);
+  --sky-wash: light-dark(#e3f2fb, #0e2029);
+
+  /* catalog-architecture.html names its hues by colour rather than by role.
+     Aliased so one edit still moves both vocabularies. */
+  --indigo:       var(--accent-2);
+  --indigo-wash:  light-dark(rgba(85,70,232,.07),  rgba(160,148,255,.10));
+  --emerald:      var(--new);
+  --emerald-wash: light-dark(rgba(10,125,85,.07),  rgba(53,211,153,.09));
+  --amber:        var(--auth);
+  --amber-wash:   light-dark(rgba(180,83,9,.07),   rgba(245,166,35,.09));
+  --rose:         var(--danger);
+  --rose-wash:    light-dark(rgba(209,52,79,.07),  rgba(242,104,126,.09));
+
+  /* ── Code surfaces ──
+     A terminal stays a terminal: these deliberately do NOT flip, because the
+     panels they describe are locked dark in both schemes. Any foreground
+     sitting on --code-bg must come from this group — pairing a locked dark
+     background with a themed ink is what made snippets unreadable in light
+     mode, since --ink resolves to near-black there. --code-ink holds ~13:1
+     on --code-bg, --code-ink-faint ~5.4:1. */
+  --code-bg:        #0a0d13;
+  --code-ink:       #dfe3ea;
+  --code-ink-faint: #8b93a3;
+  --code-line:      #232a36;
+  --code-ok:        #7cc44a;
+
+  /* ── Chrome ── */
+  --nav-veil:     light-dark(rgba(247,247,248,.85), rgba(14,14,16,.82));
+  --scroll-hover: light-dark(#a0a0ac, #4a4a56);
+  --swatch-ring:  light-dark(rgba(19,19,22,.18), rgba(255,255,255,.14));
+  --row-odd:      light-dark(#f0f0f3, #202027);
+  --row-even:     light-dark(#f8f8fa, #191920);
+  --diagram-line: light-dark(#8b8b97, #5a5a68);
+
+  /* Two wide, low-opacity washes behind the page. Kept faint enough that
+     they read as depth rather than as a gradient. */
+  --glow-a: light-dark(rgba(85,70,232,.07), rgba(123,108,255,.14));
+  --glow-b: light-dark(rgba(10,125,85,.05), rgba(53,211,153,.07));
+
+  /* ── Elevation ──
+     light-dark() returns a <color>, so it nests inside a shadow value. */
+  --shadow-sm: 0 1px 2px    light-dark(rgba(16,20,32,.06), rgba(0,0,0,.30));
+  --shadow-md: 0 6px 20px -6px  light-dark(rgba(16,20,32,.16), rgba(0,0,0,.52));
+  --shadow-lg: 0 20px 52px -14px light-dark(rgba(16,20,32,.22), rgba(0,0,0,.64));
+  --ring: 0 0 0 3px light-dark(rgba(85,70,232,.35), rgba(123,108,255,.42));
+
+  /* ── Geometry & type ── */
+  --radius: 14px;
+  --radius-sm: 8px;
+  --maxw: 1140px;
+  --nav-h: 56px;
+  --ease: cubic-bezier(.2,.7,.3,1);
+
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", "SF Mono",
+          "Roboto Mono", Menlo, Consolas, monospace;
+  /* Atkinson Hyperlegible — letterforms drawn for maximum legibility.
+     Ships only 400/700, so heading weights are normalised to those. */
+  --display: "Atkinson Hyperlegible", system-ui, sans-serif;
+  --body:    "Atkinson Hyperlegible", system-ui, sans-serif;
+  --sans:    var(--body);
+}
+
+/* The viewer's explicit choice outranks the OS, in both directions.
+   Only --scheme and color-scheme change; every colour above follows. */
+:root[data-theme="light"] { color-scheme: light; --scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark;  --scheme: dark;  }
+
+/* No stored choice → --scheme has to track the OS so the Mermaid bootstrap
+   reads the same answer the stylesheet settled on. */
+@media (prefers-color-scheme: light) {
+  :root { --scheme: light; }
+  :root[data-theme="dark"] { --scheme: dark; }
+}
+
+/* Print is light, on paper, with no page wash. */
+@media print {
+  :root { color-scheme: light; --scheme: light; --bg: #fff; --panel: #fff; }
+  body { background: #fff !important; }
+}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   2. MERMAID MOTION LAYER
+   ───────────────────────────────────────────────────────────────────────────
+
+   Mermaid renders to plain SVG, so its output can be animated with ordinary
+   CSS — no library change, and nothing here runs unless a diagram exists.
+
+   Three things had to be worked around:
+
+   1. Mermaid injects its own <style> INSIDE each SVG, scoped by the diagram's
+      id (`#mermaid-1712 .flowchart-link { … }`). That is ID specificity, so a
+      class selector out here loses. Only the declarations that genuinely
+      collide with Mermaid's own — stroke-dasharray — are marked !important.
+
+   2. Mermaid positions nodes with the SVG `transform` ATTRIBUTE. The CSS
+      `transform` property overrides that attribute outright, which would
+      stack every node at the origin. So nothing here transforms a node:
+      entrances and hovers use opacity and filter only.
+
+   3. A dash pattern is semantic in Mermaid — dotted means one thing, solid
+      another. So the marching-dash flow is only given a dasharray where the
+      line is solid; dotted and dashed lines keep the pattern they were
+      authored with and simply march it. The -32 travel is a whole number of
+      periods for all three patterns (solid 9+7, dotted 2+2, dashed 8+8), so
+      every one of them loops seamlessly.
+
+   Motion is opt-in: the whole layer sits inside prefers-reduced-motion:
+   no-preference, so a reader who asks for stillness gets a static diagram
+   rather than a diagram with its animations merely shortened.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.mermaid {
+  /* Read by the flow animation below; the shell speeds it up on hover. */
+  --dg-flow-dur: 2.6s;
+  --dg-ease: cubic-bezier(.22,.68,.28,1);
+}
+.mermaid svg { max-width: 100%; height: auto; }
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* ── Data flow along the connectors ──────────────────────────────────────
+     The one effect that carries meaning: every connector reads as a live
+     channel with a direction, which is what these diagrams are describing. */
+
+  @keyframes dg-flow { to { stroke-dashoffset: -32; } }
+
+  /* Solid connectors get a pattern to march. Nearly-closed (9 on, 7 off) so
+     the line still reads as a line and the movement stays a shimmer. */
+  .mermaid .flowchart-link:not(.edge-pattern-dotted):not(.edge-pattern-dashed),
+  .mermaid .messageLine0,
+  .mermaid .transition {
+    stroke-dasharray: 9 7 !important;
+  }
+
+  /* Dotted and dashed keep their authored pattern and just move it. */
+  .mermaid .flowchart-link,
+  .mermaid .messageLine0,
+  .mermaid .messageLine1,
+  .mermaid .transition,
+  .mermaid .relationshipLine {
+    animation: dg-flow var(--dg-flow-dur) linear infinite;
+  }
+
+  /* Leaning into a diagram accelerates it — a small reward for attention,
+     and it makes direction unmistakable when you are tracing one path. */
+  .diagram-shell:hover .mermaid,
+  .diagram-shell:focus-within .mermaid { --dg-flow-dur: 1.1s; }
+
+
+  /* ── Entrance ────────────────────────────────────────────────────────────
+     Mermaid inserts the finished SVG into the DOM in one go, so these fire
+     on insertion with no JS hook — including for diagrams inside a tab that
+     is only rendered the first time it is opened.
+
+     Nodes resolve out of a blur rather than sliding, because sliding needs
+     a transform and a transform would fight Mermaid's positioning. */
+
+  @keyframes dg-node-in {
+    from { opacity: 0; filter: blur(4px); }
+    to   { opacity: 1; filter: blur(0); }
+  }
+  @keyframes dg-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  .mermaid .node,
+  .mermaid .actor,
+  .mermaid .er.entityBox {
+    animation: dg-node-in .5s var(--dg-ease) both;
+  }
+
+  /* Staggered so the graph assembles in reading order instead of flashing
+     in as one block. Capped at 16 — past that the wait outstays the effect
+     and the remainder simply arrives with the last step. */
+  .mermaid .node:nth-child(1)  { animation-delay: .00s }
+  .mermaid .node:nth-child(2)  { animation-delay: .04s }
+  .mermaid .node:nth-child(3)  { animation-delay: .08s }
+  .mermaid .node:nth-child(4)  { animation-delay: .12s }
+  .mermaid .node:nth-child(5)  { animation-delay: .16s }
+  .mermaid .node:nth-child(6)  { animation-delay: .20s }
+  .mermaid .node:nth-child(7)  { animation-delay: .24s }
+  .mermaid .node:nth-child(8)  { animation-delay: .28s }
+  .mermaid .node:nth-child(9)  { animation-delay: .32s }
+  .mermaid .node:nth-child(10) { animation-delay: .36s }
+  .mermaid .node:nth-child(11) { animation-delay: .40s }
+  .mermaid .node:nth-child(12) { animation-delay: .44s }
+  .mermaid .node:nth-child(13) { animation-delay: .48s }
+  .mermaid .node:nth-child(14) { animation-delay: .52s }
+  .mermaid .node:nth-child(15) { animation-delay: .56s }
+  .mermaid .node:nth-child(n+16) { animation-delay: .60s }
+
+  /* Connectors, labels and the subgraph frames arrive after the nodes they
+     join, so the graph reads as "things, then relationships". */
+  .mermaid .edgePaths,
+  .mermaid .edgeLabels,
+  .mermaid .messageText,
+  .mermaid .relationshipLabelBox,
+  .mermaid text.actor-box,
+  .mermaid .cluster {
+    animation: dg-fade-in .55s var(--dg-ease) .34s both;
+  }
+
+
+  /* ── Subgraph frames ─────────────────────────────────────────────────────
+     A dashed, slowly drifting boundary distinguishes a logical grouping from
+     a concrete node, which is exactly the distinction a subgraph draws. */
+
+  @keyframes dg-cluster-drift { to { stroke-dashoffset: -64; } }
+
+  .mermaid .cluster rect {
+    stroke-dasharray: 5 5 !important;
+    animation: dg-fade-in .55s var(--dg-ease) .34s both,
+               dg-cluster-drift 12s linear infinite;
+  }
+
+
+  /* ── Pulsing nodes ───────────────────────────────────────────────────────
+     Only the two classes that mean "acts on its own": `async` (background,
+     scheduled) and `ext` (third party, outside our process). Everything else
+     in the diagram is inert until something calls it, and pulsing those too
+     would flatten the distinction back out.
+
+     The halo colours match the PALETTE table in each doc's bootstrap —
+     Mermaid resolves classDef colours at layout time and writes them inline,
+     so CSS cannot read them back out of the node. */
+
+  @keyframes dg-pulse-async {
+    0%, 100% { filter: drop-shadow(0 0 0   rgba(96,165,250,0)); }
+    50%      { filter: drop-shadow(0 0 7px rgba(96,165,250,.60)); }
+  }
+  @keyframes dg-pulse-ext {
+    0%, 100% { filter: drop-shadow(0 0 0   rgba(217,70,239,0)); }
+    50%      { filter: drop-shadow(0 0 7px rgba(217,70,239,.55)); }
+  }
+
+  .mermaid .node.async { animation: dg-node-in .5s var(--dg-ease) both,
+                                    dg-pulse-async 2.9s ease-in-out .6s infinite; }
+  .mermaid .node.ext   { animation: dg-node-in .5s var(--dg-ease) both,
+                                    dg-pulse-ext   3.4s ease-in-out .8s infinite; }
+}
+
+
+/* ── Hover ──────────────────────────────────────────────────────────────────
+   Outside the reduced-motion gate on purpose: this is feedback for a
+   deliberate pointer action, not ambient movement. Filter only — see the
+   transform note at the top of this section. */
+
+.mermaid .node,
+.mermaid .actor,
+.mermaid .er.entityBox {
+  transition: filter .22s var(--dg-ease, ease);
+}
+.mermaid .node:hover,
+.mermaid .actor:hover,
+.mermaid .er.entityBox:hover {
+  filter: brightness(1.14) drop-shadow(0 3px 10px rgba(0,0,0,.45));
+}
+@media (prefers-color-scheme: light) {
+  .mermaid .node:hover,
+  .mermaid .actor:hover,
+  .mermaid .er.entityBox:hover {
+    filter: brightness(1.03) drop-shadow(0 3px 10px rgba(16,20,32,.20));
+  }
+}
+
+/* A diagram is a figure, not a text block — let the pointer say so. */
+.mermaid .node { cursor: default; }
