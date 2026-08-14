@@ -4,16 +4,24 @@
 
    ONE stylesheet for the whole doc set, across both repos:
 
-     GameStore/docs/architecture.html
-     GameStore/docs/catalog-architecture.html
-     GameStore/docs/frontend-roadmap.html
-     GameStoreBackEnd/Bino/docs/architecture.html
-     GameStoreBackEnd/Bino/docs/architecture-and-learning-guide.html
-     GameStoreBackEnd/Bino/docs/backend-roadmap.html
+     gameStore/docs/architecture.html
+     gameStore/docs/catalog-architecture.html
+     gameStore/docs/frontend-roadmap.html
+     gameStore-backend/docs/architecture.html
+     gameStore-backend/docs/architecture-and-learning-guide.html
+     gameStore-backend/docs/backend-roadmap.html
 
    The backend docs already reach across the repo boundary with relative
-   links (../../../GameStore/docs/...), so this file lives with the frontend
+   links (../../gameStore/docs/...), so this file lives with the frontend
    docs and is linked the same way. Editing a colour here changes all six.
+
+   NOTE: that cross-repo link only resolves when both repos are checked out as
+   siblings under one parent directory. It had in fact rotted — the backend
+   docs pointed at ../../../GameStore/ (wrong depth, wrong case), so all three
+   rendered with every token undefined until it was repaired. It also cannot
+   work on GitHub Pages, where each repo publishes under its own base path.
+   That is why the six documents are moving to self-contained inline CSS
+   generated from docs/_src/core.css.
 
    ── How the theming contract works ────────────────────────────────────────
    Every colour is declared ONCE with light-dark(). `color-scheme` decides
