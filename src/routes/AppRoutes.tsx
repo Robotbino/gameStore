@@ -20,8 +20,10 @@ import GameDetailsPage from "../pages/user/GameDetailsPage.tsx";
 import LibraryPage from "../pages/user/LibraryPage.tsx";
 import WishlistPage from "../pages/user/WishlistPage.tsx";
 import CartPage from "../pages/user/CartPage.tsx";
-import ProfilePage from "../pages/user/ProfilePage.tsx";
-import SettingsPage from "../pages/user/SettingsPage.tsx";
+
+// Account pages
+import ProfilePage from "../pages/account/ProfilePage.tsx";
+import SettingsPage from "../pages/account/SettingsPage.tsx";
 
 // Admin pages
 import AdminDashboard from "../pages/admin/AdminDashBoard.tsx";
@@ -72,6 +74,8 @@ export default function AppRoutes() {
           <Route path="cart" element={<CartPage />} />
           <Route path="library" element={<LibraryPage />} />
           <Route path="wishlist" element={<WishlistPage />} />
+          {/* Reached from the avatar menu, not the sidebar — the sidebar is
+              store navigation, the avatar is the account surface. */}
           <Route path="profile" element={<ProfilePage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>

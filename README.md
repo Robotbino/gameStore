@@ -46,6 +46,7 @@ Role badges, points, and user CRUD. Passwords never leave the server — the bac
 - **Cart & checkout** — checkout is idempotent: games you already own come back in `alreadyOwned` rather than failing the whole transaction
 - **Library** — everything the signed-in user owns, resolved from the token (never a URL param)
 - **Quick Launch** — an idle carousel in the sidebar that rotates through the user's own library and drives the Browse hero
+- **Profile & settings** — reached from the avatar menu. Identity, region, join month, games owned and loyalty points on `/profile`; three independent forms on `/settings` for presentation (display name, avatar preset, bio, region), account (username, email) and password
 
 **Admin (role `ADMIN`)**
 
@@ -131,7 +132,8 @@ npm run format:check  # prettier --check .
 src/
 ├── assets/         # local images + seed game data
 ├── components/
-│   ├── auth/       # AuthShell (shared login/register frame)
+│   ├── account/    # AvatarMark, AvatarPicker, avatarPresets
+  ├── auth/       # AuthShell (shared login/register frame)
 │   ├── game/       # GameGrid, HeroSection
 │   ├── layout/     # AppLayout (store) and AdminLayout (portal)
 │   ├── ui/         # Chakra color-mode plumbing
@@ -139,6 +141,7 @@ src/
 ├── context/        # AuthContext, CartContext, QuickLaunchProvider
 ├── hooks/          # useAuth, useCart, useQuickLaunch
 ├── pages/
+│   ├── account/    # ProfilePage, SettingsPage
 │   ├── admin/      # AdminDashBoard, ManageGamesPage, ManageUsersPage
 │   ├── auth/       # LoginPage, RegisterPage
 │   └── user/       # Home, Browse, GameDetails, Cart, Library
@@ -146,7 +149,7 @@ src/
 ├── services/       # axios layer: api, auth, games, users, purchases
 ├── styles/         # index.css (design tokens + base styles)
 ├── types/          # Game, User, Purchase, auth, pagination
-└── utils/          # apiError, genre parsing
+└── utils/          # apiError, genre parsing, country codes
 ```
 
 ### Routes
@@ -160,6 +163,8 @@ src/
 | `/games/:id` | `USER` | Game details |
 | `/cart` | `USER` | Cart & checkout |
 | `/library` | `USER` | Owned games |
+| `/profile` | `USER` | Profile |
+| `/settings` | `USER` | Account settings |
 | `/admin` | `ADMIN` | Dashboard |
 | `/admin/games` | `ADMIN` | Manage games |
 | `/admin/users` | `ADMIN` | Manage users |
@@ -175,6 +180,13 @@ A few decisions worth knowing before you read the code — the full reasoning li
 **Auth lives in one place.** `services/api.ts` owns the single axios instance. The request interceptor attaches the bearer token; the response interceptor handles `401` by clearing the token and redirecting — but it deliberately skips `/auth/*` URLs, so a wrong password shows an error on the login form instead of reloading it. No other service holds auth logic.
 
 **The token is the identity.** `GET /users/me` and `GET /purchases/me` take no id parameter; the server resolves the caller from the JWT. `applyToken()` throws rather than returning a role it never applied — an earlier version of that let a failed register look like a success.
+
+**Changing your email re-issues your token.** A JWT's subject is the email, and the backend resolves
+the caller by looking that subject up. So `PUT /users/me/account` returns a freshly minted token
+alongside the updated record, and `AuthContext.applyNewToken` swaps it in — without that, the next
+request after an email change would arrive anonymous and the 401 interceptor would bounce you to
+`/login` mid-save. For the same interceptor reason, a wrong *current* password on the password form
+comes back as `400`, not `401`: a typo must not read as a dead session.
 
 **The catalogue is cached, searches aren't.** `gameService` keeps a 60-second read-through cache keyed by the full query string, capped at 20 pages with FIFO eviction, plus a by-id map primed from every page fetch. Keyword searches are excluded: they're already debounced, every keystroke is a distinct key, so caching them would grow the map without ever scoring a hit. Every admin mutation clears both caches.
 
@@ -210,3 +222,4 @@ Stated plainly rather than hidden — these are tracked in the roadmap, not over
 - **RAWG sync is a stub.** The admin button calls an endpoint that returns `501` by design.
 - **Wishlist buttons are inert.** The control is in the UI on the hero and details pages; there's no wishlist backend behind it yet.
 - **No automated tests yet.**
+- **Avatars are presets, not uploads.** You pick from twelve code-drawn marks; there is no image upload, and none is planned until there is somewhere to store one.

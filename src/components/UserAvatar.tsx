@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { displayNameOf } from "../types/user";
+import AvatarMark from "./account/AvatarMark";
 
 export default function UserAvatar() {
   const { userEmail, currentUser, userRole, logout } = useAuth();
@@ -8,10 +10,9 @@ export default function UserAvatar() {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Prefer the real userName once /users/me lands; fall back to the JWT
-  // email (available synchronously) so the button never briefly renders "?".
-  const displayName = currentUser?.userName ?? userEmail ?? "";
-  const initial = displayName ? displayName.charAt(0).toUpperCase() : "?";
+  // Prefer the chosen display name, then the handle, then the JWT email
+  // (available synchronously) so the button never briefly renders "?".
+  const displayName = currentUser ? displayNameOf(currentUser) : (userEmail ?? "");
 
   // Close on click outside or Escape; Escape hands focus back to the button.
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function UserAvatar() {
     };
   }, [open]);
 
-  const goTo = (path: string) => {
+  const go = (path: string) => {
     setOpen(false);
     navigate(path);
   };
@@ -58,7 +59,7 @@ export default function UserAvatar() {
         aria-label={displayName ? `Account menu for ${displayName}` : "Account menu"}
         title={displayName}
       >
-        {initial}
+        <AvatarMark avatarKey={currentUser?.avatarKey} name={displayName} size="100%" />
       </button>
 
       {open && (
@@ -77,14 +78,14 @@ export default function UserAvatar() {
           <button
             className="avatar-menu-item"
             role="menuitem"
-            onClick={() => goTo("/profile")}
+            onClick={() => go("/profile")}
           >
             Profile
           </button>
           <button
             className="avatar-menu-item"
             role="menuitem"
-            onClick={() => goTo("/settings")}
+            onClick={() => go("/settings")}
           >
             Settings
           </button>

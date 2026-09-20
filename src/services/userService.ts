@@ -1,5 +1,12 @@
 import api from "./api";
-import type { User, Role } from "../types/user";
+import type {
+  AccountUpdateResponse,
+  ChangePasswordRequest,
+  Role,
+  UpdateAccountRequest,
+  UpdateProfileRequest,
+  User,
+} from "../types/user";
 import type { Page, PageParams } from "../types/pagination";
 import { toPage } from "../types/pagination";
 
@@ -39,15 +46,42 @@ export const userService = {
     return res.data;
   },
 
-  updateMe: async (data: { userName: string }): Promise<User> => {
-    const res = await api.put<User>("/users/me", data);
+  // ── Self-service. Three endpoints, one per form on the Settings page. ──
+  //
+  // These live under /users/me/**, which the backend's security chain lists
+  // explicitly; everything else under /users/ is ADMIN-only. That split is the
+  // reason a normal user can call these at all — see UsersController.
+
+  /**
+   * PUT /users/me/profile — presentation fields only.
+   * Sends all four every time: the backend replaces rather than merges, which
+   * is how a bio gets cleared rather than being stuck forever.
+   */
+  updateProfile: async (data: UpdateProfileRequest): Promise<User> => {
+    const res = await api.put<User>("/users/me/profile", data);
     return res.data;
   },
 
-  changePassword: async (data: {
-    currentPassword: string;
-    newPassword: string;
-  }): Promise<void> => {
+  /**
+   * PUT /users/me/account — userName and email.
+   * Always returns a replacement token, because changing the email invalidates
+   * the one the caller is holding. The caller must hand it to
+   * AuthContext.applyNewToken or the very next request is anonymous.
+   */
+  updateAccount: async (
+    data: UpdateAccountRequest,
+  ): Promise<AccountUpdateResponse> => {
+    const res = await api.put<AccountUpdateResponse>("/users/me/account", data);
+    return res.data;
+  },
+
+  /**
+   * PUT /users/me/password — 204 on success, nothing to read back.
+   * A wrong current password comes back as 400, not 401, specifically so the
+   * response interceptor doesn't mistake a typo for a dead session and log the
+   * user out. Don't log either field.
+   */
+  changePassword: async (data: ChangePasswordRequest): Promise<void> => {
     await api.put("/users/me/password", data);
   },
 

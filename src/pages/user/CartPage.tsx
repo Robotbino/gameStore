@@ -10,7 +10,7 @@ const REMOVE_MS = 150;
 
 export default function CartPage() {
   const { items, total, remove, clear } = useCart();
-  const { currentUser, refreshUser } = useAuth();
+  const { currentUser, refreshCurrentUser } = useAuth();
   const navigate = useNavigate();
 
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -28,7 +28,7 @@ export default function CartPage() {
   async function handleSuccess(order: Order) {
     setCheckoutOpen(false);
     clear();
-    await refreshUser();
+    await refreshCurrentUser();
     navigate("/library", { state: { orderRef: order.paymentReference } });
   }
 

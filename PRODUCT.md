@@ -47,6 +47,8 @@ The differentiator is honest and narrow: a working full-stack commerce loop with
 - Cart, checkout, and library. Checkout is idempotent: games the user already owns are reported via `alreadyOwned`, not treated as an error.
 - Admin CRUD over games and users. A page count / totals surface and role management sit inside the admin layout.
 - Public RBAC demo page at `/demo`, and an admin-triggered RAWG sync stub button that currently calls a 501 endpoint.
+- **Account area** at `/profile` and `/settings`, reached from the avatar menu. A signed-in person can see their identity, region, join month, games owned and loyalty points; and can edit their display name, avatar, bio and region, their username and email, and their password. Backed by `PUT /users/me/profile`, `/users/me/account` and `/users/me/password`.
+- **Loyalty points, settled.** `points` accrues at **1 point per R10 spent**, rounded down, awarded on checkout and shown read-only on the profile. It is a **score, not a balance**: nothing spends it, nothing may be priced in it, and no surface may present it as store credit, a discount, or a redeemable amount — the economy is simulated (see below) and a spendable balance would cross into implying real commerce. Tiers, ranks and badges are *not* part of this decision and remain unclaimed.
 
 ### Backend contract constraints (future work must preserve)
 
@@ -59,14 +61,14 @@ The differentiator is honest and narrow: a working full-stack commerce loop with
 
 - **Economy — simulated, permanently.** No real payment provider is planned. ZAR prices and checkout are demonstration mechanics that grant server-side ownership; the checkout modal carries Stripe/Payflex/Visa/Mastercard-style marks purely as visual cues and a visible "Demo checkout, no money moves" badge; nothing on this surface should imply real financial transactions, real refunds, or real fulfilment.
 - **The `points` field on `User`** is a **rewards balance** (settled September 2026). Users earn 10 points per R1 of an order's final total (rounded down) and can redeem 100 points for R1 off at checkout, capped at the subtotal. The balance and a ledger are shown on Profile, and admins may still adjust it directly. Points have no cash value; like the rest of the economy they are simulated.
-- **Auth wall correction.** Today `ProtectedRoute` wraps all five customer routes (`src/routes/AppRoutes.tsx`). The intended product truth is: **home, browse, and game details are public; auth gates cart, checkout, and library only.** This is recorded as the intended state; moving the guard is separate work.
+- **Auth wall correction.** Today `ProtectedRoute` wraps all seven customer routes (`src/routes/AppRoutes.tsx`) — profile and settings belong behind it permanently, so this concerns the other five. The intended product truth is: **home, browse, and game details are public; auth gates cart, checkout, and library only.** This is recorded as the intended state; moving the guard is separate work.
 - **RAWG external-catalogue pivot.** `docs/catalog-architecture.html` describes a tiered-cache pivot; the endpoint returns 501. Whether the catalogue stays self-owned or moves to RAWG-plus-cache is an open architectural decision.
 - **Design-system consolidation.** The roadmap has an unshipped decision between Chakra UI v3, Bootstrap + react-bootstrap, and a custom CSS system (`docs/frontend-roadmap.html`). All three are currently present as dependencies. PRODUCT.md does not resolve this; it records it as open.
 
 ## Brand Commitments
 
 - **Name:** GameStore.
-- **Assets:** none binding. `public/` contains only Vite's default logo; there is no GameStore logo, wordmark, illustration set, or photography of its own. Per-game imagery comes from the backend as URLs.
+- **Assets:** none binding. `public/` contains only Vite's default logo; there is no GameStore logo, wordmark, illustration set, or photography of its own. Per-game imagery comes from the backend as URLs. The avatar presets (`src/components/account/avatarPresets.ts`) are the one exception and are deliberately not assets: they are code-authored SVG geometry in the existing gold/neutral palette, so there is no third-party artwork whose provenance this repo can't account for.
 - **Voice:** none explicitly committed. The engineering handbook in `docs/` has a distinct, plain-spoken and technically candid voice ("Honest now, with a target to close to", etc.); whether that voice extends to the storefront UI has not been decided.
 - **Aesthetic direction:** intentionally not captured here. Init records product truth only; the incumbent visual system (a dark theme with a single warm accent, DM Sans + Sora) lives in code and is `document`'s subject, not this file's.
 
@@ -92,7 +94,7 @@ The differentiator is honest and narrow: a working full-stack commerce loop with
 1. **The store fiction stays internally consistent, and never claims to be real commerce.** Prices, checkouts, and ownership behave like a store because that is the demonstration; nothing on any surface may cross into implying real financial transactions, real fulfilment, or real market position.
 2. **The build is the portfolio evidence.** Because a second audience is a hiring reviewer with 90 seconds, shortcuts that read as shortcuts cost twice — once in the shopping experience and once in the evaluation. Half-finished states are worse here than in a normal product.
 3. **Discovery is public; ownership is gated.** Browsing, understanding a game, and reading detail pages belong to anyone; carting, buying, and owning belong to a signed-in identity. Surfaces should honor this even where the current code doesn't yet.
-4. **Say what's true, hold what's undecided.** Where product facts are not settled (economy, RAWG, design system), surfaces treat those areas as explicitly reserved rather than invent an answer. The record here is the authority; do not overwrite it silently.
+4. **Say what's true, hold what's undecided.** Where product facts are not settled (economy, RAWG, design system), surfaces treat those areas as explicitly reserved rather than invent an answer. The record here is the authority; do not overwrite it silently — `points` was settled by an explicit decision recorded above, not by a surface quietly assuming a meaning.
 5. **Docs are part of the product.** The engineering handbook is not marketing; it is a running artifact evaluated at the same time as the app. Changes that affect architecture, roadmap position, or capabilities update `docs/` in the same beat.
 
 ## Accessibility & Inclusion

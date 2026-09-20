@@ -267,6 +267,13 @@ The component feel is **responsive and lifted**: flat and quiet until touched, t
 - **Active:** Row background lifts to raised and its icon turns gold — the active state is the one place gold marks position in the nav.
 - **Brand:** Sora, tight tracking, with a single gold accent character.
 
+### Avatar
+- **Style:** A `50%` circle — one of the two shapes that break the Growing Radius Rule on purpose. Two forms: the **initial** (Marquee Gold → Warm Gold gradient, black monogram in Sora 700) and a **preset mark** (flat inline SVG).
+- **Presets:** Twelve geometric marks drawn from Marquee Gold and the neutral ladder *only* — ring, half, eclipse, bars, grid, arc and so on. They read as a set because they share two colours and differ in geometry, never in hue; the One Voice Rule is what rules out a colourful avatar set. Authored in code, not shipped as image assets.
+- **State:** In the navbar the circle scales `1.06` and takes a `0.15` gold halo on hover and while its menu is open; keyboard focus gets the dark-gap-plus-gold haloed ring.
+- **Picker:** A radio group of `44px` marks in an intrinsic grid. Rest is transparent with a transparent border; hover lifts `translateY(-2px)` onto the raised surface; **selected** wears the accent wash (`0.08` background, `0.35` border) — one of the few places gold appears at rest.
+- **Fallback:** An unknown or unset key renders the initial circle. It is a destination, not an error state, and the first option in the picker selects it deliberately.
+
 ### Modal
 - Centered `520px` dialog on a `rgba(0,0,0,0.72)` backdrop with a `2px` blur; `14px` radius, medium border, the deep **Modal** shadow, and a bordered footer for actions. Reserved for focused create/edit tasks (admin forms), not casual confirmation.
 

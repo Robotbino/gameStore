@@ -28,8 +28,15 @@ interface AuthContextType {
   login: (data: LoginRequest) => Promise<Role>;
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => void;
-  // Re-fetch /users/me after the user edits their own profile.
-  refreshUser: () => Promise<void>;
+  // Re-read GET /users/me into currentUser. Call after any self-service save:
+  // without it the navbar avatar and the profile header keep rendering the
+  // values from login until the next full page load.
+  refreshCurrentUser: () => Promise<void>;
+  // Adopt a token the server minted mid-session. Only PUT /users/me/account
+  // issues one, and only because changing your email invalidates the token you
+  // are holding — the JWT subject IS the email, so the old one resolves to
+  // nobody and the next request arrives anonymous.
+  applyNewToken: (jwt: string) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -131,9 +138,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await activateSession(res.access_token);
   };
 
-  const refreshUser = async () => {
-    setCurrentUser(await userService.getMe());
-  };
+  // Unlike activateSession's hydrate, a failure here is NOT grounds for logging
+  // out: the save that prompted it already succeeded server-side, and dumping
+  // the user at /login would be a worse outcome than a briefly stale avatar.
+  const refreshCurrentUser = useCallback(async () => {
+    const me = await userService.getMe();
+    setCurrentUser(me);
+  }, []);
+
+  // Full activateSession, not just a localStorage write: the new token can
+  // carry a different subject, so userEmail has to be re-derived from it
+  // rather than left pointing at the address the user just stopped using.
+  const applyNewToken = useCallback(
+    async (jwt: string) => {
+      await activateSession(jwt);
+    },
+    [activateSession],
+  );
 
   const value: AuthContextType = {
     access_token: token,
@@ -146,7 +167,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     register,
     logout,
-    refreshUser,
+    refreshCurrentUser,
+    applyNewToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
