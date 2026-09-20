@@ -6,13 +6,14 @@ interface ModalProps {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  size?: "default" | "wide";
 }
 
 const EXIT_MS = 150;
 const FOCUSABLE =
   'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [href]';
 
-export default function Modal({ open, title, onClose, children }: ModalProps) {
+export default function Modal({ open, title, onClose, children, size = "default" }: ModalProps) {
   const titleId = useId();
   const boxRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
@@ -70,7 +71,7 @@ export default function Modal({ open, title, onClose, children }: ModalProps) {
       onKeyDown={handleKeyDown}
     >
       <div
-        className="modal-box"
+        className={`modal-box ${size === "wide" ? "modal-box--wide" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

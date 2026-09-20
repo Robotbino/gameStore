@@ -19,3 +19,7 @@
 
 /* Legacy stylesheet — decomposed and deleted across Phases 4–6. */
 @import "../App.css";
+
+/* Checkout modal, payment marks, rewards surfaces (after App.css so it can
+   override the profile stat grid). */
+@import "./checkout.css";

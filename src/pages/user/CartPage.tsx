@@ -1,19 +1,20 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../hooks/useCart";
-import { purchaseService } from "../../services/purchaseService";
-import { getApiErrorMessage } from "../../utils/apiError";
+import { useAuth } from "../../hooks/useAuth";
+import CheckoutModal from "../../components/checkout/CheckoutModal";
+import { canRedeem, formatPoints, formatRand, pointsEarned, randsFor } from "../../utils/rewards";
+import type { Order } from "../../types/order";
 
 const REMOVE_MS = 150;
 
 export default function CartPage() {
   const { items, total, remove, clear } = useCart();
+  const { currentUser, refreshUser } = useAuth();
   const navigate = useNavigate();
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [removingId, setRemovingId] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
 
   // Let the row fade before it leaves the list.
   function handleRemove(gameId: number) {
@@ -24,33 +25,17 @@ export default function CartPage() {
     }, REMOVE_MS);
   }
 
-  async function handleCheckout() {
-    if (isSubmitting || items.length === 0) return;
-    setIsSubmitting(true);
-    setError(null);
-    setNotice(null);
-
-    try {
-      const result = await purchaseService.checkout(items.map((g) => g.id));
-
-      // Games already owned aren't an error — report them, don't block.
-      if (result.alreadyOwned.length > 0 && result.purchased.length === 0) {
-        setNotice("You already own everything in this cart.");
-      }
-
-      clear();
-      navigate("/library");
-    } catch (err) {
-      setError(getApiErrorMessage(err, "Checkout failed. Please try again."));
-      setIsSubmitting(false);
-    }
+  async function handleSuccess(order: Order) {
+    setCheckoutOpen(false);
+    clear();
+    await refreshUser();
+    navigate("/library", { state: { orderRef: order.paymentReference } });
   }
 
   if (items.length === 0) {
     return (
       <div className="cart-page">
         <h2 className="page-title">Your Cart</h2>
-        {notice && <p className="alert alert-success">{notice}</p>}
         <div className="empty-state">
           <i className="fa-solid fa-cart-shopping empty-state-icon" aria-hidden="true" />
           <h3 className="empty-state-title">Your cart is empty</h3>
@@ -65,11 +50,11 @@ export default function CartPage() {
     );
   }
 
+  const balance = currentUser?.points ?? 0;
+
   return (
     <div className="cart-page">
       <h2 className="page-title">Your Cart</h2>
-
-      {error && <p className="alert alert-error">{error}</p>}
 
       <ul className="cart-list">
         {items.map((game) => (
@@ -81,7 +66,7 @@ export default function CartPage() {
             <Link to={`/games/${game.id}`} className="cart-item-title">
               {game.title}
             </Link>
-            <span className="cart-item-price">R {game.price.toFixed(2)}</span>
+            <span className="cart-item-price">{formatRand(game.price)}</span>
             <button
               className="btn-outline btn-sm"
               onClick={() => handleRemove(game.id)}
@@ -93,19 +78,32 @@ export default function CartPage() {
         ))}
       </ul>
 
+      <p className="cart-rewards-hint">
+        <span>
+          Earn <span className="accent">+{formatPoints(pointsEarned(total))} pts</span> on this order
+        </span>
+        {canRedeem(balance) && (
+          <span>
+            You have <span className="accent">{formatRand(randsFor(balance))}</span> in rewards to spend
+          </span>
+        )}
+      </p>
+
       <div className="cart-summary">
         <span className="cart-total">
-          Total <strong>R {total.toFixed(2)}</strong>
+          Total <strong>{formatRand(total)}</strong>
         </span>
-        <button
-          className="btn-primary"
-          onClick={handleCheckout}
-          disabled={isSubmitting}
-          aria-busy={isSubmitting}
-        >
-          {isSubmitting ? "Processing…" : "Checkout"}
+        <button className="btn-primary" onClick={() => setCheckoutOpen(true)}>
+          Checkout
         </button>
       </div>
+
+      <CheckoutModal
+        open={checkoutOpen}
+        items={items}
+        onClose={() => setCheckoutOpen(false)}
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 }
