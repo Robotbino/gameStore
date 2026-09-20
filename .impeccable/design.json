@@ -8,69 +8,223 @@
         "role": "primary",
         "displayName": "Marquee Gold",
         "canonical": "#F5C518",
-        "tonalRamp": ["#2e2404", "#5c4908", "#8a6d0c", "#b89110", "#dcae13", "#F5C518", "#f8d552", "#fbe793"]
+        "tonalRamp": [
+          "#2e2404",
+          "#5c4908",
+          "#8a6d0c",
+          "#b89110",
+          "#dcae13",
+          "#F5C518",
+          "#f8d552",
+          "#fbe793"
+        ]
       },
       "marquee-gold-hover": {
         "role": "primary",
         "displayName": "Marquee Gold (Warm)",
         "canonical": "#e0b200",
-        "tonalRamp": ["#2a2104", "#544107", "#7e620b", "#a8830e", "#c99b11", "#e0b200", "#eec84a", "#f5dd86"]
+        "tonalRamp": [
+          "#2a2104",
+          "#544107",
+          "#7e620b",
+          "#a8830e",
+          "#c99b11",
+          "#e0b200",
+          "#eec84a",
+          "#f5dd86"
+        ]
       },
       "bg-primary": {
         "role": "neutral",
         "displayName": "Ink",
         "canonical": "#121212",
-        "tonalRamp": ["#0f0f0f", "#121212", "#161616", "#1a1a1a", "#1e1e1e", "#2a2a2a", "#333333", "#444444"]
+        "tonalRamp": [
+          "#0f0f0f",
+          "#121212",
+          "#161616",
+          "#1a1a1a",
+          "#1e1e1e",
+          "#2a2a2a",
+          "#333333",
+          "#444444"
+        ]
       },
       "bg-sidebar": {
         "role": "neutral",
         "displayName": "Stage Black",
         "canonical": "#0f0f0f",
-        "tonalRamp": ["#000000", "#080808", "#0f0f0f", "#141414", "#1a1a1a", "#242424", "#2e2e2e", "#3a3a3a"]
+        "tonalRamp": [
+          "#000000",
+          "#080808",
+          "#0f0f0f",
+          "#141414",
+          "#1a1a1a",
+          "#242424",
+          "#2e2e2e",
+          "#3a3a3a"
+        ]
       },
       "bg-raised": {
         "role": "neutral",
         "displayName": "Raised",
         "canonical": "#1a1a1a",
-        "tonalRamp": ["#0f0f0f", "#141414", "#1a1a1a", "#1e1e1e", "#242424", "#2a2a2a", "#333333", "#444444"]
+        "tonalRamp": [
+          "#0f0f0f",
+          "#141414",
+          "#1a1a1a",
+          "#1e1e1e",
+          "#242424",
+          "#2a2a2a",
+          "#333333",
+          "#444444"
+        ]
       },
       "text-primary": {
         "role": "neutral",
         "displayName": "Text Primary",
         "canonical": "#e8e8e8",
-        "tonalRamp": ["#1a1a1a", "#2a2a2a", "#3d3d3d", "#555555", "#6e6e6e", "#8a8a8a", "#b0b0b0", "#e8e8e8"]
+        "tonalRamp": [
+          "#1a1a1a",
+          "#2a2a2a",
+          "#3d3d3d",
+          "#555555",
+          "#6e6e6e",
+          "#8a8a8a",
+          "#b0b0b0",
+          "#e8e8e8"
+        ]
       },
       "text-muted": {
         "role": "neutral",
         "displayName": "Text Muted",
         "canonical": "#666666",
-        "tonalRamp": ["#1a1a1a", "#2a2a2a", "#3d3d3d", "#4d4d4d", "#555555", "#666666", "#888888", "#aaaaaa"]
+        "tonalRamp": [
+          "#1a1a1a",
+          "#2a2a2a",
+          "#3d3d3d",
+          "#4d4d4d",
+          "#555555",
+          "#666666",
+          "#888888",
+          "#aaaaaa"
+        ]
       },
       "danger": {
         "role": "danger",
         "displayName": "Alarm Coral",
         "canonical": "#ff6b6b",
-        "tonalRamp": ["#3a1414", "#5c1f1f", "#852d2d", "#b83c3c", "#e05252", "#ff6b6b", "#ff9494", "#ffc0c0"]
+        "tonalRamp": [
+          "#3a1414",
+          "#5c1f1f",
+          "#852d2d",
+          "#b83c3c",
+          "#e05252",
+          "#ff6b6b",
+          "#ff9494",
+          "#ffc0c0"
+        ]
       }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Page and section titles: hero title, page titles, 404 headline. Sora 700, tight tracking." },
-      "headline": { "displayName": "Headline", "purpose": "Grid section headings and stat values. Sora 700." },
-      "title": { "displayName": "Title", "purpose": "Modal titles, sidebar brand, smaller structural headings. Sora 700." },
-      "body": { "displayName": "Body", "purpose": "Default reading text, descriptions, table cells. DM Sans 400." },
-      "label": { "displayName": "Label", "purpose": "Uppercase, wide-tracked micro-labels: eyebrows, badges, column headers, form labels. DM Sans 600." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page and section titles: hero title, page titles, 404 headline. Sora 700, tight tracking."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Grid section headings and stat values. Sora 700."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Modal titles, sidebar brand, smaller structural headings. Sora 700."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default reading text, descriptions, table cells. DM Sans 400."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase, wide-tracked micro-labels: eyebrows, badges, column headers, form labels. DM Sans 600."
+      }
     },
     "shadows": [
-      { "name": "lift", "value": "0 12px 32px rgba(0,0,0,0.5)", "purpose": "Game-card hover and the resting auth card — the 'rose toward you' shadow." },
-      { "name": "menu", "value": "0 8px 32px rgba(0,0,0,0.5)", "purpose": "Floating overlays anchored to a trigger, e.g. the avatar dropdown." },
-      { "name": "modal", "value": "0 24px 60px rgba(0,0,0,0.6)", "purpose": "Centered dialogs over the dimmed, blurred backdrop — the deepest, softest shadow." },
-      { "name": "focus-ring", "value": "0 0 0 3px rgba(245,197,24,0.12)", "purpose": "State cue, not depth: gold glow paired with a gold border on focused inputs." }
+      {
+        "name": "lift",
+        "value": "0 12px 32px rgba(0,0,0,0.5)",
+        "purpose": "Game-card hover and the resting auth card — the 'rose toward you' shadow."
+      },
+      {
+        "name": "menu",
+        "value": "0 8px 32px rgba(0,0,0,0.5)",
+        "purpose": "Floating overlays anchored to a trigger, e.g. the avatar dropdown."
+      },
+      {
+        "name": "modal",
+        "value": "0 24px 60px rgba(0,0,0,0.6)",
+        "purpose": "Centered dialogs over the dimmed, blurred backdrop — the deepest, softest shadow."
+      },
+      {
+        "name": "focus-ring",
+        "value": "0 0 0 3px rgba(245,197,24,0.12)",
+        "purpose": "State cue, not depth: gold glow paired with a gold border on focused inputs."
+      }
     ],
     "motion": [
-      { "name": "ease-smooth", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Default easing for sidebar width, card lift, and image zoom (--transition-smooth = 0.3s of this)." },
-      { "name": "card-lift", "value": "transform 0.25s cubic-bezier(0.4,0,0.2,1)", "purpose": "The tactile signature: translateY(-4px) plus warm fill on game-card hover." },
-      { "name": "poster-zoom", "value": "transform 0.4s cubic-bezier(0.4,0,0.2,1)", "purpose": "Poster image scales to 1.05 within its clipped frame on card hover." },
-      { "name": "fade-slide-up", "value": "fadeSlideUp 0.4s ease both", "purpose": "Catalogue entrance: cards rise 16px and fade in, staggered 0.06s per child for the first eight." }
+      {
+        "name": "duration-fast",
+        "value": "120ms",
+        "purpose": "Press, focus and small state changes."
+      },
+      {
+        "name": "duration-base",
+        "value": "200ms",
+        "purpose": "Hover, reveal, page enter, alerts."
+      },
+      {
+        "name": "duration-slow",
+        "value": "350ms",
+        "purpose": "Layout, overlays, card arrival."
+      },
+      {
+        "name": "duration-focal",
+        "value": "500ms",
+        "purpose": "The hero spotlight swap — the one authored moment."
+      },
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Routine state changes."
+      },
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Arrivals: confident deceleration."
+      },
+      {
+        "name": "ease-pop",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Pops: cart badge and wishlist heart."
+      },
+      {
+        "name": "spotlight-swap",
+        "value": "opacity + scale(1.04→1) over duration-focal ease-out, copy rises after 80ms",
+        "purpose": "Hero crossfade between two image layers; Quick Launch row flashes gold as it hands over."
+      },
+      {
+        "name": "card-arrival",
+        "value": "fadeSlideUp duration-slow ease-out, delay calc(var(--i) * 40ms)",
+        "purpose": "Catalogue entrance staggered across all cards on the page."
+      },
+      {
+        "name": "page-enter",
+        "value": "pageEnter duration-base ease-out backwards",
+        "purpose": "8px rise on every route change."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "single prefers-reduced-motion: reduce block",
+        "purpose": "Every animation and transition collapses to its final frame."
+      }
     ]
   },
   "components": [
@@ -158,12 +312,36 @@
       "Sora display / DM Sans body, with uppercase wide-tracked labels for micro-structure."
     ],
     "rules": [
-      { "name": "The One Voice Rule", "body": "Marquee Gold is used on ≤10% of any given screen, and only ever means 'this matters most, or you can act here.' A second saturated hue never joins it; genres, categories, and statuses are not color-coded.", "section": "colors" },
-      { "name": "The Accent Wash Rule", "body": "When the accent appears as anything other than a solid fill or text, it appears as a low-alpha tint of itself: rgba(245,197,24,0.08) backgrounds, 0.30–0.35 borders, 0.10–0.12 focus rings. Never introduce a separate pastel or tint token to stand in for it.", "section": "colors" },
-      { "name": "The Two-Voice Rule", "body": "Sora announces, DM Sans reads. Sora is reserved for titles and headings; body copy, controls, and inputs are always DM Sans.", "section": "typography" },
-      { "name": "The Eyebrow Rule", "body": "Micro-labels are the only text set in uppercase, always tracked out (0.06–0.10em) at the smallest sizes in a muted neutral (or gold on an accent element). Sentence-case everything else.", "section": "typography" },
-      { "name": "The Shadow-As-Response Rule", "body": "Surfaces are flat at rest; a drop shadow appears only as a response to state (hover) or as the signature of a true overlay (modal, menu, dropdown). Depth is earned, never ambient — layer with tone instead.", "section": "elevation" },
-      { "name": "The Growing Radius Rule", "body": "Corner radius tracks surface size — never give a small control a large radius or a large surface a tight one. Pills are reserved for chips; the full circle is reserved for the avatar.", "section": "elevation" }
+      {
+        "name": "The One Voice Rule",
+        "body": "Marquee Gold is used on ≤10% of any given screen, and only ever means 'this matters most, or you can act here.' A second saturated hue never joins it; genres, categories, and statuses are not color-coded.",
+        "section": "colors"
+      },
+      {
+        "name": "The Accent Wash Rule",
+        "body": "When the accent appears as anything other than a solid fill or text, it appears as a low-alpha tint of itself: rgba(245,197,24,0.08) backgrounds, 0.30–0.35 borders, 0.10–0.12 focus rings. Never introduce a separate pastel or tint token to stand in for it.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Voice Rule",
+        "body": "Sora announces, DM Sans reads. Sora is reserved for titles and headings; body copy, controls, and inputs are always DM Sans.",
+        "section": "typography"
+      },
+      {
+        "name": "The Eyebrow Rule",
+        "body": "Micro-labels are the only text set in uppercase, always tracked out (0.06–0.10em) at the smallest sizes in a muted neutral (or gold on an accent element). Sentence-case everything else.",
+        "section": "typography"
+      },
+      {
+        "name": "The Shadow-As-Response Rule",
+        "body": "Surfaces are flat at rest; a drop shadow appears only as a response to state (hover) or as the signature of a true overlay (modal, menu, dropdown). Depth is earned, never ambient — layer with tone instead.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Growing Radius Rule",
+        "body": "Corner radius tracks surface size — never give a small control a large radius or a large surface a tight one. Pills are reserved for chips; the full circle is reserved for the avatar.",
+        "section": "elevation"
+      }
     ],
     "dos": [
       "Do keep Marquee Gold to ≤10% of any screen and to a single job — price, primary action, active state, focus.",

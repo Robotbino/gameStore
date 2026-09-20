@@ -56,7 +56,7 @@
   --duration-focal: 500ms;  /* the hero spotlight swap */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-pop: cubic-bezier(0.22, 1, 0.36, 1);
   --transition-smooth: var(--duration-slow) var(--ease-standard);
 
   /* Radius scales with surface size */
@@ -506,7 +506,7 @@ body {
 /* A brief pop when the count changes draws the eye to the number, not the
    whole button — the one authored motion moment on this cluster. */
 .nav-cart-badge {
-  animation: cartBadgePop 220ms var(--ease-spring) both;
+  animation: cartBadgePop 220ms var(--ease-pop) both;
 }
 
 @keyframes cartBadgePop {
@@ -2492,11 +2492,11 @@ a.btn-outline {
 }
 
 .wishlist-btn i {
-  transition: transform var(--duration-slow) var(--ease-spring);
+  transition: transform var(--duration-slow) var(--ease-pop);
 }
 
 .wishlist-btn.is-popping i {
-  animation: heartPop 300ms var(--ease-spring);
+  animation: heartPop 300ms var(--ease-pop);
 }
 
 .wishlist-btn.is-popping::after {

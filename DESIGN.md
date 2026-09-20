@@ -205,6 +205,34 @@ Borders are hairline (`1px`) and neutral by default, stepping through the three-
 ### Named Rules
 **The Growing Radius Rule.** Corner radius tracks surface size — never give a small control a large radius or a large surface a tight one. Pills are reserved for chips; the full circle is reserved for the avatar.
 
+## Motion
+
+Motion is **feedback first, one authored moment second.** Every transition explains a state, a relationship, or an arrival; nothing loops for decoration except the Quick Launch fill, which is a countdown. Durations express distance and easings express intent, from one token ladder in `:root`:
+
+| Token | Value | Use |
+|---|---|---|
+| `--duration-fast` | 120ms | press, focus, small state changes |
+| `--duration-base` | 200ms | hover, reveal, page enter, alerts |
+| `--duration-slow` | 350ms | layout, overlays, card arrival |
+| `--duration-focal` | 500ms | the hero spotlight swap |
+| `--ease-standard` | `cubic-bezier(0.4, 0, 0.2, 1)` | routine state changes |
+| `--ease-out` | `cubic-bezier(0.16, 1, 0.3, 1)` | arrivals: confident deceleration |
+| `--ease-pop` | `cubic-bezier(0.22, 1, 0.36, 1)` | pops: the cart badge and the wishlist heart |
+
+### The Focal Moment: the Spotlight Swap
+The hero is the marquee. When a new game takes the spotlight, the incoming art fades in over the outgoing layer while settling from `scale(1.04)` to `1` over `--duration-focal`; the copy rises in after an 80ms beat. On Browse, the Quick Launch row that just finished its 8-second fill flashes a gold border for 300ms at the same instant, so the eye is led from row to stage. Two image layers, never a gap to black.
+
+### Supporting Motion
+- **Arrival:** game cards rise 16px and fade over `--duration-slow`, staggered 40ms per card across the whole page. Pages enter with an 8px rise over `--duration-base`, keyed on the route.
+- **Feedback:** every button gives 1px under press; the wishlist heart pops to 1.3× with an expanding gold wash ring when it lights; the cart badge pops when its count changes; alerts slide down 4px as they appear.
+- **Overlays:** the admin modal scales in from 0.96 over `--duration-slow` and leaves in `--duration-fast`; the avatar menu drops in over `--duration-base`.
+- **Waiting:** skeletons breathe at 1.4s; the route-guard loading screen shows three gold dots pulsing in sequence.
+
+### Named Rules
+**The One Reduce Rule.** A single `prefers-reduced-motion: reduce` block at the end of the stylesheet collapses every animation and transition to its final frame. New motion never adds its own media query.
+
+**The Transform-and-Opacity Rule.** Motion animates `transform`, `opacity`, `box-shadow` and `border-color` only; blur is confined to the modal backdrop. Layout-driving properties are never animated.
+
 ## Components
 
 The component feel is **responsive and lifted**: flat and quiet until touched, then they lift, warm, and reveal. Interaction is meant to be *felt*.
@@ -227,11 +255,11 @@ The component feel is **responsive and lifted**: flat and quiet until touched, t
 - **Hover:** Background warms to `#1e1e1e`, border becomes `border-strong`, the whole card lifts `translateY(-4px)` with the **Lift** shadow, and the poster image scales to `1.05`.
 - **Reveal:** A "View Details" outline button lives at `opacity: 0` and fades in only on hover/focus-within (forced visible under `@media (hover: none)` so touch users aren't stranded).
 - **Selected:** A medium-gray fill with a `0.30` gold border — the only place a card carries gold at rest.
-- **Entrance:** Cards animate in with `fadeSlideUp` (rise `16px` + fade over `0.4s`), staggered `0.06s` per child for the first eight — the catalogue's authored arrival moment.
+- **Entrance:** Cards animate in with `fadeSlideUp` (rise `16px` + fade over `0.4s`), staggered `40ms` per card across the whole page — the catalogue's arrival.
 
 ### Inputs / Fields
 - **Style:** `#121212` fill, `1px` medium border, `8–10px` radius, DM Sans.
-- **Focus:** Border becomes Marquee Gold and a `3px` gold glow ring appears (`rgba(245,197,24,0.10–0.12)`); the search bar variant uses `:focus-within` to light the whole pill.
+- **Focus:** Border becomes Marquee Gold and the shared `--focus-ring` (`3px` at `0.35` gold) appears. The same ring marks keyboard focus on every button, card, nav row and menu item; gold-filled controls get a dark gap first.
 - **Error:** Field-level errors surface as coral text on a coral wash (`.auth-error`, `.page-error`), not as a red border on the input.
 
 ### Navigation (Sidebar)
@@ -241,6 +269,13 @@ The component feel is **responsive and lifted**: flat and quiet until touched, t
 
 ### Modal
 - Centered `520px` dialog on a `rgba(0,0,0,0.72)` backdrop with a `2px` blur; `14px` radius, medium border, the deep **Modal** shadow, and a bordered footer for actions. Reserved for focused create/edit tasks (admin forms), not casual confirmation.
+
+
+### Wishlist Heart
+- **Off:** an outlined heart in secondary gray. On a card it sits in the poster's top-right corner on a translucent ink disc and is revealed with the hover state, like "View Details".
+- **On:** solid Marquee Gold with the accent-wash border and fill; once wished the card's heart stays visible at rest — the only accent a card carries when idle.
+- **Toggle:** the heart pops to 1.3× on `--ease-pop` while a gold wash ring expands and fades: the bulb lighting. Optimistic, reverting if the server declines.
+- **Labelled variant:** beside the hero and details primary action, styled as an outline button reading "Wishlist" / "Wishlisted".
 
 ## Do's and Don'ts
 
