@@ -7,6 +7,7 @@ import { gameService } from "../../services/gameService";
 import { useAuth } from "../../hooks/useAuth";
 import { useQuickLaunch } from "../../hooks/useQuickLaunch";
 import GameGrid from "../../components/game/GameGrid";
+import GameGridSkeleton from "../../components/game/GameGridSkeleton";
 import HeroSection from "../../components/game/HeroSection";
 import Pagination from "../../components/Pagination";
 
@@ -99,7 +100,8 @@ export default function BrowsePage() {
     if (next > 0) params.page = String(next);
     // A push, not a replace: paging is navigation, so Back should undo it.
     setSearchParams(params);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
   }
 
   return (
@@ -122,24 +124,12 @@ export default function BrowsePage() {
         </div>
       </div>
 
-      {error && <p className="browse-error">{error}</p>}
+      {error && <p className="alert alert-error">{error}</p>}
 
       {/* Only the results swap out while loading. Returning early here instead
           would unmount the input above and drop focus on every keystroke. */}
       {isLoading ? (
-        <div
-          className="game-grid"
-          role="status"
-          aria-label="Loading games"
-        >
-          {Array.from({ length: BROWSE_PAGE_SIZE }).map((_, i) => (
-            <div key={i} className="game-card-skeleton" aria-hidden="true">
-              <div className="game-card-skeleton-poster" />
-              <div className="game-card-skeleton-line" />
-              <div className="game-card-skeleton-line short" />
-            </div>
-          ))}
-        </div>
+        <GameGridSkeleton count={BROWSE_PAGE_SIZE} />
       ) : (
         <>
           <GameGrid

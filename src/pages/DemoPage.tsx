@@ -93,6 +93,7 @@ export default function DemoPage() {
 
   return (
     <div
+      className="page-enter"
       style={{
         maxWidth: 900,
         margin: "2rem auto",

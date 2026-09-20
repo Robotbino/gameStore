@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import type { CSSProperties } from "react";
 import { useAuth } from "../hooks/useAuth";
@@ -18,6 +19,9 @@ const navItems = [
   { icon: "fa-solid fa-book", label: "Library", to: "/library" },
 ];
 
+// How long the finishing Quick Launch row glows as it hands the spotlight to the hero.
+const HANDOFF_MS = 300;
+
 export default function SideBar({ isOpen, onToggle }: SideBarProps) {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
@@ -27,6 +31,19 @@ export default function SideBar({ isOpen, onToggle }: SideBarProps) {
   // here. It used to render the catalogue's first few rows, which meant the
   // strip was offering games the user hadn't bought.
   const { library, activeId, cycle, cycleMs } = useQuickLaunch();
+
+  // When a turn ends, the row that was filling flashes gold at the same
+  // instant the hero starts its swap — the eye is led from row to stage.
+  const [handoffId, setHandoffId] = useState<number | null>(null);
+  const lastActiveId = useRef(activeId);
+  useEffect(() => {
+    const finished = lastActiveId.current;
+    lastActiveId.current = activeId;
+    if (cycle === 0 || finished === null) return;
+    setHandoffId(finished);
+    const timer = setTimeout(() => setHandoffId(null), HANDOFF_MS);
+    return () => clearTimeout(timer);
+  }, [cycle, activeId]);
 
   return (
     <aside className={`sidebar ${isOpen ? "" : "collapsed"}`}>
@@ -62,9 +79,12 @@ export default function SideBar({ isOpen, onToggle }: SideBarProps) {
               const isFilling = game.id === activeId;
 
               return (
-                <div
+                <button
+                  type="button"
                   key={game.id}
-                  className={`quick-launch-item ${isFilling ? "is-filling" : ""}`}
+                  className={`quick-launch-item ${isFilling ? "is-filling" : ""} ${
+                    game.id === handoffId ? "is-handoff" : ""
+                  }`}
                   // Two identical keyframes alternating by turn. A CSS animation
                   // only restarts when its NAME changes, and on a one-game
                   // library the class never leaves this row — so without the
@@ -78,9 +98,9 @@ export default function SideBar({ isOpen, onToggle }: SideBarProps) {
                   style={{ "--ql-cycle": `${cycleMs}ms` } as CSSProperties}
                   onClick={() => navigate(`/games/${game.id}`)}
                 >
-                  <img src={game.imageUrl} alt={game.title} />
+                  <img src={game.imageUrl} alt="" />
                   <span>{game.title}</span>
-                </div>
+                </button>
               );
             })}
           </div>

@@ -13,17 +13,27 @@ export default function UserAvatar() {
   const displayName = currentUser?.userName ?? userEmail ?? "";
   const initial = displayName ? displayName.charAt(0).toUpperCase() : "?";
 
-  // Close on click outside
+  // Close on click outside or Escape; Escape hands focus back to the button.
   useEffect(() => {
+    if (!open) return;
+
     function handleClickOutside(e: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      wrapperRef.current?.querySelector<HTMLElement>(".user-avatar")?.focus();
     }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
   }, [open]);
 
   const goTo = (path: string) => {

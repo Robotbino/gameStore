@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Outlet, NavLink, Link } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import Navbar from "../Navbar";
+import PageTransition from "./PageTransition";
 
 export default function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -56,7 +57,7 @@ export default function AdminLayout() {
 
       <main className="content">
         <Navbar showCart={false} />
-        <Outlet />
+        <PageTransition />
       </main>
     </div>
   );

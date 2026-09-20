@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import StarRating from "../../components/StarRating.tsx";
 import { gameService } from "../../services/gameService";
-import { purchaseService } from "../../services/purchaseService";
 import { useCart } from "../../hooks/useCart";
+import { usePurchases } from "../../hooks/usePurchases";
 import { parseGenres } from "../../utils/genre";
 import type { Game } from "../../types/game";
 
@@ -11,9 +11,9 @@ export default function GameDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { add, has: inCart } = useCart();
+  const { owns } = usePurchases();
 
   const [game, setGame] = useState<Game | null>(null);
-  const [owned, setOwned] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +32,6 @@ export default function GameDetailsPage() {
 
     setIsLoading(true);
     setError(null);
-    setOwned(false);
 
     gameService
       .getById(gameId)
@@ -49,24 +48,22 @@ export default function GameDetailsPage() {
         if (!cancelled) setIsLoading(false);
       });
 
-    // Is this game already in the user's library? Drives the button state.
-    // Best-effort — on failure the button just falls back to "Add to Cart".
-    purchaseService
-      .getMine()
-      .then((purchases) => {
-        if (!cancelled) setOwned(purchases.some((p) => p.game.id === gameId));
-      })
-      .catch(() => {
-        /* leave owned=false */
-      });
-
     return () => {
       cancelled = true;
     };
   }, [id]);
 
   if (isLoading) {
-    return <div className="loading-screen">Loading game…</div>;
+    return (
+      <div className="game-details-page" role="status" aria-label="Loading game">
+        <div className="skeleton skeleton-hero" />
+        <div className="game-details-content">
+          <div className="skeleton skeleton-line skeleton-title" />
+          <div className="skeleton skeleton-line" />
+          <div className="skeleton skeleton-line short" />
+        </div>
+      </div>
+    );
   }
 
   if (error || !game) {
@@ -116,7 +113,7 @@ export default function GameDetailsPage() {
         <p className="hero-description">{game.description}</p>
 
         <div className="hero-actions">
-          {owned ? (
+          {owns(game.id) ? (
             <button className="btn-primary" disabled>
               ✓ In Library
             </button>

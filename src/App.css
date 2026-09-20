@@ -48,7 +48,39 @@
   --sidebar-width: 260px;
   --sidebar-collapsed: 60px;
   --content-max-width: 1400px;
-  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Motion — durations express distance, easings express intent */
+  --duration-fast: 120ms;   /* press, focus, small state */
+  --duration-base: 200ms;   /* hover, reveal, page enter */
+  --duration-slow: 350ms;   /* layout, overlay */
+  --duration-focal: 500ms;  /* the hero spotlight swap */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-smooth: var(--duration-slow) var(--ease-standard);
+
+  /* Radius scales with surface size */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
+  --radius-3xl: 20px;
+  --radius-pill: 999px;
+
+  /* Depth is earned by state; these are the only shadows */
+  --shadow-lift: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-menu: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.6);
+
+  /* The accent wash family and the one focus ring */
+  --accent-wash: rgba(245, 197, 24, 0.08);
+  --accent-wash-border: rgba(245, 197, 24, 0.3);
+  --focus-ring: 0 0 0 3px rgba(245, 197, 24, 0.35);
+  --danger: #ff6b6b;
+  --danger-wash: rgba(255, 107, 107, 0.08);
+  --danger-wash-border: rgba(255, 107, 107, 0.2);
 }
 
 
@@ -218,7 +250,7 @@ body {
   background: var(--bg-raised);
   border: 1px solid var(--border-medium);
   border-radius: 20px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lift);
 }
 
 /* Compact wordmark inside the card — shown only when the stage is hidden
@@ -318,10 +350,8 @@ body {
 }
 
 /* The card arrives with the catalogue's signature rise-and-fade. */
-@media (prefers-reduced-motion: no-preference) {
-  .auth-card {
-    animation: fadeSlideUp 0.5s ease both;
-  }
+.auth-card {
+  animation: fadeSlideUp var(--duration-focal) var(--ease-out) both;
 }
 
 /* Below 900px the stage steps aside; the card carries a compact wordmark. */
@@ -475,10 +505,8 @@ body {
 
 /* A brief pop when the count changes draws the eye to the number, not the
    whole button — the one authored motion moment on this cluster. */
-@media (prefers-reduced-motion: no-preference) {
-  .nav-cart-badge {
-    animation: cartBadgePop 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
+.nav-cart-badge {
+  animation: cartBadgePop 220ms var(--ease-spring) both;
 }
 
 @keyframes cartBadgePop {
@@ -538,15 +566,13 @@ body {
   border: 1px solid var(--border-medium);
   border-radius: 10px;
   padding: 4px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-menu);
   z-index: 50;
   transform-origin: top right;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .avatar-menu {
-    animation: avatarMenuIn 0.16s ease-out both;
-  }
+.avatar-menu {
+  animation: avatarMenuIn var(--duration-base) var(--ease-out) both;
 }
 
 @keyframes avatarMenuIn {
@@ -750,13 +776,25 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
   padding: 6px;
-  border-radius: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
   /* background-color, not the `background` shorthand: the idle carousel paints
      its fill into background-image, and transitioning the shorthand would drag
      that layer into the hover transition. */
-  transition: background-color 0.15s ease;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-slow) var(--ease-out);
+}
+
+/* The turn just ended here: a gold flash hands the spotlight to the hero. */
+.quick-launch-item.is-handoff {
+  border-color: var(--accent);
 }
 
 /* Likewise longhand — `background: …` here would reset background-image to
@@ -807,12 +845,6 @@ body {
 
 /* Reduced motion still needs to answer "which one is playing?" — keep the
    highlight, drop the sweep. */
-@media (prefers-reduced-motion: reduce) {
-  .quick-launch-item.is-filling {
-    animation: none;
-    background-size: 100% 100%;
-  }
-}
 
 .quick-launch-item img {
   width: 36px;
@@ -881,16 +913,24 @@ body {
   margin-bottom: var(--space-xl);
 }
 
+/* Two stacked layers: the outgoing art stays put while the incoming one
+   settles from a slight zoom — the marquee's one authored moment. */
 .hero-image {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: opacity 0.4s ease;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity var(--duration-focal) var(--ease-out),
+    transform var(--duration-focal) var(--ease-out);
 }
 
-.hero-image.transitioning {
-  opacity: 0;
+.hero-image.is-live {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .hero-gradient {
@@ -913,12 +953,8 @@ body {
   left: 0;
   right: 0;
   padding: var(--space-xl);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.hero-content.transitioning {
-  opacity: 0;
-  transform: translateY(8px);
+  animation: fadeSlideUp var(--duration-slow) var(--ease-out) both;
+  animation-delay: 80ms;
 }
 
 .hero-genre {
@@ -963,7 +999,8 @@ body {
   cursor: pointer;
   font-family: var(--font-body);
   letter-spacing: 0.02em;
-  transition: background 0.2s ease;
+  transition: background var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 .btn-primary:hover {
@@ -980,12 +1017,55 @@ body {
   font-weight: 500;
   cursor: pointer;
   font-family: var(--font-body);
-  transition: border-color 0.2s ease, color 0.2s ease;
+  transition: border-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 .btn-outline:hover {
   border-color: var(--text-muted);
   color: #fff;
+}
+
+/* Press: the control gives under the finger, then springs back on release. */
+.btn-primary:active:not(:disabled),
+.btn-outline:active:not(:disabled),
+.btn-danger:active:not(:disabled),
+.game-card-view:active,
+.game-details-back:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+
+/* ============================================
+  KEYBOARD FOCUS
+  One ring for every control: the same gold wash the inputs already use.
+  Gold-filled controls get a dark gap first so the ring separates from the fill.
+  ============================================ */
+.btn-outline:focus-visible,
+.btn-danger:focus-visible,
+.game-card-view:focus-visible,
+.game-details-back:focus-visible,
+.game-grid-viewall:focus-visible,
+.modal-close:focus-visible,
+.sidebar-toggle:focus-visible,
+.sidebar-nav-item:focus-visible,
+.sidebar-switch:focus-visible,
+.avatar-menu-item:focus-visible,
+.quick-launch-item:focus-visible,
+.pagination-controls button:focus-visible,
+.profile-purchases a:focus-visible,
+.profile-section-header .accent:focus-visible,
+.auth-footer .accent:focus-visible,
+.game-card:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-color: var(--accent);
+}
+
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg-primary), var(--focus-ring);
 }
 
 
@@ -1039,15 +1119,21 @@ body {
   background: transparent;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: fadeSlideUp 0.4s ease both;
+  transition: background var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard);
+  /* Arrival: each card rises in turn. --i is set by GameGrid, so a 12-card
+     page staggers all the way through instead of stopping at the eighth. */
+  animation: fadeSlideUp var(--duration-slow) var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
 }
 
 .game-card:hover {
   background: var(--bg-card-hover);
   border-color: var(--border-strong);
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lift);
 }
 
 .game-card.selected {
@@ -1055,15 +1141,6 @@ body {
   border-color: rgba(245, 197, 24, 0.3);
 }
 
-
-.game-card:nth-child(1) { animation-delay: 0s; }
-.game-card:nth-child(2) { animation-delay: 0.06s; }
-.game-card:nth-child(3) { animation-delay: 0.12s; }
-.game-card:nth-child(4) { animation-delay: 0.18s; }
-.game-card:nth-child(5) { animation-delay: 0.24s; }
-.game-card:nth-child(6) { animation-delay: 0.30s; }
-.game-card:nth-child(7) { animation-delay: 0.36s; }
-.game-card:nth-child(8) { animation-delay: 0.42s; }
 
 @keyframes fadeSlideUp {
   from {
@@ -1171,11 +1248,28 @@ body {
   margin-top: 10px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .game-card-skeleton-poster,
-  .game-card-skeleton-line {
-    animation: skeletonPulse 1.4s ease-in-out infinite;
-  }
+.game-card-skeleton-poster,
+.game-card-skeleton-line,
+.skeleton {
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+}
+
+/* Generic skeleton pieces for the routes that used to show bare "Loading…" text. */
+.skeleton {
+  background: var(--bg-raised);
+  border-radius: var(--radius-md);
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: var(--radius-xs);
+}
+
+.skeleton-hero {
+  aspect-ratio: 21 / 9;
+  max-height: 420px;
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-xl);
 }
 
 @keyframes skeletonPulse {
@@ -1217,6 +1311,29 @@ body {
   font-size: var(--text-base);
   color: var(--text-muted);
   background: var(--bg-primary);
+}
+
+/* Three dots breathing in sequence, so a wait reads as alive rather than stuck. */
+.loading-dots {
+  display: inline-flex;
+  gap: 6px;
+  margin-left: 10px;
+}
+
+.loading-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  animation: loadingDot 1.2s ease-in-out infinite;
+}
+
+.loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes loadingDot {
+  0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
 }
 
 
@@ -1288,28 +1405,56 @@ body {
   }
 }
 
-.browse-error {
-  margin-bottom: var(--space-lg);
-  padding: 10px 14px;
-  background: rgba(255, 107, 107, 0.08);
-  border: 1px solid rgba(255, 107, 107, 0.2);
-  border-radius: 6px;
-  font-size: var(--text-sm);
-  color: #ff6b6b;
-}
-
 
 /* ============================================
-  AUTH ERROR
+  ALERTS
+  One family for every inline message. The older class names stay as aliases
+  so each page keeps its own margin without a markup change.
   ============================================ */
-.auth-error {
-  font-size: var(--text-sm);
-  color: #ff6b6b;
-  background: rgba(255, 107, 107, 0.08);
-  border: 1px solid rgba(255, 107, 107, 0.2);
-  border-radius: 6px;
+.alert,
+.browse-error,
+.page-error,
+.auth-error,
+.error-state,
+.form-success {
   padding: 10px 14px;
-  text-align: center;
+  border: 1px solid;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  animation: alertIn var(--duration-base) var(--ease-out) both;
+}
+
+.alert-error,
+.browse-error,
+.page-error,
+.auth-error,
+.error-state {
+  color: var(--danger);
+  background: var(--danger-wash);
+  border-color: var(--danger-wash-border);
+}
+
+.alert-success,
+.form-success {
+  color: var(--accent);
+  background: var(--accent-wash);
+  border-color: var(--accent-wash-border);
+}
+
+.browse-error { margin-bottom: var(--space-lg); }
+.page-error,
+.error-state { margin-bottom: var(--space-md); }
+.auth-error { text-align: center; }
+
+@keyframes alertIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 
@@ -1383,16 +1528,6 @@ body {
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
-}
-
-.page-error {
-  margin-bottom: var(--space-md);
-  padding: 10px 14px;
-  background: rgba(255, 107, 107, 0.08);
-  border: 1px solid rgba(255, 107, 107, 0.2);
-  border-radius: 6px;
-  font-size: var(--text-sm);
-  color: #ff6b6b;
 }
 
 .table-loading,
@@ -1509,7 +1644,9 @@ body {
   font-weight: 500;
   cursor: pointer;
   font-family: var(--font-body);
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition: background var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 .btn-danger:hover {
@@ -1621,6 +1758,47 @@ body {
   justify-content: center;
   z-index: 500;
   backdrop-filter: blur(2px);
+  animation: modalOverlayIn var(--duration-base) var(--ease-out) both;
+}
+
+.modal-overlay.is-closing {
+  animation: modalOverlayOut var(--duration-fast) var(--ease-standard) both;
+}
+
+.modal-overlay.is-closing .modal-box {
+  animation: modalBoxOut var(--duration-fast) var(--ease-standard) both;
+}
+
+@keyframes modalOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalOverlayOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes modalBoxIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes modalBoxOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
 }
 
 .modal-box {
@@ -1632,7 +1810,8 @@ body {
   max-width: 92vw;
   max-height: 88vh;
   overflow-y: auto;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--shadow-modal);
+  animation: modalBoxIn var(--duration-slow) var(--ease-out) both;
 }
 
 .modal-header {
@@ -2125,15 +2304,6 @@ a.btn-outline {
   cursor: not-allowed;
 }
 
-.form-success {
-  padding: 10px 14px;
-  background: rgba(245, 197, 24, 0.08);
-  border: 1px solid rgba(245, 197, 24, 0.25);
-  border-radius: 6px;
-  font-size: var(--text-sm);
-  color: var(--accent);
-}
-
 .settings-actions {
   display: flex;
   justify-content: flex-end;
@@ -2146,5 +2316,204 @@ a.btn-outline {
   }
   .profile-stats {
     grid-template-columns: 1fr;
+  }
+}
+
+
+/* ============================================
+  CART
+  ============================================ */
+.cart-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+  overflow: hidden;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--duration-base) var(--ease-standard),
+    opacity var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.cart-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.cart-item.is-removing {
+  opacity: 0;
+  transform: translateX(8px);
+}
+
+.cart-item-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.cart-item-title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cart-item-title:hover,
+.cart-item-title:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+.cart-item-price {
+  min-width: 90px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+.cart-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+}
+
+.cart-total {
+  color: var(--text-secondary);
+}
+
+.cart-total strong {
+  margin-left: var(--space-sm);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--accent);
+}
+
+
+/* ============================================
+  ADMIN SECTIONS
+  ============================================ */
+.admin-section {
+  margin-top: var(--space-2xl);
+  padding: var(--space-lg);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-xl);
+  background: var(--bg-raised);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.section-subtitle {
+  margin: var(--space-xs) 0 var(--space-md);
+  max-width: 60ch;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.sync-result {
+  margin-top: var(--space-md);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+
+/* ============================================
+  SKELETON SHAPES
+  ============================================ */
+.skeleton-card {
+  height: 128px;
+  border-radius: var(--radius-lg);
+}
+
+.skeleton-stat {
+  height: 96px;
+  border-radius: var(--radius-xl);
+}
+
+.skeleton-title {
+  width: 40%;
+  height: 28px;
+  margin-bottom: var(--space-md);
+}
+
+.game-details-content .skeleton-line {
+  margin-top: var(--space-sm);
+}
+
+.game-details-content .skeleton-line.short {
+  width: 60%;
+}
+
+
+/* ============================================
+  PAGE ENTER
+  Keyed on the route in PageTransition, so every screen arrives the same way.
+  `backwards`, not `both`: a resting transform on this wrapper would become the
+  containing block for the admin modal's fixed overlay rendered inside it.
+  ============================================ */
+.page-enter {
+  animation: pageEnter var(--duration-base) var(--ease-out) backwards;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* ============================================
+  REDUCED MOTION
+  One rule for the whole app: everything collapses to its final frame.
+  ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Keep the static highlight on the active Quick Launch row. */
+  .quick-launch-item.is-filling {
+    background-size: 100% 100%;
+  }
+
+  .game-card:hover {
+    transform: none;
   }
 }

@@ -1,27 +1,24 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { purchaseService } from "../../services/purchaseService";
-import type { Purchase } from "../../types/purchase";
+import { usePurchases } from "../../hooks/usePurchases";
 
 const RECENT_LIMIT = 4;
 
 export default function ProfilePage() {
   const { currentUser } = useAuth();
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    purchaseService
-      .getMine()
-      .then(setPurchases)
-      .catch(() => setError("Failed to load your library."))
-      .finally(() => setIsLoading(false));
-  }, []);
+  const { purchases, isLoading, error } = usePurchases();
 
   if (!currentUser || isLoading) {
-    return <div className="loading-screen">Loading profile…</div>;
+    return (
+      <div className="profile-page" role="status" aria-label="Loading profile">
+        <h2 className="page-title">My Profile</h2>
+        <div className="skeleton skeleton-card" />
+        <div className="profile-stats">
+          <div className="skeleton skeleton-stat" />
+          <div className="skeleton skeleton-stat" />
+        </div>
+      </div>
+    );
   }
 
   const recent = [...purchases]
@@ -67,7 +64,7 @@ export default function ProfilePage() {
           </Link>
         </div>
 
-        {error && <p className="browse-error">{error}</p>}
+        {error && <p className="alert alert-error">{error}</p>}
 
         {!error && recent.length === 0 ? (
           <p className="profile-empty">

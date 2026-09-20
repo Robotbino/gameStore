@@ -131,7 +131,11 @@ export default function AdminDashboard() {
       <h2 className="page-title">Dashboard</h2>
 
       {isLoading ? (
-        <p className="table-loading">Loading stats…</p>
+        <div className="stats-grid" role="status" aria-label="Loading stats">
+          {Array.from({ length: 4 }, (_, i) => (
+            <div key={i} className="skeleton skeleton-stat" />
+          ))}
+        </div>
       ) : (
         <div className="stats-grid">
           {stats.map((stat) => (
@@ -147,7 +151,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      <section className="admin-section" style={{ marginTop: "2rem" }}>
+      <section className="admin-section">
         <h3 className="section-title">Catalogue Sync</h3>
         <p className="section-subtitle">
           Pull the game catalogue from RAWG. Currently a stub — the endpoint
@@ -155,17 +159,14 @@ export default function AdminDashboard() {
         </p>
         <button
           type="button"
-          className="btn btn-primary"
+          className="btn-primary"
           onClick={handleSyncRawg}
           disabled={sync.kind === "loading"}
         >
           {sync.kind === "loading" ? "Syncing…" : "Sync from RAWG"}
         </button>
         {sync.kind === "result" && (
-          <p
-            className="sync-result"
-            style={{ marginTop: "0.75rem", opacity: 0.85 }}
-          >
+          <p className="sync-result">
             <strong>HTTP {sync.status}</strong> — {sync.message}
           </p>
         )}

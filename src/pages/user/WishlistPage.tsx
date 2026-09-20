@@ -1,37 +1,28 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { Game } from "../../types/game";
-import { usePurchases } from "../../hooks/usePurchases";
+import { useWishlist } from "../../hooks/useWishlist";
 import GameGrid from "../../components/game/GameGrid";
 import GameGridSkeleton from "../../components/game/GameGridSkeleton";
 
-export default function LibraryPage() {
+export default function WishlistPage() {
   const navigate = useNavigate();
-  const { purchases, isLoading, error } = usePurchases();
+  const { items, isLoading } = useWishlist();
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-  const games = purchases.map((p) => p.game);
-
-  if (isLoading) {
-    return (
-      <div className="library-page">
-        <h2 className="page-title">My Library</h2>
-        <GameGridSkeleton count={8} />
-      </div>
-    );
-  }
+  const games = items.map((item) => item.game);
 
   return (
-    <div className="library-page">
-      <h2 className="page-title">My Library</h2>
+    <div className="wishlist-page">
+      <h2 className="page-title">My Wishlist</h2>
 
-      {error && <p className="alert alert-error">{error}</p>}
-
-      {!error && games.length === 0 ? (
+      {isLoading ? (
+        <GameGridSkeleton count={8} />
+      ) : games.length === 0 ? (
         <div className="empty-state">
-          <i className="fa-solid fa-gamepad empty-state-icon" aria-hidden="true" />
-          <h3 className="empty-state-title">Your library is empty</h3>
+          <i className="fa-regular fa-heart empty-state-icon" aria-hidden="true" />
+          <h3 className="empty-state-title">Nothing wishlisted yet</h3>
           <p className="empty-state-text">
-            Games you buy will show up here. Find your next one in the store.
+            Tap the heart on any game to save it here for later.
           </p>
           <Link to="/browse" className="btn-primary">
             Browse the store

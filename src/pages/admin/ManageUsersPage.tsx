@@ -5,6 +5,7 @@ import type { Page } from "../../types/pagination";
 import { emptyPage } from "../../types/pagination";
 import { getApiErrorMessage } from "../../utils/apiError";
 import Pagination from "../../components/Pagination";
+import Modal from "../../components/Modal";
 
 const PAGE_SIZE = 20;
 
@@ -229,14 +230,11 @@ export default function ManageUsersPage() {
         </>
       )}
 
-      {modalMode && (
-        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && closeModal()}>
-          <div className="modal-box">
-            <div className="modal-header">
-              <h3 className="modal-title">{modalMode === "add" ? "Add Employee" : "Edit Employee"}</h3>
-              <button className="modal-close" onClick={closeModal}>✕</button>
-            </div>
-
+      <Modal
+        open={modalMode !== null}
+        title={modalMode === "add" ? "Add Employee" : "Edit Employee"}
+        onClose={closeModal}
+      >
             <form className="form-grid" onSubmit={handleSubmit}>
               <div className="form-field">
                 <label>Username</label>
@@ -276,9 +274,7 @@ export default function ManageUsersPage() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 }

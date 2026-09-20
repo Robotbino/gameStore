@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
 import Navbar from "../Navbar";
 import SideBar from "../SideBar";
 import { QuickLaunchProvider } from "../../context/QuickLaunchProvider";
+import PageTransition from "./PageTransition";
 
 export default function AppLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -20,7 +20,7 @@ export default function AppLayout() {
         />
         <main className="content">
           <Navbar />
-          <Outlet />           {/* ← page content renders here */}
+          <PageTransition />
         </main>
       </div>
     </QuickLaunchProvider>

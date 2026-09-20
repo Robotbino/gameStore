@@ -4,6 +4,7 @@ import { gameService } from "../../services/gameService";
 import type { Game } from "../../types/game";
 import HeroSection from "../../components/game/HeroSection.tsx";
 import GameGrid from "../../components/game/GameGrid.tsx";
+import GameGridSkeleton from "../../components/game/GameGridSkeleton.tsx";
 
 // The landing grid is a showcase, not the catalogue — one page is the whole
 // point of it. Anything past this belongs on /browse, which can actually page.
@@ -29,9 +30,17 @@ export default function HomePage() {
       .finally(() => setIsLoading(false));
   }, []);
 
-  if (isLoading) return <div className="loading-screen">Loading games…</div>;
-  if (error) return <div className="error-state"><p style={{ color: "var(--text-muted)" }}>{error}</p></div>;
-  if (!selectedGame) return <div className="empty-state"><p style={{ color: "var(--text-muted)" }}>No games available.</p></div>;
+  if (isLoading) return <GameGridSkeleton count={HOME_PAGE_SIZE} withHero />;
+  if (error) return <p className="alert alert-error">{error}</p>;
+  if (!selectedGame) {
+    return (
+      <div className="empty-state">
+        <i className="fa-solid fa-gamepad empty-state-icon" aria-hidden="true" />
+        <h3 className="empty-state-title">No games available</h3>
+        <p className="empty-state-text">The catalogue is empty right now. Check back soon.</p>
+      </div>
+    );
+  }
 
   return (
     <>

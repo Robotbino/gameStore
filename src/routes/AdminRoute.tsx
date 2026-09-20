@@ -1,11 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import LoadingScreen from "../components/LoadingScreen";
 
 export default function AdminRoute() {
   const { isAuthenticated, isAdmin, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div className="loading-screen">Loading…</div>;
+    return <LoadingScreen />;
   }
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;

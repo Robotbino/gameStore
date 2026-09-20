@@ -6,7 +6,7 @@ export default function NotFoundPage() {
   const homePath = isAuthenticated ? (isAdmin ? "/admin" : "/") : "/login";
 
   return (
-    <div className="not-found-page">
+    <div className="not-found-page page-enter">
       <span className="not-found-code">404</span>
       <h1 className="not-found-title">Page not found</h1>
       <p className="not-found-text">

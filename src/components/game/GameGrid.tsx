@@ -39,10 +39,11 @@ export default function GameGrid({
       )}
 
       <div className="game-grid">
-        {items.map((item) => (
+        {items.map((item, index) => (
           <GameCard
             key={item.id}
             game={item}
+            index={index}
             isSelected={selectedGame?.id === item.id}
             onSelect={onSelectItem}
           />
