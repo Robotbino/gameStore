@@ -93,14 +93,8 @@ export default function BrowsePage() {
         <h2 className="browse-title">Browse Games</h2>
         {urlQuery && (
           <p className="browse-caption" aria-live="polite">
-            Results for <strong>“{urlQuery}”</strong>
-            <button
-              type="button"
-              className="browse-clear"
-              onClick={() => setSearchParams({}, { replace: true })}
-            >
-              Clear
-            </button>
+            {result.totalElements} {result.totalElements === 1 ? "result" : "results"} for{" "}
+            <strong>“{urlQuery}”</strong>
           </p>
         )}
       </div>

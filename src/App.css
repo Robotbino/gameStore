@@ -118,6 +118,16 @@ body {
   display: none;                 
 }
 
+::selection {
+  background: rgba(245, 197, 24, 0.3);
+  color: #fff;
+}
+
+input,
+textarea {
+  caret-color: var(--accent);
+}
+
 /* ============================================
   APP LAYOUT
   ============================================ */
@@ -390,37 +400,102 @@ body {
   margin-bottom: var(--space-lg);
 }
 
+/* The search is the marquee's ticket window: a quiet hairline pill at rest
+   that lights up gold, with a warm glow beneath it, the moment it's reached. */
 .navbar .search-bar {
   grid-column: 2;
   display: flex;
   align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 14px 0 16px;
   background: var(--bg-raised);
-  border-radius: var(--radius-pill);
-  padding: var(--space-sm) var(--space-md);
-  gap: var(--space-sm);
   border: 1px solid var(--border-medium);
+  border-radius: var(--radius-pill);
   transition: border-color var(--duration-base) var(--ease-standard),
-    box-shadow var(--duration-base) var(--ease-standard);
+    background var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-slow) var(--ease-out);
+}
+
+.navbar .search-bar:hover {
+  border-color: var(--border-strong);
 }
 
 .navbar .search-bar:focus-within {
   border-color: var(--accent);
-  box-shadow: var(--focus-ring);
+  background: #161616;
+  box-shadow: var(--focus-ring), 0 10px 28px rgba(245, 197, 24, 0.12);
 }
 
 .navbar .search-bar .search-icon {
   color: var(--text-faint);
   font-size: var(--text-sm);
+  transition: color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-slow) var(--ease-pop);
+}
+
+.navbar .search-bar:focus-within .search-icon {
+  color: var(--accent);
+  transform: scale(1.1);
 }
 
 .navbar .search-bar input {
+  flex: 1;
+  min-width: 0;
   background: transparent;
   border: none;
   outline: none;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-size: var(--text-sm);
   font-family: var(--font-body);
-  width: 100%;
+}
+
+.navbar .search-bar input::placeholder {
+  color: var(--text-muted);
+}
+
+/* The browser's own cancel button would fight the styled clear control. */
+.navbar .search-bar input::-webkit-search-cancel-button {
+  display: none;
+}
+
+/* Keyboard hint: a tracked micro-label that steps aside once the box is in use. */
+.search-kbd {
+  padding: 2px 7px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-faint);
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.navbar .search-bar:focus-within .search-kbd {
+  opacity: 0;
+}
+
+.search-clear {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--border-medium);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.search-clear:hover,
+.search-clear:focus-visible {
+  outline: none;
+  background: var(--accent);
+  color: #000;
 }
 
 /* Right-hand cluster (cart + avatar). Hugs the right edge of the third
@@ -1382,25 +1457,6 @@ body {
   font-weight: 600;
 }
 
-.browse-clear {
-  padding: 4px 10px;
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-pill);
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  cursor: pointer;
-  transition: border-color var(--duration-base) var(--ease-standard),
-    color var(--duration-base) var(--ease-standard);
-}
-
-.browse-clear:hover,
-.browse-clear:focus-visible {
-  outline: none;
-  border-color: var(--accent);
-  color: var(--accent);
-}
 
 
 /* ============================================
