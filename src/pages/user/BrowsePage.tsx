@@ -23,6 +23,10 @@ export default function BrowsePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const urlQuery = searchParams.get("q") ?? "";
   const urlPage = Math.max(0, Number(searchParams.get("page") ?? "0") || 0);
+  // A search is active once the URL carries a real term. Gating on the URL,
+  // not on the navbar's keystrokes, means the hero comes and goes exactly
+  // once per search rather than flickering while the user types.
+  const isSearching = urlQuery.trim() !== "";
 
   const [result, setResult] = useState<Page<Game>>(emptyPage(BROWSE_PAGE_SIZE));
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
@@ -85,13 +89,14 @@ export default function BrowsePage() {
 
   return (
     <div className="browse-page">
-      {/* The other half of the carousel. Rendering it only when there's a game
-          keeps the page from reserving a 21:9 gap on an empty search. */}
-      {heroGame && <HeroSection item={heroGame} />}
+      {/* The other half of the carousel. Not rendered at all during a search,
+          so the results start at the top of the page instead of below a 21:9
+          banner — and not rendered on an empty catalogue either, so no gap. */}
+      {!isSearching && heroGame && <HeroSection item={heroGame} />}
 
       <div className="browse-header">
         <h2 className="browse-title">Browse Games</h2>
-        {urlQuery && (
+        {isSearching && (
           <p className="browse-caption" aria-live="polite">
             {result.totalElements} {result.totalElements === 1 ? "result" : "results"} for{" "}
             <strong>“{urlQuery}”</strong>
