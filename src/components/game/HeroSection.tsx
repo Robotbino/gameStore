@@ -50,7 +50,7 @@ export default function HeroSection({ item }: HeroSectionProps) {
     <div className="hero-container">
       {previous && (
         <img
-          key={previous.id}
+          key={`previous-${previous.id}`}
           src={previous.heroImage || previous.imageUrl}
           alt=""
           aria-hidden="true"
@@ -59,7 +59,7 @@ export default function HeroSection({ item }: HeroSectionProps) {
       )}
       {/* heroImage, not imageUrl: imageUrl is the 2:3 portrait capsule. */}
       <img
-        key={current.id}
+        key={`image-${current.id}`}
         src={current.heroImage || current.imageUrl}
         alt={current.title}
         className={`hero-image ${isLive ? "is-live" : ""}`}
@@ -72,7 +72,7 @@ export default function HeroSection({ item }: HeroSectionProps) {
       />
       <div className="hero-gradient" />
 
-      <div className="hero-content" key={current.id}>
+      <div className="hero-content" key={`copy-${current.id}`}>
         <span className="hero-genre">{genre}</span>
         <h1 className="hero-title">{current.title}</h1>
         <p className="hero-description">{current.description}</p>
