@@ -377,34 +377,35 @@ body {
 /* A two-zone bar: the search claims the free space on the left, the action
    cluster (cart + profile) anchors the right. No isolated left-hand text and
    no centered island — the two things you reach for sit where the eye expects. */
+/* Three columns so the search sits on the content's centre line and the
+   action cluster hugs the right gutter, whatever the sidebar is doing. */
 .navbar {
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 520px) 1fr;
   align-items: center;
   gap: var(--space-lg);
-  padding: var(--space-md) var(--space-2xl);
+  padding: var(--space-md) 0;
   border-bottom: 1px solid var(--border-subtle);
   margin-bottom: var(--space-lg);
 }
 
 .navbar .search-bar {
+  grid-column: 2;
   display: flex;
   align-items: center;
   background: var(--bg-raised);
-  border-radius: 8px;
+  border-radius: var(--radius-pill);
   padding: var(--space-sm) var(--space-md);
   gap: var(--space-sm);
-  flex: 1;
-  max-width: 480px;
   border: 1px solid var(--border-medium);
-  transition: border-color 0.2s ease;
+  transition: border-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard);
 }
-
-
-
 
 .navbar .search-bar:focus-within {
   border-color: var(--accent);
+  box-shadow: var(--focus-ring);
 }
 
 .navbar .search-bar .search-icon {
@@ -422,9 +423,10 @@ body {
   width: 100%;
 }
 
-/* Right-hand cluster (role badge + avatar). Hugs the right edge of the third
+/* Right-hand cluster (cart + avatar). Hugs the right edge of the third
    grid column so the avatar aligns with the content gutter. */
 .navbar-actions {
+  grid-column: 3;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -1366,50 +1368,38 @@ body {
   letter-spacing: -0.02em;
 }
 
-.browse-search-bar {
+/* The active search term, driven by the navbar box. */
+.browse-caption {
   display: flex;
   align-items: center;
-  background: var(--bg-raised);
-  border-radius: 8px;
-  padding: var(--space-sm) var(--space-md);
   gap: var(--space-sm);
-  width: 320px;
-  border: 1px solid var(--border-medium);
-  transition: border-color 0.2s ease;
-}
-
-.browse-search-bar:focus-within {
-  border-color: var(--accent);
-}
-
-.browse-search-bar .search-icon {
-  color: var(--text-faint);
   font-size: var(--text-sm);
-  flex-shrink: 0;
+  color: var(--text-muted);
 }
 
-.browse-search-bar input {
+.browse-caption strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.browse-clear {
+  padding: 4px 10px;
   background: transparent;
-  border: none;
-  outline: none;
   color: var(--text-secondary);
-  font-size: var(--text-sm);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
   font-family: var(--font-body);
-  width: 100%;
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: border-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
 }
 
-/* Below 640px the fixed-width search would crowd the title; stack the header
-   and let the search bar span the full column. */
-@media (max-width: 640px) {
-  .browse-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-md);
-    margin-bottom: var(--space-lg);
-  }
-  .browse-search-bar {
-    width: 100%;
-  }
+.browse-clear:hover,
+.browse-clear:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 

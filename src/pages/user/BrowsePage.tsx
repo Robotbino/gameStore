@@ -26,29 +26,8 @@ export default function BrowsePage() {
 
   const [result, setResult] = useState<Page<Game>>(emptyPage(BROWSE_PAGE_SIZE));
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-  const [query, setQuery] = useState(urlQuery);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Mirror URL changes that came from somewhere else (navbar, back button)
-  // into the input.
-  useEffect(() => {
-    setQuery(urlQuery);
-  }, [urlQuery]);
-
-  // Commit typing to the URL after a pause. The equality guard is what stops
-  // this and the effect above from bouncing updates off each other. Writing
-  // only `q` also drops `page`, which is what you want — results for a new
-  // term start at page 1, not wherever the last term left off.
-  useEffect(() => {
-    if (query === urlQuery) return;
-
-    const timeout = setTimeout(() => {
-      setSearchParams(query ? { q: query } : {}, { replace: true });
-    }, 300);
-
-    return () => clearTimeout(timeout);
-  }, [query, urlQuery, setSearchParams]);
 
   // Searching is now the backend's job: /games/all?q=… filters and pages in one
   // query, so this page no longer pulls the whole catalogue down to filter it
@@ -112,22 +91,24 @@ export default function BrowsePage() {
 
       <div className="browse-header">
         <h2 className="browse-title">Browse Games</h2>
-        <div className="browse-search-bar">
-          <span className="search-icon">⌕</span>
-          <input
-            type="search"
-            placeholder="Search games..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            aria-label="Search games"
-          />
-        </div>
+        {urlQuery && (
+          <p className="browse-caption" aria-live="polite">
+            Results for <strong>“{urlQuery}”</strong>
+            <button
+              type="button"
+              className="browse-clear"
+              onClick={() => setSearchParams({}, { replace: true })}
+            >
+              Clear
+            </button>
+          </p>
+        )}
       </div>
 
       {error && <p className="alert alert-error">{error}</p>}
 
-      {/* Only the results swap out while loading. Returning early here instead
-          would unmount the input above and drop focus on every keystroke. */}
+      {/* Only the results swap out while loading, so the navbar search keeps
+          focus while the user types. */}
       {isLoading ? (
         <GameGridSkeleton count={BROWSE_PAGE_SIZE} />
       ) : (

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, NavLink, useLocation, useSearchParams } from "react-router-dom";
 import UserAvatar from "./UserAvatar";
 import { useCart } from "../hooks/useCart";
 
@@ -10,13 +10,35 @@ interface NavBarProps {
   showCart?: boolean;
 }
 
+const SEARCH_DEBOUNCE_MS = 300;
+
 export default function NavBar({ showCart = true }: NavBarProps) {
   const navigate = useNavigate();
-  const [query, setQuery] = useState("");
+  const { pathname } = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { count } = useCart();
 
-  // BrowsePage owns the actual searching; the navbar just hands it a term via
-  // the URL so the result is linkable and survives a refresh.
+  // The URL's ?q= is the source of truth: Browse reads it, and this box mirrors
+  // it so Back, Clear and a shared link all keep the input honest.
+  const onBrowse = pathname === "/browse";
+  const urlQuery = searchParams.get("q") ?? "";
+  const [query, setQuery] = useState(urlQuery);
+
+  useEffect(() => {
+    setQuery(urlQuery);
+  }, [urlQuery]);
+
+  // On Browse, typing filters live after a pause. Writing only `q` drops
+  // `page`, so a new term always starts from the first page.
+  useEffect(() => {
+    if (!onBrowse || query === urlQuery) return;
+    const timer = setTimeout(() => {
+      setSearchParams(query ? { q: query } : {}, { replace: true });
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [query, urlQuery, onBrowse, setSearchParams]);
+
+  // Anywhere else, submitting hands the term to Browse.
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const term = query.trim();
@@ -26,7 +48,7 @@ export default function NavBar({ showCart = true }: NavBarProps) {
   return (
     <nav className="navbar">
       <form className="search-bar" onSubmit={handleSubmit} role="search">
-        <span className="search-icon">⌕</span>
+        <i className="fa-solid fa-magnifying-glass search-icon" aria-hidden="true" />
         <input
           type="search"
           placeholder="Search games..."
