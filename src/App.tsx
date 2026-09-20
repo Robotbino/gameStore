@@ -1,5 +1,6 @@
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
+import { WishlistProvider } from "./context/WishlistProvider";
 import AppRoutes from "./routes/AppRoutes";
 // Global styles are imported once from main.tsx (src/styles/index.css).
 // Do not add "./App.css" here — the double import would land unlayered and
@@ -11,7 +12,9 @@ export default function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <AppRoutes />
+        <WishlistProvider>
+          <AppRoutes />
+        </WishlistProvider>
       </CartProvider>
     </AuthProvider>
   );

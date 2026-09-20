@@ -2473,6 +2473,125 @@ a.btn-outline {
 
 
 /* ============================================
+  WISHLIST HEART
+  Off: a muted outline. On: the bulb lights — solid gold with a pop and a
+  wash ring that expands and fades. The only accent a card carries at rest.
+  ============================================ */
+.wishlist-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard),
+    background var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.wishlist-btn i {
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+
+.wishlist-btn.is-popping i {
+  animation: heartPop 300ms var(--ease-spring);
+}
+
+.wishlist-btn.is-popping::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 0 var(--accent-wash-border);
+  animation: heartRing 400ms var(--ease-out) forwards;
+  pointer-events: none;
+}
+
+.wishlist-btn:active {
+  transform: scale(0.96);
+}
+
+.wishlist-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-color: var(--accent);
+}
+
+/* Labelled: sits beside the primary action, styled like the outline button. */
+.wishlist-btn-labelled {
+  padding: 10px 24px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid #444;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.wishlist-btn-labelled:hover {
+  border-color: var(--text-muted);
+  color: #fff;
+}
+
+.wishlist-btn-labelled.is-wished {
+  color: var(--accent);
+  border-color: var(--accent-wash-border);
+  background: var(--accent-wash);
+}
+
+/* Icon: pinned to the poster corner, revealed with the card like View Details. */
+.wishlist-btn-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-pill);
+  background: rgba(18, 18, 18, 0.72);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  opacity: 0;
+  backdrop-filter: blur(2px);
+}
+
+.game-card:hover .wishlist-btn-icon,
+.game-card:focus-within .wishlist-btn-icon,
+.wishlist-btn-icon.is-wished {
+  opacity: 1;
+}
+
+.wishlist-btn-icon:hover {
+  color: var(--accent);
+  border-color: var(--accent-wash-border);
+}
+
+.wishlist-btn-icon.is-wished {
+  color: var(--accent);
+  border-color: var(--accent-wash-border);
+}
+
+@media (hover: none) {
+  .wishlist-btn-icon {
+    opacity: 1;
+  }
+}
+
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+@keyframes heartRing {
+  from { box-shadow: 0 0 0 0 var(--accent-wash-border); opacity: 1; }
+  to { box-shadow: 0 0 0 10px transparent; opacity: 0; }
+}
+
+
+/* ============================================
   PAGE ENTER
   Keyed on the route in PageTransition, so every screen arrives the same way.
   `backwards`, not `both`: a resting transform on this wrapper would become the

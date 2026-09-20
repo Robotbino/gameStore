@@ -17,6 +17,7 @@ const navItems = [
   { icon: "fa-solid fa-house", label: "Home", to: "/" },
   { icon: "fa-solid fa-bullseye", label: "Browse", to: "/browse" },
   { icon: "fa-solid fa-book", label: "Library", to: "/library" },
+  { icon: "fa-solid fa-heart", label: "Wishlist", to: "/wishlist" },
 ];
 
 // How long the finishing Quick Launch row glows as it hands the spotlight to the hero.

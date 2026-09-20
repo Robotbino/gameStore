@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import type { Game } from "../../types/game";
 import { useCart } from "../../hooks/useCart";
 import { usePurchases } from "../../hooks/usePurchases";
+import WishlistButton from "../WishlistButton";
 
 interface HeroSectionProps {
   item: Game;
@@ -90,7 +91,7 @@ export default function HeroSection({ item }: HeroSectionProps) {
               Add to Cart — R {current.price.toFixed(2)}
             </button>
           )}
-          <button className="btn-outline">+ Wishlist</button>
+          <WishlistButton game={current} />
         </div>
       </div>
     </div>

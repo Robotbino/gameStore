@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import StarRating from "../../components/StarRating.tsx";
+import WishlistButton from "../../components/WishlistButton";
 import { gameService } from "../../services/gameService";
 import { useCart } from "../../hooks/useCart";
 import { usePurchases } from "../../hooks/usePurchases";
@@ -126,7 +127,7 @@ export default function GameDetailsPage() {
               Add to Cart — R {game.price.toFixed(2)}
             </button>
           )}
-          <button className="btn-outline">+ Wishlist</button>
+          <WishlistButton game={game} />
         </div>
       </div>
     </div>

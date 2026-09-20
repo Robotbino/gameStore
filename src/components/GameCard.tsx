@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import type { Game } from "../types/game";
 import { parseGenres } from "../utils/genre";
 import StarRating from "./StarRating.tsx";
+import WishlistButton from "./WishlistButton";
 
 interface GameCardProps {
   game: Game;
@@ -43,6 +44,7 @@ export default function GameCard({
     >
       <div className="game-card-image-wrapper">
         <img src={game.imageUrl} alt={game.title} />
+        <WishlistButton game={game} variant="icon" />
       </div>
 
       <div className="game-card-info">
