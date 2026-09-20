@@ -2315,8 +2315,20 @@ a.btn-outline {
   restating them; only what is genuinely new to this area lives here.
   ============================================ */
 
+/* A single reading column, centered in whatever width the sidebar leaves.
+   .content caps itself at --content-max-width and sits flush left, which is
+   right for wide grids but would leave this narrow column hugging the sidebar
+   on large screens. Lifting the cap here lets the auto margins measure the
+   true remaining space, so the column stays centered whether the sidebar is
+   open or collapsed, and slides smoothly between the two. */
+.content:has(> .account-page) {
+  max-width: none;
+}
+
 .account-page {
+  width: 100%;
   max-width: 720px;
+  margin: 0 auto;
 }
 
 /* Visually hidden but still announced — used for the avatar options, whose
