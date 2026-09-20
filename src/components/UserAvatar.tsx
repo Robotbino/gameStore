@@ -26,6 +26,11 @@ export default function UserAvatar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
+  const goTo = (path: string) => {
+    setOpen(false);
+    navigate(path);
+  };
+
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -62,14 +67,14 @@ export default function UserAvatar() {
           <button
             className="avatar-menu-item"
             role="menuitem"
-            onClick={() => setOpen(false)}
+            onClick={() => goTo("/profile")}
           >
             Profile
           </button>
           <button
             className="avatar-menu-item"
             role="menuitem"
-            onClick={() => setOpen(false)}
+            onClick={() => goTo("/settings")}
           >
             Settings
           </button>

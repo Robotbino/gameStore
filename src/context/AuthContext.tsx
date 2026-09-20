@@ -28,6 +28,8 @@ interface AuthContextType {
   login: (data: LoginRequest) => Promise<Role>;
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => void;
+  // Re-fetch /users/me after the user edits their own profile.
+  refreshUser: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -129,6 +131,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await activateSession(res.access_token);
   };
 
+  const refreshUser = async () => {
+    setCurrentUser(await userService.getMe());
+  };
+
   const value: AuthContextType = {
     access_token: token,
     userEmail,
@@ -140,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     register,
     logout,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

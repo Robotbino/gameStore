@@ -39,6 +39,18 @@ export const userService = {
     return res.data;
   },
 
+  updateMe: async (data: { userName: string }): Promise<User> => {
+    const res = await api.put<User>("/users/me", data);
+    return res.data;
+  },
+
+  changePassword: async (data: {
+    currentPassword: string;
+    newPassword: string;
+  }): Promise<void> => {
+    await api.put("/users/me/password", data);
+  },
+
   create: async (data: CreateUserPayload): Promise<User> => {
     const res = await api.post<User>("/users/add", data);
     return res.data;

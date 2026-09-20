@@ -41,13 +41,14 @@ export default function CartPage() {
         <h2 className="page-title">Your Cart</h2>
         {notice && <p className="browse-status">{notice}</p>}
         <div className="empty-state">
-          <p style={{ color: "var(--text-muted)" }}>
-            Your cart is empty.{" "}
-            <Link to="/browse" className="accent">
-              Browse the store
-            </Link>{" "}
-            to add a game.
+          <i className="fa-solid fa-cart-shopping empty-state-icon" aria-hidden="true" />
+          <h3 className="empty-state-title">Your cart is empty</h3>
+          <p className="empty-state-text">
+            Games you add will show up here, ready for checkout.
           </p>
+          <Link to="/browse" className="btn-primary">
+            Browse the store
+          </Link>
         </div>
       </div>
     );

@@ -31,13 +31,14 @@ export default function LibraryPage() {
 
       {!error && games.length === 0 ? (
         <div className="empty-state">
-          <p style={{ color: "var(--text-muted)" }}>
-            Your library is empty.{" "}
-            <Link to="/browse" className="accent">
-              Browse the store
-            </Link>{" "}
-            to find your next game.
+          <i className="fa-solid fa-gamepad empty-state-icon" aria-hidden="true" />
+          <h3 className="empty-state-title">Your library is empty</h3>
+          <p className="empty-state-text">
+            Games you buy will show up here. Find your next one in the store.
           </p>
+          <Link to="/browse" className="btn-primary">
+            Browse the store
+          </Link>
         </div>
       ) : (
         <GameGrid

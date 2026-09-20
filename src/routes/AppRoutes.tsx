@@ -19,6 +19,8 @@ import BrowsePage from "../pages/user/BrowsePage.tsx";
 import GameDetailsPage from "../pages/user/GameDetailsPage.tsx";
 import LibraryPage from "../pages/user/LibraryPage.tsx";
 import CartPage from "../pages/user/CartPage.tsx";
+import ProfilePage from "../pages/user/ProfilePage.tsx";
+import SettingsPage from "../pages/user/SettingsPage.tsx";
 
 // Admin pages
 import AdminDashboard from "../pages/admin/AdminDashBoard.tsx";
@@ -68,6 +70,8 @@ export default function AppRoutes() {
           <Route path="games/:id" element={<GameDetailsPage />} />
           <Route path="cart" element={<CartPage />} />
           <Route path="library" element={<LibraryPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Route>
 
