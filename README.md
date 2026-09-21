@@ -4,7 +4,7 @@ A game storefront web app with a customer-facing shop and a separate admin porta
 
 It demonstrates a complete commerce loop — **discover → cart → own** — with the architecture behind it documented as a first-class deliverable.
 
-> **Live demo:** _coming soon_ &nbsp;·&nbsp; **Backend repo:** [`GameStoreBackEnd`](../GameStoreBackEnd/Bino) &nbsp;·&nbsp; **Architecture docs:** [Frontend](docs/architecture.html) · [Catalog pivot](docs/catalog-architecture.html) · [Roadmap](docs/frontend-roadmap.html)
+> **Live demo:** _coming soon_ &nbsp;·&nbsp; **Backend repo:** [`gameStore-backend`](../gameStore-backend) &nbsp;·&nbsp; **Architecture docs:** [Frontend](docs/architecture.html) · [Catalog pivot](docs/catalog-architecture.html) · [Roadmap](docs/frontend-roadmap.html)
 
 ---
 
@@ -41,12 +41,15 @@ Role badges, points, and user CRUD. Passwords never leave the server — the bac
 **Store (role `USER`)**
 
 - **Home** — featured hero, plus a paginated catalogue grid
-- **Browse** — debounced live search and genre filtering, server-side paginated
-- **Game details** — hero art, parsed genre chips, star rating, add to cart
-- **Cart & checkout** — checkout is idempotent: games you already own come back in `alreadyOwned` rather than failing the whole transaction
+- **Search** — one centred navbar box, shown only on the store's browsing routes. Debounced, URL-synced (`?q=&page=`) against the server-side `GET /games/all` query, with up to six live suggestions as a keyboard-navigable combobox. `/` focuses it from anywhere; Escape clears it
+- **Browse** — genre filtering and server-side pagination; the hero steps aside while a search term is active so results start at the top
+- **Game details** — hero art, parsed genre chips, star rating, add to cart, and a wishlist heart
+- **Wishlist** — a heart on the hero, the details page and every card, backed by `GET /wishlist/me` and `POST`/`DELETE /wishlist/{gameId}` with optimistic toggling and rollback; the `/wishlist` page lists what you saved
+- **Cart & checkout** — a four-step checkout modal (review → pay → processing → success) with a live card preview and a visible "Demo checkout, no money moves" badge. `POST /orders/checkout` snapshots title and price per line, returns a `DEMO-` payment reference, and is idempotent: games you already own come back in `alreadyOwned` rather than failing the whole transaction
+- **Rewards** — a simulated points balance: 10 points per R1 of an order's final total, redeemable at checkout at 100 points = R1 off, capped at the subtotal. The cart shows points to earn; the profile shows the balance, its Rand worth and the last five ledger entries from `GET /rewards/me`
 - **Library** — everything the signed-in user owns, resolved from the token (never a URL param)
 - **Quick Launch** — an idle carousel in the sidebar that rotates through the user's own library and drives the Browse hero
-- **Profile & settings** — reached from the avatar menu. Identity, region, join month, games owned and loyalty points on `/profile`; three independent forms on `/settings` for presentation (display name, avatar preset, bio, region), account (username, email) and password
+- **Profile & settings** — reached from the avatar menu. Identity, region, join month, games owned, rewards balance, the ledger and recent orders on `/profile`; three independent forms on `/settings` for presentation (display name, avatar preset, bio, region), account (username, email) and password
 
 **Admin (role `ADMIN`)**
 
@@ -59,6 +62,8 @@ Role badges, points, and user CRUD. Passwords never leave the server — the bac
 - Register / sign in with JWT, role decoded from the token claim
 - Axios interceptors: attach `Authorization` on every request, and on a `401` from anything other than `/auth/*`, clear the token and bounce to `/login`
 - 60-second read-through cache over the catalogue, keyed by query string and invalidated on every admin mutation
+- A motion system on one token ladder (`--duration-*`, `--ease-*`): route enter transitions, staggered card arrival, a two-layer hero crossfade, press and focus feedback on every control, and one `prefers-reduced-motion` rule that collapses all of it
+- Skeleton loaders on every loading route instead of "Loading…" text; a shared `Modal` with enter/exit motion, Escape and a focus trap for admin forms and checkout
 - Public RBAC demo page at `/demo`
 
 ---
@@ -130,26 +135,29 @@ npm run format:check  # prettier --check .
 
 ```
 src/
-├── assets/         # local images + seed game data
+├── assets/         # local images
 ├── components/
 │   ├── account/    # AvatarMark, AvatarPicker, avatarPresets
-  ├── auth/       # AuthShell (shared login/register frame)
-│   ├── game/       # GameGrid, HeroSection
-│   ├── layout/     # AppLayout (store) and AdminLayout (portal)
+│   ├── auth/       # AuthShell (shared login/register frame)
+│   ├── checkout/   # CheckoutModal (review → pay → processing → success)
+│   ├── game/       # GameGrid, GameGridSkeleton, HeroSection
+│   ├── layout/     # AppLayout (store), AdminLayout (portal), PageTransition
+│   ├── payment/    # PaymentMarks (inline demo card/provider marks)
+│   ├── search/     # SearchBar, SearchSuggestions
 │   ├── ui/         # Chakra color-mode plumbing
-│   └── *.tsx       # Navbar, SideBar, GameCard, Pagination, StarRating, ...
-├── context/        # AuthContext, CartContext, QuickLaunchProvider
-├── hooks/          # useAuth, useCart, useQuickLaunch
+│   └── *.tsx       # Navbar, SideBar, GameCard, WishlistButton, Modal, Pagination, StarRating, ...
+├── context/        # AuthContext, CartContext, WishlistProvider, QuickLaunchProvider
+├── hooks/          # useAuth, useCart, useWishlist, useOrders, useRewards, usePurchases, useGameSuggestions, useQuickLaunch
 ├── pages/
 │   ├── account/    # ProfilePage, SettingsPage
 │   ├── admin/      # AdminDashBoard, ManageGamesPage, ManageUsersPage
 │   ├── auth/       # LoginPage, RegisterPage
-│   └── user/       # Home, Browse, GameDetails, Cart, Library
+│   └── user/       # Home, Browse, GameDetails, Cart, Library, Wishlist
 ├── routes/         # AppRoutes + ProtectedRoute / AdminRoute guards
-├── services/       # axios layer: api, auth, games, users, purchases
+├── services/       # axios layer: api, auth, games, users, purchases, orders, rewards, wishlist
 ├── styles/         # index.css (design tokens + base styles)
-├── types/          # Game, User, Purchase, auth, pagination
-└── utils/          # apiError, genre parsing, country codes
+├── types/          # Game, User, Purchase, Order, Rewards, Wishlist, auth, pagination
+└── utils/          # apiError, genre parsing, country codes, rewards maths
 ```
 
 ### Routes
@@ -163,6 +171,7 @@ src/
 | `/games/:id` | `USER` | Game details |
 | `/cart` | `USER` | Cart & checkout |
 | `/library` | `USER` | Owned games |
+| `/wishlist` | `USER` | Saved games |
 | `/profile` | `USER` | Profile |
 | `/settings` | `USER` | Account settings |
 | `/admin` | `ADMIN` | Dashboard |
@@ -192,7 +201,9 @@ comes back as `400`, not `401`: a typo must not read as a dead session.
 
 **The backend contract is mirrored, not corrected.** `GET /games/find/{id}` and `POST /games/add` aren't REST-conventional, but they're what the backend serves today — the service layer documents this rather than "fixing" it unilaterally. Likewise `Game.genre` is one comma-separated column (`"RPG, Open World, Fantasy"`), not an array; `parseGenres()` in `utils/genre.ts` is the single seam that turns it into chips.
 
-**Prices are simulated.** Display currency is South African Rand (`R 899.99`). There is no payment provider and none is planned — checkout grants server-side ownership and nothing more.
+**Prices and payment are simulated.** Display currency is South African Rand (`R 899.99`). There is no payment provider and none is planned. The checkout modal's provider marks and card preview are visual cues under a visible demo badge; `POST /orders/checkout` grants server-side ownership, snapshots each line's title and price, and hands back a `DEMO-` reference. Nothing else happens.
+
+**Rewards maths lives in one file, and the server always recomputes.** `utils/rewards.ts` mirrors the backend's `RewardsService` constants (10 points earned per R1, 100 points per R1 off) so the cart and checkout preview show the same numbers the server will return. The frontend never trusts its own arithmetic: the order response carries the authoritative `pointsEarned`, `discount` and `pointsBalance`.
 
 ---
 
@@ -205,7 +216,7 @@ This project ships an interactive engineering handbook — open the HTML files i
 | [`docs/architecture.html`](docs/architecture.html) | Full-stack architecture and data flows, plus the **maturity ladder, roadmap board, scorecard, and recruiter checklist** (§10–§13) |
 | [`docs/catalog-architecture.html`](docs/catalog-architecture.html) | Proposed RAWG external-catalog pivot with a tiered cache (target architecture, not yet built) |
 | [`docs/frontend-roadmap.html`](docs/frontend-roadmap.html) | Frontend backlog and open items |
-| [`GameStoreBackEnd`](../GameStoreBackEnd/Bino/docs/architecture.html) | Backend architecture, **caching strategy, persistence, $0 deployment, Docker topology, and hardening** (§11–§16) |
+| [`gameStore-backend`](../gameStore-backend/docs/architecture.html) | Backend architecture, **caching strategy, persistence, $0 deployment, Docker topology, and hardening** (§11–§16) |
 
 The two repos' docs cross-link via a switcher strip at the top of each page.
 
@@ -216,10 +227,11 @@ The two repos' docs cross-link via a switcher strip at the top of each page.
 Stated plainly rather than hidden — these are tracked in the roadmap, not oversights:
 
 - **No deployed instance yet.** Everything runs locally against a local API.
-- **Desktop-first.** Width-based breakpoints are an open roadmap item; the layout is built for a desktop viewport.
+- **Desktop-first.** Two width breakpoints exist today (900px and 640px, covering the auth page, the profile header and the checkout modal); the store layout itself is still built for a desktop viewport and a full responsive pass is an open roadmap item.
 - **Catalogue discovery requires sign-in.** Opening browse to signed-out visitors is intended future state.
 - **Genre filtering is exact-match.** The backend matches `g.genre = :genre` against a column that stores a comma-separated list, so a single genre like `"RPG"` won't match a multi-genre row until the backend splits that column or switches to `LIKE`.
 - **RAWG sync is a stub.** The admin button calls an endpoint that returns `501` by design.
-- **Wishlist buttons are inert.** The control is in the UI on the hero and details pages; there's no wishlist backend behind it yet.
+- **Checkout is a demonstration.** The modal shows provider-style marks and a card preview, but no card details are read or sent; the server marks every order `PAID` and mints a `DEMO-` reference. Rewards points have no cash value.
+- **Sort is plumbed but unused.** The catalogue query accepts `sort=` end to end; no control sets it yet.
 - **No automated tests yet.**
 - **Avatars are presets, not uploads.** You pick from twelve code-drawn marks; there is no image upload, and none is planned until there is somewhere to store one.

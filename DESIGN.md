@@ -275,7 +275,24 @@ The component feel is **responsive and lifted**: flat and quiet until touched, t
 - **Fallback:** An unknown or unset key renders the initial circle. It is a destination, not an error state, and the first option in the picker selects it deliberately.
 
 ### Modal
-- Centered `520px` dialog on a `rgba(0,0,0,0.72)` backdrop with a `2px` blur; `14px` radius, medium border, the deep **Modal** shadow, and a bordered footer for actions. Reserved for focused create/edit tasks (admin forms), not casual confirmation.
+- Centered dialog (`520px` by default, a wider `size` for checkout) on a `rgba(0,0,0,0.72)` backdrop with a `2px` blur; `14px` radius, medium border, the deep **Modal** shadow, and a bordered footer for actions. Scales in from `0.96` over `--duration-slow`, leaves in `--duration-fast`, traps focus, closes on Escape. Reserved for focused tasks — admin create/edit forms and checkout — not casual confirmation.
+
+### Search Bar
+- **Rest:** a quiet hairline pill on the content's centre line in the navbar, muted icon, DM Sans placeholder, with a `/` key hint at the trailing edge that steps aside once the box has text.
+- **Focus:** border and icon light Marquee Gold with a soft warm glow beneath — the marquee treatment, the only glow in the chrome. Selection and caret colours join the accent so the browser's own surfaces carry the design.
+- **Suggestions:** up to six rows beneath the pill as a combobox (`role="listbox"`, arrow keys, Enter, Escape). The panel fades and settles on `transform`/`opacity` only; the active row takes the raised surface, never a gold fill.
+- **Scope:** rendered only on the store's browsing routes. Profile, cart, settings and the admin console keep a clean navbar.
+
+### Checkout Modal
+- Four steps in one dialog: **review** (lines with poster thumbnails, subtotal, a rewards toggle reading "use N points · R X off", points to earn), **pay** (a demo card preview that fills as you type, provider marks rendered inline as flat glyphs in the neutral ladder), **processing** (the three-dot loading pulse), **success** (the `DEMO-` reference as a chip, points earned, a single primary "Go to library").
+- **The Demo Rule:** a "Demo checkout · no money moves" badge is visible on every step. Provider marks are monochrome cues, never brand colour, so nothing reads as a real merchant surface.
+- Gold appears once per step: the primary action. Totals are `--text-primary`, the discount line is muted, never red or green.
+
+### Empty State
+- A dashed `border-strong` card on the raised surface, centred: a `56px` icon disc on the accent wash, a Sora heading, one line of muted copy at `34ch`, and a single primary action. Shared by cart, library, wishlist and home so an empty screen always looks deliberate rather than broken.
+
+### Skeleton
+- Shimmer blocks on the raised surface, breathing at 1.4s, shaped like the content they replace — grid cards mirror `GameCard`'s 3:4 poster, stat tiles mirror the dashboard tiles. Every loading route uses one; "Loading…" text is retired outside the auth guard's three-dot screen.
 
 
 ### Wishlist Heart

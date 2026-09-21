@@ -42,13 +42,14 @@ The differentiator is honest and narrow: a working full-stack commerce loop with
 
 - Register, log in, and JWT session handling with automatic redirect on 401, via axios request/response interceptors (`src/services/api.ts`, `src/context/AuthContext.tsx`).
 - Catalogue of `Game` records: `{ title, genre, price, rating, description, imageUrl, heroImage }` where `genre` is a comma-separated string served by the backend and split client-side.
-- Client-side search and genre filter over the full catalogue (`src/services/gameService.ts`). The backend `searchGames()` and `getGamesByGenre()` methods exist but no controller currently exposes them.
+- Server-side search, genre filter and pagination over the catalogue (`GET /games/all?q=&genre=&page=&size=`), consumed by one navbar search box that is URL-synced on Browse and offers live suggestions from anywhere on the store's browsing routes (`src/components/search/`, `src/services/gameService.ts`).
 - 60-second read-through cache of `/games/all` and a by-id map, invalidated on every admin mutation.
-- Cart, checkout, and library. Checkout is idempotent: games the user already owns are reported via `alreadyOwned`, not treated as an error.
+- Cart, checkout, and library. Checkout runs through a four-step modal (review, pay, processing, success) against `POST /orders/checkout`, which snapshots title and price per line, returns a `DEMO-` payment reference and is idempotent: games the user already owns are reported via `alreadyOwned`, not treated as an error. Orders are readable back from `GET /orders/me`.
+- **Wishlist.** A heart on the hero, the details page and every card, plus a `/wishlist` page, backed by `GET /wishlist/me` and `POST`/`DELETE /wishlist/{gameId}` with optimistic toggling that reverts if the server declines.
 - Admin CRUD over games and users. A page count / totals surface and role management sit inside the admin layout.
 - Public RBAC demo page at `/demo`, and an admin-triggered RAWG sync stub button that currently calls a 501 endpoint.
-- **Account area** at `/profile` and `/settings`, reached from the avatar menu. A signed-in person can see their identity, region, join month, games owned and loyalty points; and can edit their display name, avatar, bio and region, their username and email, and their password. Backed by `PUT /users/me/profile`, `/users/me/account` and `/users/me/password`.
-- **Loyalty points, settled.** `points` accrues at **1 point per R10 spent**, rounded down, awarded on checkout and shown read-only on the profile. It is a **score, not a balance**: nothing spends it, nothing may be priced in it, and no surface may present it as store credit, a discount, or a redeemable amount — the economy is simulated (see below) and a spendable balance would cross into implying real commerce. Tiers, ranks and badges are *not* part of this decision and remain unclaimed.
+- **Account area** at `/profile` and `/settings`, reached from the avatar menu. A signed-in person can see their identity, region, join month, games owned, rewards balance, the recent ledger and recent orders; and can edit their display name, avatar, bio and region, their username and email, and their password. Backed by `PUT /users/me/profile`, `/users/me/account` and `/users/me/password`, plus `GET /rewards/me` and `GET /orders/me`.
+- **Rewards points, settled (September 2026).** `points` on `User` is a **simulated rewards balance**. Users earn 10 points per R1 of an order's final total (rounded down) and can redeem 100 points for R1 off at checkout, capped at the subtotal; the balance and a ledger (`EARN`, `REDEEM`, `ADJUST`) are shown on Profile, and admins may still adjust it directly. Points have no cash value and may never be presented as money, credit, or anything convertible outside the store; like the rest of the economy they are simulated. This supersedes the earlier "score, not a balance" ruling, which was overturned by an explicit decision when checkout shipped. Tiers, ranks and badges are *not* part of this decision and remain unclaimed.
 
 ### Backend contract constraints (future work must preserve)
 
@@ -60,7 +61,6 @@ The differentiator is honest and narrow: a working full-stack commerce loop with
 ### Explicitly undecided (future work must not invent an answer)
 
 - **Economy — simulated, permanently.** No real payment provider is planned. ZAR prices and checkout are demonstration mechanics that grant server-side ownership; the checkout modal carries Stripe/Payflex/Visa/Mastercard-style marks purely as visual cues and a visible "Demo checkout, no money moves" badge; nothing on this surface should imply real financial transactions, real refunds, or real fulfilment.
-- **The `points` field on `User`** is a **rewards balance** (settled September 2026). Users earn 10 points per R1 of an order's final total (rounded down) and can redeem 100 points for R1 off at checkout, capped at the subtotal. The balance and a ledger are shown on Profile, and admins may still adjust it directly. Points have no cash value; like the rest of the economy they are simulated.
 - **Auth wall correction.** Today `ProtectedRoute` wraps all seven customer routes (`src/routes/AppRoutes.tsx`) — profile and settings belong behind it permanently, so this concerns the other five. The intended product truth is: **home, browse, and game details are public; auth gates cart, checkout, and library only.** This is recorded as the intended state; moving the guard is separate work.
 - **RAWG external-catalogue pivot.** `docs/catalog-architecture.html` describes a tiered-cache pivot; the endpoint returns 501. Whether the catalogue stays self-owned or moves to RAWG-plus-cache is an open architectural decision.
 - **Design-system consolidation.** The roadmap has an unshipped decision between Chakra UI v3, Bootstrap + react-bootstrap, and a custom CSS system (`docs/frontend-roadmap.html`). All three are currently present as dependencies. PRODUCT.md does not resolve this; it records it as open.
@@ -78,15 +78,16 @@ The differentiator is honest and narrow: a working full-stack commerce loop with
 
 - A backend-served catalogue with per-game hero and card imagery loaded via URL (source and licensing of those URLs is not documented in this repo).
 - Working JWT auth including 401 handling and token attachment.
-- A working cart → checkout → library round-trip against a live backend.
+- A working cart → checkout → library round-trip against a live backend, with order snapshots, a rewards ledger and a wishlist behind real endpoints.
 - The engineering handbook in `docs/` (architecture, catalog pivot, frontend roadmap), which is itself part of what the recruiter audience judges.
 
 ### Absent — future work must not fabricate
 
-- **No reviews or testimonials.** `src/assets/gameData.ts` is a dead fixture containing invented reviewer names, avatars, and comments; the only component that reads it (`src/components/AboutGame.tsx`) is not mounted anywhere in the app. No review, rating comment, testimonial, or user quote may be invented on any surface.
+- **No reviews or testimonials.** The invented review fixture and the unmounted carousel that read it were deleted on 2026-09-20; nothing in the tree carries reviewer names or quotes now, and no review, rating comment, testimonial, or user quote may be invented on any surface.
 - **No user counts, sales figures, "trusted by" logos, press mentions, awards, or partnerships.**
 - **No live deployment.** The README's "Live demo: coming soon" is aspirational; no public URL exists yet, and no surface may imply otherwise.
-- **No pricing legitimacy.** ZAR prices are demonstration values; no discount, sale, tax, refund, or currency-conversion claim may be added.
+- **No pricing legitimacy.** ZAR prices are demonstration values; no sale, tax, refund, or currency-conversion claim may be added. The single permitted discount is the rewards redemption at checkout, which is computed server-side, capped at the subtotal, and labelled as points, never as money off a real charge.
+- **No real payment.** The checkout modal's Stripe/Payflex/Visa/Mastercard-style marks and card preview are visual cues under a visible "Demo checkout, no money moves" badge. No card field is read, stored or sent; no surface may drop the badge or imply a charge occurred.
 - **No licensing or storefront-agreement content.** There are no terms of service, refund policy, or age-rating claims to draw from.
 
 ## Product Principles
