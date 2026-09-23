@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-gs-doc="fe-catalog">
+<head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>External Catalog Architecture — Game Store</title>
@@ -3061,8 +3062,30 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
   .doc-switch .theme-toggle, .doc-switch .gs-keys-btn { display: none; }
 </style></noscript>
 <!-- GS:CORE-CSS:END -->
+</head>
+<body>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     DOCUMENT MAP · docs/catalog-architecture.html · data-gs-doc="fe-catalog"
 
+     Generated regions (owned by gameStore-backend/docs/_src and rewritten by
+     stamp.mjs, never hand-edited): GS:CORE-CSS, GS:NAV, GS:INDEX, GS:CHROME-JS.
+     Hand-authored regions, in file order:
+       · head: the pre-paint theme script above GS:CORE-CSS
+       · main: status banner (the brief is a plan: the RAWG integration,
+         Caffeine cache and cart/checkout it cites do not exist yet), hero,
+         subnav, then the sections listed below
+       · code samples: none. The only pre is the Mermaid flowchart in
+         #read-path, so no data-lang attribute appears in this document
+       · footer
+       · after GS:CHROME-JS:END: no page script, only a comment saying why
 
+     Sections in order (id · kicker · title · what it holds):
+       #system     The System        div.tier ×3 joined by div.link ×2, legend, caption
+       #problem    The Core Problem  article.panel ×2 (rejected / chosen), div.callout
+       #identity   Identity          article.panel ×2 (unique key / status flag)
+       #read-path  Read Path         div.rung ×3, Mermaid flowchart, p.caption ×2
+       #flow       The Flow          div.step ×7 (04 is .pivot), div.callout
+     ═══════════════════════════════════════════════════════════════════════ -->
 
 <!-- GS:NAV:START -->
 <a class="skip-link" href="#gs-main">Skip to content</a>
@@ -3110,6 +3133,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
 <!-- GS:NAV:END -->
 
 <main id="gs-main" tabindex="-1">
+<!-- ── Status banner · proposed, not yet built · div.status-banner ── -->
 <div class="status-banner">
   <div class="sb-inner">
     <span class="sb-tag">Proposed · not yet built</span>
@@ -3120,6 +3144,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
   </div>
 </div>
 
+<!-- ── Hero · eyebrow, title, lede, stack chips, read-path schema plate · header.hero ── -->
 <header class="hero">
   <div class="wrap">
     <div class="hero-main">
@@ -3153,6 +3178,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
   </div>
 </header>
 
+<!-- ── Subnav · one anchor per section · nav.subnav ── -->
 <nav class="subnav" aria-label="Section navigation">
   <div class="subnav-inner">
     <a href="#system">The System</a>
@@ -3163,6 +3189,18 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
   </div>
 </nav>
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     THE SYSTEM                                             id="system"
+     Tier map of the target system: RAWG is only a data source; price,
+     ownership and order history are owned locally.
+     Blocks: div.scroller (div.map: div.tier ×3 holding div.node ×11
+             classed is-core exists today / is-new net-new / is-auth /
+             is-ext, joined by div.link ×2) · div.legend · p.caption
+     Cites:  useCart() · AuthContext · CatalogService (backend) ·
+             CatalogProvider (backend) · /api/catalog/** · /api/cart ·
+             /checkout · /api/admin/** · MySQL — games · MySQL — commerce
+             (users · carts · cart_items · orders · order_items)
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="system">
   <div class="wrap">
     <p class="kicker">The System</p>
@@ -3174,6 +3212,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
 
     <div class="scroller">
       <div class="map">
+        <!-- ── Tier · Client (React SPA) · div.tier ── -->
         <div class="tier">
           <div class="tier-head"><span class="dot d-indigo"></span>Client · React SPA</div>
           <div class="node is-core">
@@ -3190,12 +3229,14 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
           </div>
         </div>
 
+        <!-- ── Link · REST + Bearer, JSON · div.link.is-auth ── -->
         <div class="link is-auth">
           <span class="lbl">REST<br />+ Bearer</span>
           <span class="arrow" aria-hidden="true">⇄</span>
           <span class="lbl">JSON</span>
         </div>
 
+        <!-- ── Tier · Spring Boot API · div.tier ── -->
         <div class="tier">
           <div class="tier-head"><span class="dot d-amber"></span>Spring Boot API</div>
           <div class="node is-auth">
@@ -3216,12 +3257,14 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
           </div>
         </div>
 
+        <!-- ── Link · on cache miss only, 2s / 4s timeout · div.link.is-ext ── -->
         <div class="link is-ext">
           <span class="lbl">on cache<br />miss only</span>
           <span class="arrow" aria-hidden="true">→</span>
           <span class="lbl">2s / 4s<br />timeout</span>
         </div>
 
+        <!-- ── Tier · Data & Third Party · div.tier ── -->
         <div class="tier">
           <div class="tier-head"><span class="dot d-sky"></span>Data &amp; Third Party</div>
           <div class="node is-new">
@@ -3244,6 +3287,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
       </div>
     </div>
 
+    <!-- ── Legend · swatch key for the map (sw-core, sw-new, sw-auth, sw-ext mirror the node classes is-core, is-new, is-auth, is-ext) · div.legend ── -->
     <div class="legend">
       <span><i class="swatch sw-core"></i> Exists today, expanded</span>
       <span><i class="swatch sw-new"></i> Net-new in this pivot</span>
@@ -3258,6 +3302,15 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
   </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     THE CORE PROBLEM                                      id="problem"
+     Why an order line cannot safely point at a product that exists only
+     upstream: two schemas compared, one rejected and one chosen.
+     Blocks: div.compare (article.panel.bad · article.panel.good, each with
+             div.panel-head, p, div.rows of div.row ×4, p.fk-note) · div.callout
+     Cites:  order_items · games · rawg_id · game_id · title_snapshot ·
+             unit_price
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="problem">
   <div class="wrap">
     <p class="kicker">The Core Problem</p>
@@ -3269,6 +3322,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
     </p>
 
     <div class="compare">
+      <!-- ── Panel · Naive passthrough · rejected ── -->
       <article class="panel bad">
         <div class="panel-head">
           <h3>Naive passthrough</h3>
@@ -3287,6 +3341,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
         <p class="fk-note"><span class="dot" style="background: var(--rose)"></span> Integrity: none. History: mutable.</p>
       </article>
 
+      <!-- ── Panel · Lazy shadow table + snapshot · chosen ── -->
       <article class="panel good">
         <div class="panel-head">
           <h3>Lazy shadow table + snapshot</h3>
@@ -3306,6 +3361,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
       </article>
     </div>
 
+    <!-- ── Callout · Why both, and not one or the other · div.callout ── -->
     <div class="callout">
       <b>Why both, and not one or the other.</b> The foreign key keeps joins and referential
       integrity honest — “how many users own this game?” stays a single query. The snapshot keeps
@@ -3316,6 +3372,16 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
   </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     IDENTITY                                             id="identity"
+     The two games-table constraints the design leans on: a composite
+     UNIQUE (source, external_id) key, and a status flag in place of DELETE.
+     Blocks: div.compare (article.panel.good ×2, each with div.panel-head, p,
+             div.rows of div.row ×4)
+     Cites:  games · UNIQUE (source, external_id) · external_id ·
+             source='LOCAL' · status ACTIVE / UNAVAILABLE · cached_at ·
+             price_overridden
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="identity">
   <div class="wrap">
     <p class="kicker">Identity</p>
@@ -3325,6 +3391,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
     </p>
 
     <div class="compare">
+      <!-- ── Panel · UNIQUE (source, external_id) · article.panel.good ── -->
       <article class="panel good">
         <div class="panel-head"><h3>UNIQUE (source, external_id)</h3></div>
         <p>
@@ -3341,6 +3408,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
         </div>
       </article>
 
+      <!-- ── Panel · status flag, never DELETE · article.panel.good ── -->
       <article class="panel good">
         <div class="panel-head"><h3>status — flag, never DELETE</h3></div>
         <p>
@@ -3359,6 +3427,18 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
   </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     READ PATH                                           id="read-path"
+     Three tiers, cheapest first (two caches, then RAWG): quota spend stays
+     small and a RAWG outage degrades to a banner, not an error page.
+     Blocks: div.ladder (div.rung ×3: .t1 .t2 .t3) · div.diagram-shell
+             (pre.mermaid flowchart) · p.caption ×2
+     Cites:  RestClient (backend) · cached_at · RawgCatalogProvider (backend) ·
+             saveAll · GET /api/catalog/games?q=witcher&page=1
+     Script: shared chrome (GS:CHROME-JS) renders pre.mermaid and binds each
+             span[data-node] (T1, T2, RAWG) to the diagram node of that id:
+             hover a span to light its node; click a node to scroll to its span
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="read-path">
   <div class="wrap">
     <p class="kicker">Read Path</p>
@@ -3370,6 +3450,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
     </p>
 
     <div class="ladder">
+      <!-- ── Tier 1 · in-process · Caffeine ── -->
       <div class="rung t1">
         <span class="tierno">Tier 1 · in-process</span>
         <h3>Caffeine</h3>
@@ -3377,6 +3458,8 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
           controller, so the internal materialization path is protected too.</p>
         <span class="hit">Hit → ~0 ms, 0 quota</span>
       </div>
+
+      <!-- ── Tier 2 · durable · MySQL shadow row ── -->
       <div class="rung t2">
         <span class="tierno">Tier 2 · durable</span>
         <h3>MySQL shadow row</h3>
@@ -3384,6 +3467,8 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
           <code>cached_at</code> is under 14 days old</span> — and serves everything when RAWG is down.</p>
         <span class="hit">Hit → one local query, 0 quota</span>
       </div>
+
+      <!-- ── Tier 3 · remote · RAWG API ── -->
       <div class="rung t3">
         <span class="tierno">Tier 3 · remote</span>
         <h3>RAWG API</h3>
@@ -3393,6 +3478,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
       </div>
     </div>
 
+    <!-- ── Diagram · one search request walking the ladder; the Upsert node is step 04 of #flow · pre.mermaid in div.diagram-shell ── -->
     <div class="diagram-shell">
       <pre class="mermaid">
 flowchart TB
@@ -3429,6 +3515,8 @@ flowchart TB
   class Breaker fail
       </pre>
     </div>
+
+    <!-- ── Captions · how to read the diagram (its green, purple and red are the node classes ok, work, fail), then the quota arithmetic · p.caption ×2 ── -->
     <p class="caption">
       Diagram · one search request walking the ladder top to bottom. <b>Hover a tier's description
       in the list above to light its box here.</b> Each tier answers if it can, so
@@ -3446,6 +3534,18 @@ flowchart TB
   </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     THE FLOW                                                 id="flow"
+     Seven steps from a guest search to the library render; step 04, the
+     batch upsert, is where remote data gains a local primary key.
+     Blocks: div.steps (div.step ×7, the fourth is div.step.pivot; each an
+             empty span.idx, so the numbers 01 to 07 appear only in the
+             group comment below, and a div.body of b and p) · div.callout
+     Cites:  GET /api/catalog/games?q=witcher&page=1 · permitAll ·
+             RawgCatalogProvider (backend) · CatalogGame (backend) · saveAll ·
+             POST /api/cart/items · UNIQUE(cart_id, game_id) · orders ·
+             order_items · GET /api/library
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="flow">
   <div class="wrap">
     <p class="kicker">The Flow</p>
@@ -3455,6 +3555,7 @@ flowchart TB
       primary key, and every downstream feature gets to be ordinary.
     </p>
 
+    <!-- ── Steps · search to receipt, 01 to 07 · div.steps (div.step ×7, 04 is .pivot) ── -->
     <div class="steps">
       <div class="step">
         <span class="idx" aria-hidden="true"></span>
@@ -3464,6 +3565,7 @@ flowchart TB
             the catalog is <code>permitAll</code>, so the store is browsable before signup.</p>
         </div>
       </div>
+
       <div class="step">
         <span class="idx" aria-hidden="true"></span>
         <div class="body">
@@ -3473,6 +3575,7 @@ flowchart TB
             never escape their package.</p>
         </div>
       </div>
+
       <div class="step">
         <span class="idx" aria-hidden="true"></span>
         <div class="body">
@@ -3482,6 +3585,7 @@ flowchart TB
             would silently reprice everything sitting in customers’ carts.</p>
         </div>
       </div>
+
       <div class="step pivot">
         <span class="idx" aria-hidden="true"></span>
         <div class="body">
@@ -3492,6 +3596,7 @@ flowchart TB
             keys need no provider-aware URL scheme at all.</p>
         </div>
       </div>
+
       <div class="step">
         <span class="idx" aria-hidden="true"></span>
         <div class="body">
@@ -3501,6 +3606,7 @@ flowchart TB
             — you cannot buy two copies of a digital licence.</p>
         </div>
       </div>
+
       <div class="step">
         <span class="idx" aria-hidden="true"></span>
         <div class="body">
@@ -3510,6 +3616,7 @@ flowchart TB
             clear the cart, and award loyalty points.</p>
         </div>
       </div>
+
       <div class="step">
         <span class="idx" aria-hidden="true"></span>
         <div class="body">
@@ -3520,6 +3627,7 @@ flowchart TB
       </div>
     </div>
 
+    <!-- ── Callout · When RAWG is unreachable · div.callout ── -->
     <div class="callout">
       <b>When RAWG is unreachable.</b> The provider returns a failure, the service falls back to
       tier 2, and the response carries a degraded flag — a “showing cached results” banner rather
@@ -3528,7 +3636,6 @@ flowchart TB
     </div>
   </div>
 </section>
-
 </main>
 
 <footer>
@@ -3543,8 +3650,6 @@ flowchart TB
     </p>
   </div>
 </footer>
-
-
 
 <!-- GS:INDEX:START -->
 <script>
@@ -5234,8 +5339,14 @@ window.GS_SEARCH = [{"doc":"fe-arch","id":"overview","title":"The whole system o
 
 </script>
 <!-- GS:CHROME-JS:END -->
-<!-- This document has no page-specific behaviour: the back-to-top button and
-     scroll reveal it used to declare here were a second, drifted copy of what
-     the shared chrome above already does — down to a duplicate element with
-     the same id, so two buttons were being stacked in the corner. -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PAGE SCRIPT · none
+     This document has no page-specific behaviour: the back-to-top
+     button and scroll reveal it used to declare here were a second,
+     drifted copy of what the shared chrome above already does — down
+     to a duplicate element with the same id, so two buttons were
+     being stacked in the corner.
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+</body>
 </html>

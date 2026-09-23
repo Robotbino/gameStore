@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-gs-doc="fe-arch">
+<head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Game Store — Architecture</title>
@@ -3308,8 +3309,35 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
   .doc-switch .theme-toggle, .doc-switch .gs-keys-btn { display: none; }
 </style></noscript>
 <!-- GS:CORE-CSS:END -->
+</head>
+<body>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     DOCUMENT MAP · docs/architecture.html · data-gs-doc="fe-arch"
 
+     Generated regions (owned by gameStore-backend/docs/_src and rewritten by
+     stamp.mjs, never hand-edited): GS:CORE-CSS, GS:NAV, GS:INDEX, GS:CHROME-JS.
+     Hand-authored regions, in file order:
+       · head: the pre-paint theme script above GS:CORE-CSS
+       · main: subnav, hero, then the sections listed below
+       · footer
+       · page script after GS:CHROME-JS:END: layer explorer, flow tabs,
+         roadmap filter chips, scorecard, recruiter checklist
 
+     Sections in order (id · kicker · title · what it holds):
+       #overview    § 1   System Overview             Mermaid flowchart of the three tiers
+       #layers      § 2   Interactive Layer Explorer  three tabs, file list per layer
+       #flows       § 3   Data Flow Walkthroughs      four tabbed journeys: sequence diagram + code steps
+       #auth-state  § 4   Client Auth State Machine   Mermaid state diagram, two accordions
+       #model       § 5   Data Model                  Mermaid ER diagram, three entity tables
+       #anatomy     § 6   Request Anatomy             four annotated HTTP wire samples
+       #failure     § 7   Failure Modes               six error-path cards
+       #features    § 8   The Increment               three feature cards
+       #extended    § 9   Extended State              Mermaid flowchart with a generated key
+       #maturity    § 10  Maturity Ladder             four rungs, Stage 0 to Stage 3
+       #roadmap     § 11  Roadmap Board               filter chips, 20 cards in four stage groups
+       #scorecard   § 12  Architecture Scorecard      nine score rows, now / target toggle
+       #checklist   § 13  Recruiter Checklist         ten persisted checkboxes, progress bar
+     ═══════════════════════════════════════════════════════════════════════ -->
 
 <!-- GS:NAV:START -->
 <a class="skip-link" href="#gs-main">Skip to content</a>
@@ -3357,6 +3385,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
 <!-- GS:NAV:END -->
 
 <main id="gs-main" tabindex="-1">
+<!-- ── Subnav · one anchor per section ── -->
 <nav class="subnav">
   <div class="subnav-inner">
     <a href="#overview">Overview</a>
@@ -3375,6 +3404,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
   </div>
 </nav>
 
+<!-- ── Hero · title, lede, stack chips, schema plate, KPIs ── -->
 <header class="hero">
   <div class="wrap">
     <div class="hero-main">
@@ -3427,7 +3457,16 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
   </div>
 </header>
 
-<!-- ─────────────────────────── OVERVIEW ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 1 · SYSTEM OVERVIEW                                id="overview"
+     The whole stack as one Mermaid flowchart: browser, Spring Boot API and MySQL,
+     with the auth boundary marked in amber.
+     Blocks: div.diagram-shell (pre.mermaid flowchart) · p.caption
+     Cites:  AuthContext · QuickLaunchProvider · JWTAuthenticationFilter (backend) ·
+             SecurityFilterChain (backend) · /api/v2/auth/** · /games · /purchases ·
+             /users
+     Script: shared chrome (GS:CHROME-JS) renders pre.mermaid
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="overview">
   <div class="wrap">
     <p class="kicker">§ 1 · System Overview</p>
@@ -3437,6 +3476,8 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
       holds the rules. MySQL holds the data. Every write crosses the amber auth boundary; every
       byte on the wire is JSON.
     </p>
+
+    <!-- ── Diagram 1 · Mermaid flowchart, three tiers · div.diagram-shell ── -->
     <div class="diagram-shell">
       <pre class="mermaid">
 flowchart TB
@@ -3491,7 +3532,18 @@ flowchart TB
   </div>
 </section>
 
-<!-- ─────────────────────────── LAYERS ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 2 · INTERACTIVE LAYER EXPLORER                       id="layers"
+     Three layer tabs; each shows that layer's summary and its file list.
+     Blocks: div.layer-grid (button.layer-btn[data-layer] ×3) ·
+             div.layer-detail ×3 (h3 · p · div.files of div.file-row)
+     Cites:  31 div.file-row paths: 13 under src/ (#layer-client), 10 Java files
+             (#layer-api, backend), 8 entity, repository, migration and config files
+             (#layer-db, backend); the prose also names ProtectedRoute · AdminRoute ·
+             JWTAuthenticationFilter · GlobalExceptionHandler · JpaRepository
+     Script: page script at the end of this file toggles .layer-btn and shows one of
+             #layer-client · #layer-api · #layer-db at a time
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="layers">
   <div class="wrap">
     <p class="kicker">§ 2 · Interactive Layer Explorer</p>
@@ -3502,6 +3554,7 @@ flowchart TB
       the database answers.
     </p>
 
+    <!-- ── Layer tabs · one button per layer · div.layer-grid ── -->
     <div class="layer-grid" role="tablist" aria-label="Architecture layers">
       <button class="layer-btn active" data-layer="client" role="tab" aria-selected="true">
         <span class="label">Layer 1 · Presentation</span>
@@ -3520,6 +3573,7 @@ flowchart TB
       </button>
     </div>
 
+    <!-- ── Layer 1 · React SPA · #layer-client ── -->
     <div class="layer-detail" id="layer-client">
       <h3>Layer 1 — React SPA (browser)</h3>
       <p>
@@ -3545,6 +3599,7 @@ flowchart TB
       </div>
     </div>
 
+    <!-- ── Layer 2 · Spring Boot API · #layer-api ── -->
     <div class="layer-detail" id="layer-api" hidden>
       <h3>Layer 2 — Spring Boot API</h3>
       <p>
@@ -3569,6 +3624,7 @@ flowchart TB
       </div>
     </div>
 
+    <!-- ── Layer 3 · MySQL via JPA · #layer-db ── -->
     <div class="layer-detail" id="layer-db" hidden>
       <h3>Layer 3 — MySQL via JPA / Hibernate</h3>
       <p>
@@ -3597,7 +3653,18 @@ flowchart TB
   </div>
 </section>
 
-<!-- ─────────────────────────── FLOWS ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 3 · DATA FLOW WALKTHROUGHS                            id="flows"
+     Four tabbed journeys, each a Mermaid sequence diagram beside numbered code steps.
+     Blocks: div.tabs (button.tab[data-flow] ×4) · div.flow-panel[data-flow-panel] ×4,
+             each div.diagram-shell (pre.mermaid) + div.steps of div.step-item (21 in
+             all; 9 carry a pre[data-lang] snippet: 8 ts, 1 jpql) · div.legend
+     Cites:  pages/auth/LoginPage.tsx · context/AuthContext.tsx · routes/AppRoutes.tsx ·
+             pages/user/BrowsePage.tsx · services/api.ts · services/gameService.ts ·
+             routes/AdminRoute.tsx · repositories/GamesRepository.java (backend)
+     Script: page script at the end of this file switches .tab / .flow-panel and
+             calls GS.renderMermaid on the panel just revealed
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="flows">
   <div class="wrap">
     <p class="kicker">§ 3 · Data Flow Walkthroughs</p>
@@ -3609,6 +3676,7 @@ flowchart TB
       raise or handle an error.
     </p>
 
+    <!-- ── Flow tabs · one button per panel · div.tabs ── -->
     <div class="tabs" role="tablist">
       <button class="tab active" data-flow="login"><span class="step">A</span>User logs in</button>
       <button class="tab" data-flow="browse"><span class="step">B</span>User browses</button>
@@ -3616,7 +3684,7 @@ flowchart TB
       <button class="tab" data-flow="expiry"><span class="step">D</span>Token expires</button>
     </div>
 
-    <!-- FLOW A: LOGIN -->
+    <!-- ── Flow A · User logs in · data-flow-panel="login" ── -->
     <div class="flow-panel" data-flow-panel="login">
       <div class="diagram-shell">
         <pre class="mermaid">
@@ -3652,7 +3720,7 @@ sequenceDiagram
           <div class="n">Step 1 · Form submit</div>
           <div class="title">LoginPage collects credentials</div>
           <p class="body">The page owns the form state locally, then hands the payload to the auth context — no HTTP details leak into the component.</p>
-          <pre><span class="c">// src/pages/auth/LoginPage.tsx</span>
+          <pre data-lang="ts"><span class="c">// src/pages/auth/LoginPage.tsx</span>
 <span class="k">await</span> login(form);</pre>
           <div class="file">pages/auth/LoginPage.tsx:23</div>
         </div>
@@ -3661,7 +3729,7 @@ sequenceDiagram
           <div class="n">Step 2 · Context calls service</div>
           <div class="title">AuthContext.login()</div>
           <p class="body">Context is the only thing that owns the token, so credentials flow through it and it becomes the sole writer of localStorage.</p>
-          <pre><span class="k">const</span> res = <span class="k">await</span> authService.login(data);
+          <pre data-lang="ts"><span class="k">const</span> res = <span class="k">await</span> authService.login(data);
 <span class="k">return</span> applyToken(res.access_token);</pre>
           <div class="file">context/AuthContext.tsx:84</div>
         </div>
@@ -3682,7 +3750,7 @@ sequenceDiagram
           <div class="n">Step 5 · Token comes back</div>
           <div class="title">applyToken() decodes and stores</div>
           <p class="body">The context decodes the JWT client-side purely to read <code>role</code> and expiry — no signature check on the client; the server is the only trust anchor.</p>
-          <pre><span class="k">const</span> decoded = jwtDecode&lt;JwtPayload&gt;(jwt);
+          <pre data-lang="ts"><span class="k">const</span> decoded = jwtDecode&lt;JwtPayload&gt;(jwt);
 <span class="k">if</span> (decoded.exp * <span class="n2">1000</span> &lt; Date.now())
   <span class="k">throw new</span> Error(<span class="s">"That session has expired."</span>);
 localStorage.setItem(<span class="s">"token"</span>, jwt);
@@ -3699,7 +3767,7 @@ setUserRole(decoded.role);</pre>
       </div>
     </div>
 
-    <!-- FLOW B: BROWSE -->
+    <!-- ── Flow B · User browses · data-flow-panel="browse" ── -->
     <div class="flow-panel" data-flow-panel="browse" hidden>
       <div class="diagram-shell">
         <pre class="mermaid">
@@ -3740,7 +3808,7 @@ sequenceDiagram
           <div class="n">Step 1 · URL is the source of truth</div>
           <div class="title">Typing writes to <code>?q=</code></div>
           <p class="body">A 300 ms debounce commits the input to the URL. That makes a result page shareable and lets the navbar drive the page by navigating to <code>/browse?q=…</code>.</p>
-          <pre><span class="k">const</span> timeout = setTimeout(() =&gt; {
+          <pre data-lang="ts"><span class="k">const</span> timeout = setTimeout(() =&gt; {
   setSearchParams(query ? { q: query } : {}, { replace: <span class="k">true</span> });
 }, <span class="n2">300</span>);</pre>
           <div class="file">pages/user/BrowsePage.tsx:34</div>
@@ -3756,7 +3824,7 @@ sequenceDiagram
           <div class="n">Step 3 · Interceptor attaches the token</div>
           <div class="title">axios request interceptor</div>
           <p class="body">Exactly one place in the codebase reads the token off <code>localStorage</code> for outbound calls — everywhere else is oblivious to auth.</p>
-          <pre>config.headers.Authorization = <span class="s">`Bearer </span>${token}<span class="s">`</span>;</pre>
+          <pre data-lang="ts">config.headers.Authorization = <span class="s">`Bearer </span>${token}<span class="s">`</span>;</pre>
           <div class="file">services/api.ts:14</div>
         </div>
 
@@ -3770,7 +3838,7 @@ sequenceDiagram
           <div class="n">Step 5 · One query, three UX modes</div>
           <div class="title">GamesRepository.search()</div>
           <p class="body">A single <code>@Query</code> backs the plain list, keyword search and genre browse. Both filters are optional — null <em>or</em> empty string skips the clause — so the same method serves <code>/games/all</code> with no params, with <code>?q=</code>, with <code>?genre=</code>, or with both. Hibernate emits the SELECT plus a COUNT, and returns a <code>Page</code>.</p>
-          <pre><span class="k">WHERE</span> (:q <span class="k">IS NULL OR</span> :q = <span class="s">''</span>
+          <pre data-lang="jpql"><span class="k">WHERE</span> (:q <span class="k">IS NULL OR</span> :q = <span class="s">''</span>
    <span class="k">OR</span> LOWER(g.title) <span class="k">LIKE</span> LOWER(CONCAT(<span class="s">'%'</span>, :q, <span class="s">'%'</span>)))</pre>
           <div class="file">repositories/GamesRepository.java</div>
         </div>
@@ -3779,13 +3847,13 @@ sequenceDiagram
           <div class="n">Step 6 · The envelope, and what gets cached</div>
           <div class="title">gameService.getPage()</div>
           <p class="body">The controller returns <code>PagedResponse</code>, not Spring's <code>Page</code> — Boot 3.3 warns that <code>PageImpl</code>'s JSON isn't a stable contract. <code>toPage()</code> coerces that envelope and also tolerates a bare array, so an older server degrades to the old behaviour instead of blanking the grid. Filter-only pages are cached for 60 s; keyword searches deliberately are not.</p>
-          <pre><span class="k">const</span> cacheable = !params.q; <span class="c">// every keystroke is a distinct key</span></pre>
+          <pre data-lang="ts"><span class="k">const</span> cacheable = !params.q; <span class="c">// every keystroke is a distinct key</span></pre>
           <div class="file">services/gameService.ts</div>
         </div>
       </div>
     </div>
 
-    <!-- FLOW C: ADMIN CREATE -->
+    <!-- ── Flow C · Admin creates a game · data-flow-panel="admin" ── -->
     <div class="flow-panel" data-flow-panel="admin" hidden>
       <div class="diagram-shell">
         <pre class="mermaid">
@@ -3831,7 +3899,7 @@ sequenceDiagram
           <div class="n">Step 2 · Optimistic UX, safe reload</div>
           <div class="title">POST /games/add</div>
           <p class="body">The service exposes <code>create(gameInput)</code>; the path is intentionally the shape the current backend serves (<code>/games/add</code>, not RESTful <code>/games</code>).</p>
-          <pre><span class="k">const</span> res = <span class="k">await</span> api.post&lt;Game&gt;(<span class="s">"/games/add"</span>, game);
+          <pre data-lang="ts"><span class="k">const</span> res = <span class="k">await</span> api.post&lt;Game&gt;(<span class="s">"/games/add"</span>, game);
 <span class="k">return</span> res.data;</pre>
           <div class="file">services/gameService.ts:46</div>
         </div>
@@ -3856,7 +3924,7 @@ sequenceDiagram
       </div>
     </div>
 
-    <!-- FLOW D: TOKEN EXPIRY -->
+    <!-- ── Flow D · Token expires · data-flow-panel="expiry" ── -->
     <div class="flow-panel" data-flow-panel="expiry" hidden>
       <div class="diagram-shell">
         <pre class="mermaid">
@@ -3891,7 +3959,7 @@ sequenceDiagram
           <div class="n">Step 2 · Response interceptor</div>
           <div class="title">api.ts filters login vs everything else</div>
           <p class="body">A 401 from <code>/auth/**</code> means "bad credentials"; a 401 anywhere else means "session died". The interceptor treats them differently — it clears storage only for the second case, so the login page can still surface "invalid password" without triggering a logout redirect.</p>
-          <pre><span class="k">if</span> (error.response?.status === <span class="n2">401</span>) {
+          <pre data-lang="ts"><span class="k">if</span> (error.response?.status === <span class="n2">401</span>) {
   <span class="k">const</span> url = error.config?.url ?? <span class="s">""</span>;
   <span class="k">if</span> (!url.includes(<span class="s">"/auth/"</span>)) {
     localStorage.removeItem(<span class="s">"token"</span>);
@@ -3916,6 +3984,7 @@ sequenceDiagram
       </div>
     </div>
 
+    <!-- ── Legend · step colours · div.legend ── -->
     <div class="legend">
       <span><span class="swatch sw-base"></span> Regular step</span>
       <span><span class="swatch sw-auth"></span> Auth boundary</span>
@@ -3925,7 +3994,14 @@ sequenceDiagram
   </div>
 </section>
 
-<!-- ─────────────────────────── AUTH STATE MACHINE ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 4 · CLIENT AUTH STATE MACHINE                    id="auth-state"
+     Mermaid state diagram of AuthContext: Loading · AnonymousUser · AuthenticatedUser
+     · AdminUser, plus two accordions (why Loading exists, why the client decodes).
+     Blocks: div.diagram-shell (pre.mermaid stateDiagram) · p.caption · details.acc ×2
+     Cites:  AuthContext · ProtectedRoute · isLoading
+     Script: shared chrome (GS:CHROME-JS) renders pre.mermaid
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="auth-state">
   <div class="wrap">
     <p class="kicker">§ 4 · Client Auth State Machine</p>
@@ -3935,6 +4011,8 @@ sequenceDiagram
       know, and every transition is triggered by exactly one event. The router waits for
       <em>Loading</em> to end before deciding where to send anyone.
     </p>
+
+    <!-- ── Diagram 3 · Mermaid state diagram of AuthContext · div.diagram-shell ── -->
     <div class="diagram-shell">
       <pre class="mermaid">
 stateDiagram-v2
@@ -3954,6 +4032,7 @@ stateDiagram-v2
     </div>
     <p class="caption">Diagram 3 · <code>isLoading</code> is a distinct state, not a boolean flavor of "logged out" — that's why <code>ProtectedRoute</code> shows a spinner instead of bouncing to /login on first paint.</p>
 
+    <!-- ── Accordions · two why-notes · details.acc ×2 ── -->
     <details class="acc">
       <summary>Why the loading state matters</summary>
       <div class="content">
@@ -3974,7 +4053,15 @@ stateDiagram-v2
   </div>
 </section>
 
-<!-- ─────────────────────────── DATA MODEL ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 5 · DATA MODEL                                        id="model"
+     Mermaid ER diagram of User, Game and Purchase, then a field table per entity.
+     Blocks: div.diagram-shell (pre.mermaid erDiagram) · div.entities of div.entity ×3
+             (h4 · p.desc · table)
+     Cites:  Purchase (join entity) · parseGenres() · backend brief § 12 · Persistence
+             Strategy (../../gameStore-backend/docs/architecture.html#persistence)
+     Script: shared chrome (GS:CHROME-JS) renders pre.mermaid
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="model">
   <div class="wrap">
     <p class="kicker">§ 5 · Data Model</p>
@@ -3988,6 +4075,7 @@ stateDiagram-v2
       a purchase is history, so price and title belong on the row, not behind a join.
     </p>
 
+    <!-- ── ER diagram · Mermaid erDiagram, three entities · div.diagram-shell ── -->
     <div class="diagram-shell">
       <pre class="mermaid">
 erDiagram
@@ -4022,6 +4110,7 @@ erDiagram
       </pre>
     </div>
 
+    <!-- ── Entity tables · User, Game, Purchase · div.entities ── -->
     <div class="entities">
       <div class="entity">
         <h4>User</h4>
@@ -4036,6 +4125,7 @@ erDiagram
           <tr><td class="name">enabled</td><td class="type">boolean</td></tr>
         </table>
       </div>
+
       <div class="entity">
         <h4>Game</h4>
         <p class="desc">Catalog item. <code>genre</code> is a single comma-separated string — <code>parseGenres()</code> splits it for the UI.</p>
@@ -4049,6 +4139,7 @@ erDiagram
           <tr><td class="name">heroImage</td><td class="type">String · banner</td></tr>
         </table>
       </div>
+
       <div class="entity">
         <h4>Purchase</h4>
         <p class="desc">Many-to-many join, timestamp only. No price snapshot yet — see the note above.</p>
@@ -4063,7 +4154,18 @@ erDiagram
   </div>
 </section>
 
-<!-- ─────────────────────────── REQUEST ANATOMY ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 6 · REQUEST ANATOMY                                 id="anatomy"
+     Four annotated HTTP wire samples: an authenticated read and a login, each with
+     its response; hover the underlined spans for field notes.
+     Blocks: div.anatomy of div.req-block ×4 (h4 · pre[data-lang="http"] with
+             span.anno[data-tip] notes inside the sample)
+     Cites:  GET /games/find/42 · POST /api/v2/auth/authenticate ·
+             GamesController.getById() (backend) · SecurityFilterChain (backend) ·
+             JwtService (backend) · src/services/api.ts · vite.config.ts · authService ·
+             parseGenres()
+     Script: shared chrome (GS:CHROME-JS) adds a copy button to each pre; no page script
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="anatomy">
   <div class="wrap">
     <p class="kicker">§ 6 · Request Anatomy</p>
@@ -4074,10 +4176,11 @@ erDiagram
       what Spring answers with.
     </p>
 
+    <!-- ── Wire samples · two requests, two responses · div.anatomy ── -->
     <div class="anatomy">
       <div class="req-block">
         <h4>Request · authenticated read</h4>
-<pre>GET <span class="anno" data-tip="Path routed to GamesController.getById(). Note: /find/{id} not RESTful /games/{id} — that's the current contract.">/games/find/42</span> HTTP/1.1
+        <pre data-lang="http">GET <span class="anno" data-tip="Path routed to GamesController.getById(). Note: /find/{id} not RESTful /games/{id} — that's the current contract.">/games/find/42</span> HTTP/1.1
 Host: localhost:8181
 Accept: application/json
 <span class="anno auth" data-tip="Attached by src/services/api.ts request interceptor. The only place the token leaves localStorage.">Authorization: Bearer eyJhbGciOiJIUzI1NiJ9…</span>
@@ -4086,7 +4189,7 @@ Origin: <span class="anno" data-tip="Vite is pinned to 5173 in vite.config.ts so
 
       <div class="req-block">
         <h4>Response · 200 OK</h4>
-<pre>HTTP/1.1 200 OK
+        <pre data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
@@ -4102,7 +4205,7 @@ Content-Type: application/json
 
       <div class="req-block">
         <h4>Request · login</h4>
-<pre>POST <span class="anno" data-tip="Public path — SecurityFilterChain matches /api/v2/auth/** with permitAll(). The interceptor also would not add a token here because none exists yet.">/api/v2/auth/authenticate</span> HTTP/1.1
+        <pre data-lang="http">POST <span class="anno" data-tip="Public path — SecurityFilterChain matches /api/v2/auth/** with permitAll(). The interceptor also would not add a token here because none exists yet.">/api/v2/auth/authenticate</span> HTTP/1.1
 Host: localhost:8181
 Content-Type: application/json
 
@@ -4114,7 +4217,7 @@ Content-Type: application/json
 
       <div class="req-block">
         <h4>Response · signed JWT</h4>
-<pre>HTTP/1.1 200 OK
+        <pre data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
@@ -4125,7 +4228,15 @@ Content-Type: application/json
   </div>
 </section>
 
-<!-- ─────────────────────────── FAILURES ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 7 · FAILURE MODES                                   id="failure"
+     Six error paths (401 ×2, 403, 404, 5xx, network drop), each naming the code
+     that handles it.
+     Blocks: div.failure-grid of div.failure ×6 (span.code · h4 · p); modifiers
+             .warn ×2 · .info ×1
+     Cites:  /auth/** · LoginPage · NotFoundPage · SecurityFilterChain (backend) ·
+             GlobalExceptionHandler (backend); cross-refs Flow D and § 9 feature 03
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="failure">
   <div class="wrap">
     <p class="kicker">§ 7 · Failure Modes</p>
@@ -4135,32 +4246,38 @@ Content-Type: application/json
       state (§ 9) upgrades several of these from "silent console error" to "toast the user sees".
     </p>
 
+    <!-- ── Failure cards · six error paths · div.failure-grid ── -->
     <div class="failure-grid">
       <div class="failure">
         <span class="code">401 · Unauthorized</span>
         <h4>Bad credentials on login</h4>
         <p>Path matches <code>/auth/**</code>, so the response interceptor <em>does not</em> log the user out — LoginPage shows the returned message inline.</p>
       </div>
+
       <div class="failure">
         <span class="code">401 · Session expired</span>
         <h4>Token dies mid-session</h4>
         <p>Any non-<code>/auth/</code> 401 clears localStorage and hard-redirects to <code>/login</code>. See Flow D.</p>
       </div>
+
       <div class="failure warn">
         <span class="code">403 · Forbidden</span>
         <h4>USER hits an ADMIN endpoint</h4>
         <p>SecurityFilterChain rejects before the controller runs. UI usually hides these links; the check on the server is the real one.</p>
       </div>
+
       <div class="failure warn">
         <span class="code">404 · Not found</span>
         <h4>Client-side unknown route</h4>
         <p>Catch-all route renders <code>NotFoundPage</code> instead of bouncing to home — surfaces the wrong URL to the user.</p>
       </div>
+
       <div class="failure">
         <span class="code">5xx · Backend error</span>
         <h4>Uncaught exception in a service</h4>
         <p>Bubbles into <code>GlobalExceptionHandler</code>, which returns a consistent JSON error envelope. The extended state wires this to a toast (§ 9 feature 03).</p>
       </div>
+
       <div class="failure info">
         <span class="code">— · Network dropped</span>
         <h4>Offline / server down</h4>
@@ -4170,7 +4287,15 @@ Content-Type: application/json
   </div>
 </section>
 
-<!-- ─────────────────────────── FEATURES ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 8 · THE INCREMENT                                  id="features"
+     Three feature cards (skeleton loaders, server-side search and sort, global error
+     handling), each tagged with effort, scope and the skill it shows.
+     Blocks: div.cards of article.card ×3 (span.num · h3 · p · div.meta of span.tag ×3:
+             .effort · plain · .win)
+     Cites:  GameCard · isLoading · GET /games/all?q=&genre=&page=&size=&sort= ·
+             @Query · ErrorBoundary · GlobalExceptionHandler (backend) · GameGrid
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="features">
   <div class="wrap">
     <p class="kicker">§ 8 · The Increment</p>
@@ -4180,6 +4305,8 @@ Content-Type: application/json
       <code>GlobalExceptionHandler</code>, the shared <code>GameGrid</code>, and existing
       entity fields — so nothing here touches the schema, the auth model, or the timeline.
     </p>
+
+    <!-- ── Feature cards · 01 to 03 · div.cards ── -->
     <div class="cards">
       <article class="card">
         <span class="num">01 / UX POLISH</span>
@@ -4195,6 +4322,7 @@ Content-Type: application/json
           <span class="tag win">Front-end craft</span>
         </div>
       </article>
+
       <article class="card">
         <span class="num">02 / DATA FLOW</span>
         <h3>Server-side search &amp; sort <span class="tag effort">shipped</span></h3>
@@ -4210,6 +4338,7 @@ Content-Type: application/json
           <span class="tag win">Java / Spring depth</span>
         </div>
       </article>
+
       <article class="card">
         <span class="num">03 / RESILIENCE</span>
         <h3>Global error handling</h3>
@@ -4228,7 +4357,18 @@ Content-Type: application/json
   </div>
 </section>
 
-<!-- ─────────────────────────── EXTENDED ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 9 · EXTENDED STATE                                 id="extended"
+     The same backbone as § 1 with three features overlaid: green nodes are net-new,
+     indigo nodes are existing pieces that gain responsibility.
+     Blocks: div.diagram-shell[data-legend] (pre.mermaid flowchart using :::ok and
+             :::work classes) · p.caption
+     Cites:  ErrorBoundary · AuthContext · JWTAuthenticationFilter (backend) ·
+             GlobalExceptionHandler (backend) · GamesRepository.search(q, genre,
+             pageable) (backend) · /games/all?q=&genre=&page=&size=&sort=
+     Script: shared chrome (GS:CHROME-JS) renders pre.mermaid and builds the key
+             from data-legend
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="extended">
   <div class="wrap">
     <p class="kicker">§ 9 · Extended State</p>
@@ -4238,6 +4378,8 @@ Content-Type: application/json
       nodes are existing pieces that gain responsibility. Note the search path now terminates at
       the database instead of the browser.
     </p>
+
+    <!-- ── Diagram 4 · Mermaid flowchart, generated key · div.diagram-shell[data-legend] ── -->
     <div class="diagram-shell"
          data-legend='{"ok":"New in this increment","work":"Existing, gains responsibility"}'>
       <pre class="mermaid">
@@ -4300,7 +4442,14 @@ flowchart TB
   </div>
 </section>
 
-<!-- ─────────────────────────── MATURITY ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 10 · MATURITY LADDER                               id="maturity"
+     Four stages from the current local build to the best-case version, each
+     listing what it proves to a reviewer; Stage 0 is marked as the current one.
+     Blocks: div.ladder-track of div.rung ×4 (span.stage-no · h3 · span.stage-sub · ul
+             of li ×4 · p.proves); .rung.here carries span.here-badge · p.caption
+     Cites:  catalog-architecture.html (the pivot)
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="maturity">
   <div class="wrap">
     <p class="kicker">§ 10 · Maturity Ladder</p>
@@ -4311,7 +4460,9 @@ flowchart TB
       reviewer — because a portfolio is judged on the evidence it produces, not the intentions behind it.
     </p>
 
+    <!-- ── Ladder · four rungs · div.ladder-track ── -->
     <div class="ladder-track">
+      <!-- ── Stage 0 · Current State · div.rung.here ── -->
       <div class="rung here">
         <span class="here-badge">You are here</span>
         <span class="stage-no">Stage 0</span>
@@ -4326,6 +4477,7 @@ flowchart TB
         <p class="proves"><b>Proves:</b> you can build a correctly-layered secured full-stack app.</p>
       </div>
 
+      <!-- ── Stage 1 · Next Milestone · div.rung ── -->
       <div class="rung">
         <span class="stage-no">Stage 1</span>
         <h3>Next Milestone</h3>
@@ -4339,6 +4491,7 @@ flowchart TB
         <p class="proves"><b>Proves:</b> you can ship, not just build. The single biggest gap today.</p>
       </div>
 
+      <!-- ── Stage 2 · Portfolio Ready · div.rung ── -->
       <div class="rung">
         <span class="stage-no">Stage 2</span>
         <h3>Portfolio Ready</h3>
@@ -4352,6 +4505,7 @@ flowchart TB
         <p class="proves"><b>Proves:</b> you make the operational decisions a team expects by default.</p>
       </div>
 
+      <!-- ── Stage 3 · Best-Case Version · div.rung ── -->
       <div class="rung">
         <span class="stage-no">Stage 3</span>
         <h3>Best-Case Version</h3>
@@ -4371,7 +4525,18 @@ flowchart TB
   </div>
 </section>
 
-<!-- ─────────────────────────── ROADMAP ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 11 · ROADMAP BOARD                                  id="roadmap"
+     Twenty scored candidate improvements grouped by stage, behind a filter row.
+     Blocks: div.rm-filters (button.rm-chip[data-filter] ×5) · div.rm-grid of
+             article[data-cat] ×20 (div.rm-head · p · div.rm-meta) · p.caption#rm-empty
+     Groups: data-cat next ×5 · portfolio ×5 · best ×4 · skip ×6
+     Cites:  CorsConfig · POST /purchases · GET /purchases/me · LibraryPage ·
+             /games/all · /users/all · PagedResponse · db/migration/ · package.json ·
+             application-prod.properties · mvnw verify · POST /orders/checkout ·
+             CheckoutModal · GET /rewards/me · compose.yml · catalog-architecture.html
+     Script: page script at the end of this file filters article[data-cat] by .rm-chip
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="roadmap">
   <div class="wrap">
     <p class="kicker">§ 11 · Roadmap Board</p>
@@ -4382,6 +4547,7 @@ flowchart TB
       knowing what <em>not</em> to build is the clearest signal of engineering judgment on this page.
     </p>
 
+    <!-- ── Filter chips · all + four stages · div.rm-filters ── -->
     <div class="rm-filters" role="tablist" aria-label="Roadmap filter">
       <button class="rm-chip active" data-filter="all" role="tab" aria-selected="true">All <span class="c-count"></span></button>
       <button class="rm-chip" data-filter="next" role="tab" aria-selected="false">Next Milestone</button>
@@ -4391,7 +4557,7 @@ flowchart TB
     </div>
 
     <div class="rm-grid">
-      <!-- NEXT -->
+      <!-- ── Stage · Next Milestone · data-cat="next" ── -->
       <article class="rm-card v-do" data-cat="next">
         <div class="rm-head"><h3>Deploy publicly</h3><span class="rm-verdict v-do">Do it</span></div>
         <p>Cloudflare Pages (SPA) + an Oracle Cloud Always-Free ARM VM running <code>docker compose</code>.
@@ -4448,7 +4614,7 @@ flowchart TB
         </div>
       </article>
 
-      <!-- PORTFOLIO -->
+      <!-- ── Stage · Portfolio Ready · data-cat="portfolio" ── -->
       <article class="rm-card v-done" data-cat="portfolio">
         <div class="rm-head"><h3>Server-side search &amp; pagination</h3><span class="rm-verdict v-done">Shipped</span></div>
         <p><b>Done (2026-08-08).</b> <code>/games/all</code> and <code>/users/all</code> take
@@ -4508,7 +4674,7 @@ flowchart TB
         </div>
       </article>
 
-      <!-- BEST CASE -->
+      <!-- ── Stage · Best Case · data-cat="best" ── -->
       <article class="rm-card v-do" data-cat="best">
         <div class="rm-head"><h3>RAWG catalog + tiered cache</h3><span class="rm-verdict v-do">Do it</span></div>
         <p>The headline feature: a real external-API integration behind a Caffeine → MySQL shadow-row
@@ -4556,7 +4722,7 @@ flowchart TB
         </div>
       </article>
 
-      <!-- SKIP -->
+      <!-- ── Stage · Deliberately Skip · data-cat="skip" ── -->
       <article class="rm-card v-skip" data-cat="skip">
         <div class="rm-head"><h3>Kubernetes</h3><span class="rm-verdict v-skip">Skip</span></div>
         <p>One container per service on one VM. Compose is the correct tool; k8s here is résumé-driven
@@ -4597,7 +4763,17 @@ flowchart TB
   </div>
 </section>
 
-<!-- ─────────────────────────── SCORECARD ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 12 · ARCHITECTURE SCORECARD                       id="scorecard"
+     Nine dimensions scored out of ten; a toggle swaps today's bars for the
+     Stage-2 target.
+     Blocks: div.score-toolbar (button#scoreToggle · div.score-legend) · div.score-grid
+             of div.score-row ×9 (div.s-label · div.score-bar of div.score-fill ·
+             div.score-num, both carrying data-now and data-target) · p.caption
+     Script: page script at the end of this file paints .score-fill / .score-num from
+             data-now once #scorecard scrolls into view and swaps to data-target
+             via #scoreToggle
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="scorecard">
   <div class="wrap">
     <p class="kicker">§ 12 · Architecture Scorecard</p>
@@ -4607,6 +4783,7 @@ flowchart TB
       <em>gap</em> is the point — a scorecard with everything at 10 is a scorecard nobody believes.
     </p>
 
+    <!-- ── Toolbar · now / target toggle and legend · div.score-toolbar ── -->
     <div class="score-toolbar">
       <button class="score-toggle" id="scoreToggle" aria-pressed="false">Show target state →</button>
       <div class="score-legend">
@@ -4615,6 +4792,7 @@ flowchart TB
       </div>
     </div>
 
+    <!-- ── Score rows · nine dimensions, data-now / data-target · div.score-grid ── -->
     <div class="score-grid">
       <div class="score-row"><div class="s-label">Layering &amp; structure<small>controller · service · repo · dto</small></div><div class="score-bar"><div class="score-fill" data-now="90" data-target="90"></div></div><div class="score-num" data-now="9" data-target="9">9</div></div>
       <div class="score-row"><div class="s-label">Security<small>JWT · RBAC · no leaked secrets</small></div><div class="score-bar"><div class="score-fill" data-now="70" data-target="90"></div></div><div class="score-num" data-now="7" data-target="9">7</div></div>
@@ -4631,7 +4809,18 @@ flowchart TB
   </div>
 </section>
 
-<!-- ─────────────────────────── CHECKLIST ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     § 13 · RECRUITER CHECKLIST                          id="checklist"
+     Ten things a reviewer checks first, as checkboxes whose state is kept in
+     this browser.
+     Blocks: div.check-head (span.check-progress with b#checkDone / span#checkTotal ·
+             button#checkReset) · div.check-bar-track (div#checkBar) ·
+             ul.check-list#checkList of li ×10 (label.check-item · input[data-ck] ·
+             span.ci-body)
+     Script: page script at the end of this file persists input[data-ck] under the
+             localStorage key gamestore-recruiter-checklist and updates #checkDone,
+             #checkTotal, #checkBar; #checkReset clears it
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="checklist">
   <div class="wrap">
     <p class="kicker">§ 13 · Recruiter Checklist</p>
@@ -4641,12 +4830,14 @@ flowchart TB
       Tick items off as you land them — your progress is saved in this browser.
     </p>
 
+    <!-- ── Progress · counter, reset, bar · div.check-head + div.check-bar-track ── -->
     <div class="check-head">
       <span class="check-progress"><b id="checkDone">0</b> / <span id="checkTotal">0</span> ready for review</span>
       <button class="check-reset" id="checkReset">Reset</button>
     </div>
     <div class="check-bar-track"><div class="check-bar-fill" id="checkBar"></div></div>
 
+    <!-- ── Checklist · ten items, state kept per browser · ul.check-list ── -->
     <ul class="check-list" id="checkList">
       <li><label class="check-item"><input type="checkbox" data-ck="live"><span class="ci-body"><span class="ci-title">README has a live demo link at the top</span><span class="ci-sub">the first thing anyone looks for</span></span></label></li>
       <li><label class="check-item"><input type="checkbox" data-ck="creds"><span class="ci-body"><span class="ci-title">Demo credentials provided</span><span class="ci-sub">a reviewer will not register an account</span></span></label></li>
@@ -4670,8 +4861,6 @@ flowchart TB
     <code>Mermaid.js</code>. Save alongside the repo as <code>docs/architecture.html</code>.
   </div>
 </footer>
-
-
 
 <!-- GS:INDEX:START -->
 <script>
@@ -6362,12 +6551,19 @@ window.GS_SEARCH = [{"doc":"fe-arch","id":"overview","title":"The whole system o
 </script>
 <!-- GS:CHROME-JS:END -->
 <script>
-  /* ══════════════════════════════════════════════════════════════
+  /* ═══════════════════════════════════════════════════════════════════════
+     PAGE SCRIPT · docs/architecture.html
      Document-specific state. The generic chrome (theme, scroll-spy,
      progress, back-to-top, filter chips) lives in GS:CHROME-JS above.
      Only what is unique to THIS document belongs here.
-     ══════════════════════════════════════════════════════════════ */
-// ── Layer explorer ──────────────────────────────────────────────
+     Blocks: §2 layer explorer (.layer-btn, #layer-client/api/db) ·
+             §3 flow tabs (.tab, .flow-panel, GS.renderMermaid) ·
+             §11 roadmap filter chips (.rm-chip, .rm-card, #rm-empty) ·
+             §12 scorecard (.score-fill, .score-num, #scoreToggle) ·
+             §13 recruiter checklist (#checkList, localStorage)
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  // ── §2 Layer explorer ───────────────────────────────────────────
   const layerBtns = document.querySelectorAll(".layer-btn");
   const layerDetails = {
     client: document.getElementById("layer-client"),
@@ -6389,8 +6585,7 @@ window.GS_SEARCH = [{"doc":"fe-arch","id":"overview","title":"The whole system o
     });
   });
 
-
-  // ── Flow tabs ───────────────────────────────────────────────────
+  // ── §3 Flow tabs ────────────────────────────────────────────────
   const tabs = document.querySelectorAll(".tab");
   const panels = document.querySelectorAll(".flow-panel");
   tabs.forEach((tab) => {
@@ -6408,7 +6603,6 @@ window.GS_SEARCH = [{"doc":"fe-arch","id":"overview","title":"The whole system o
       }
     });
   });
-
 
   // ── §11 Roadmap filter chips ────────────────────────────────────
   const rmChips = document.querySelectorAll(".rm-chip");
@@ -6433,7 +6627,6 @@ window.GS_SEARCH = [{"doc":"fe-arch","id":"overview","title":"The whole system o
       if (rmEmpty) rmEmpty.hidden = shown !== 0;
     });
   });
-
 
   // ── §12 Scorecard: render now-state, toggle to target ───────────
   const scoreFills = [...document.querySelectorAll(".score-fill")];
@@ -6468,7 +6661,6 @@ window.GS_SEARCH = [{"doc":"fe-arch","id":"overview","title":"The whole system o
       scoreToggle.textContent = showingTarget ? "← Back to current state" : "Show target state →";
     });
   }
-
 
   // ── §13 Recruiter checklist (persisted in localStorage) ─────────
   const CK_KEY = "gamestore-recruiter-checklist";
@@ -6511,4 +6703,6 @@ window.GS_SEARCH = [{"doc":"fe-arch","id":"overview","title":"The whole system o
   }
   renderCk();
 </script>
+
+</body>
 </html>

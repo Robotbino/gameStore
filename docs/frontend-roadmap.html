@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-gs-doc="fe-roadmap">
+<head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Game Store — Frontend Roadmap</title>
@@ -2538,8 +2539,31 @@ dialog.dg-full .dg-full-close {
   .doc-switch .theme-toggle, .doc-switch .gs-keys-btn { display: none; }
 </style></noscript>
 <!-- GS:CORE-CSS:END -->
+</head>
+<body>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     DOCUMENT MAP · docs/frontend-roadmap.html · data-gs-doc="fe-roadmap"
 
+     Generated regions (owned by gameStore-backend/docs/_src and rewritten by
+     stamp.mjs, never hand-edited): GS:CORE-CSS, GS:NAV, GS:INDEX, GS:CHROME-JS.
+     Hand-authored regions, in file order:
+       · head: the pre-paint theme script above GS:CORE-CSS
+       · main: subnav, hero, then the sections listed below
+       · footer
+       · page script after GS:CHROME-JS:END: checkbox persistence for the
+         progress bar and every card (localStorage gamestore-frontend-roadmap-v1)
 
+     Sections in order (id · kicker · title · what it holds):
+       #progress     Progress bar                   div.check-head, div.check-bar-track, p.caption
+       #build-order  Build order · at a glance      div.diagram-shell (Mermaid flowchart), p.caption
+       #phase-0      Phase 0 · Unblock deployment   div.gate, div.rm-grid: cards F1 to F4
+       #phase-1      Phase 1 · Design-system focus  div.gate, div.rm-grid: cards F5 to F8
+       #phase-2      Phase 2 · Responsive & UX      div.rm-grid: cards F9 to F12
+       #phase-3      Phase 3 · Data layer & tests   div.rm-grid: cards F13 to F18
+       #offroad      Landed off the roadmap         div.rm-grid: cards FX1 to FX5
+       #pairings     Cross-stack · Pairings         div.pair-grid: pairs P1 to P9
+       #skipped      Discarded                      div.rm-grid: cards FS1 to FS4, tradeoff callout
+     ═══════════════════════════════════════════════════════════════════════ -->
 
 <!-- GS:NAV:START -->
 <a class="skip-link" href="#gs-main">Skip to content</a>
@@ -2587,6 +2611,7 @@ dialog.dg-full .dg-full-close {
 <!-- GS:NAV:END -->
 
 <main id="gs-main" tabindex="-1">
+<!-- ── Subnav · seven anchors, every section except #progress and #offroad · nav.subnav ── -->
 <nav class="subnav" aria-label="Section navigation">
   <div class="subnav-inner">
     <a href="#build-order">Build order</a>
@@ -2599,6 +2624,7 @@ dialog.dg-full .dg-full-close {
   </div>
 </nav>
 
+<!-- ── Hero · title, lede, stack chips, schema plate, KPIs ── -->
 <header class="hero">
   <div class="wrap">
     <div class="hero-main">
@@ -2641,9 +2667,21 @@ dialog.dg-full .dg-full-close {
   </div>
 </header>
 
-<!-- ─────────────────────────── PROGRESS ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PROGRESS                                             id="progress"
+     Done / total counter for the frontend tasks, with a reset button
+     and a fill bar; backend items are tracked in the backend roadmap.
+     Blocks: div.check-head (counter + button.check-reset) ·
+             div.check-bar-track (#checkBar) · p.caption
+     Cites:  gameStore-backend/docs/backend-roadmap.html (backend)
+     Script: page script (end of file) fills #checkDone, #checkTotal,
+             #checkBar and wires #checkReset; state lives under the
+             localStorage key gamestore-frontend-roadmap-v1; FS ids are
+             tickable but excluded from the count
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="progress" style="padding-top: 34px; padding-bottom: 34px;">
   <div class="wrap">
+    <!-- ── Progress bar · done / total counter, reset, fill bar · #checkDone #checkTotal #checkReset #checkBar ── -->
     <div class="check-head">
       <span class="check-progress"><b id="checkDone">0</b> / <span id="checkTotal">0</span> frontend tasks complete</span>
       <button class="check-reset" id="checkReset">Reset</button>
@@ -2657,7 +2695,14 @@ dialog.dg-full .dg-full-close {
   </div>
 </section>
 
-<!-- ─────────────────────────── BUILD ORDER ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     BUILD ORDER · AT A GLANCE                         id="build-order"
+     Which tasks must land before which, as a Mermaid flowchart; only
+     items with a hard prerequisite are drawn, two of them backend.
+     Blocks: div.diagram-shell[data-legend] (pre.mermaid) · p.caption
+     Script: shared chrome (GS:CHROME-JS) renders pre.mermaid with the
+             data-legend key; reveal on .reveal
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="build-order" class="reveal">
   <div class="wrap">
     <p class="kicker">Build order · at a glance</p>
@@ -2669,6 +2714,7 @@ dialog.dg-full .dg-full-close {
       <em>other</em> repo ships.
     </p>
 
+    <!-- ── Diagram · Mermaid flowchart of the hard prerequisites · div.diagram-shell[data-legend] ── -->
     <div class="diagram-shell" data-legend='{"auth":"deploy blocker · unbuilt","work":"design-system gate","ok":"shipped ✓","muted":"planned next","ext":"backend repo · prerequisite"}'>
       <pre class="mermaid">
 flowchart LR
@@ -2735,7 +2781,18 @@ flowchart LR
   </div>
 </section>
 
-<!-- ─────────────────────────── PHASE 0 ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PHASE 0 · UNBLOCK DEPLOYMENT                          id="phase-0"
+     The frontend's share of getting the SPA deployed and the docs
+     reachable; the API origin must exist before the production build.
+     Blocks: div.gate · div.rm-grid (article ×4)
+     Cards:  F1 · F2 · F3 · F4
+     Cites:  services/api.ts · pages/DemoPage.tsx · .env.example ·
+             docs/architecture.html · docs/catalog-architecture.html ·
+             routes/AppRoutes.tsx · src/utils/ · src/assets/
+     Script: page script (end of file) persists the ticks; reveal on
+             .reveal via the shared chrome (GS:CHROME-JS)
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="phase-0" class="reveal">
   <div class="wrap">
     <p class="kicker">Phase 0 · Unblock deployment</p>
@@ -2746,6 +2803,7 @@ flowchart LR
       exist before the production bundle is built.
     </p>
 
+    <!-- ── Gate · F2 waits on backend B1 and B5 · div.gate ── -->
     <div class="gate">
       <span class="g-k">Gate</span>
       <p><code>F2</code> cannot be verified until the backend's <code>B1</code> (CORS from env) and
@@ -2753,8 +2811,8 @@ flowchart LR
         this phase is independent and can be done today.</p>
     </div>
 
+    <!-- ── Cards · F1, F2, F3, F4 · div.rm-grid ── -->
     <div class="rm-grid">
-
       <article class="rm-card v-crit">
         <div class="rm-head">
           <label class="rm-tick"><input type="checkbox" data-ck="F1" /><span class="rm-id">F1</span></label>
@@ -2827,12 +2885,22 @@ flowchart LR
           <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">Doc accuracy</span></div>
         </div>
       </article>
-
     </div>
   </div>
 </section>
 
-<!-- ─────────────────────────── PHASE 1 ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PHASE 1 · DESIGN-SYSTEM FOCUS                         id="phase-1"
+     Settle the design-system question before writing more CSS: the app
+     is custom-CSS with mostly removable UI kits; it gates Phase 2.
+     Blocks: div.gate · div.rm-grid (article ×4)
+     Cards:  F5 · F6 · F7 · F8
+     Cites:  components/ui/color-mode.tsx · main.tsx · App.css ·
+             PRODUCT.md · src/assets · utils/apiError.ts ·
+             .prettierrc.json · package.json
+     Script: page script (end of file) persists the ticks (Shipped ✓
+             badges pre-ticked); .reveal via the shared chrome
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="phase-1" class="reveal">
   <div class="wrap">
     <p class="kicker">Phase 1 · Design-system focus</p>
@@ -2843,6 +2911,7 @@ flowchart LR
       it is sharper than that: this is a <b>custom-CSS app</b>, and almost every UI dependency is removable.
     </p>
 
+    <!-- ── Gate · this phase gates Phase 2 · div.gate ── -->
     <div class="gate">
       <span class="g-k">Gate</span>
       <p>This phase gates Phase 2. Adding breakpoints or skeleton loaders before the design-system question
@@ -2850,8 +2919,8 @@ flowchart LR
         removed.</p>
     </div>
 
+    <!-- ── Cards · F5, F6, F7, F8 · div.rm-grid ── -->
     <div class="rm-grid">
-
       <article class="rm-card v-crit">
         <div class="rm-head">
           <label class="rm-tick"><input type="checkbox" data-ck="F5" /><span class="rm-id">F5</span></label>
@@ -2922,12 +2991,22 @@ flowchart LR
           <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">Low–Medium</span></div>
         </div>
       </article>
-
     </div>
   </div>
 </section>
 
-<!-- ─────────────────────────── PHASE 2 ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PHASE 2 · RESPONSIVE & UX                             id="phase-2"
+     Responsive layout and UX polish; the phone-screen line is unmet.
+     Blocks: div.rm-grid (article ×4)
+     Cards:  F9 · F10 · F11 · F12
+     Cites:  App.css · AppLayout.tsx · AdminLayout.tsx · index.html ·
+             src/pages · components/game/GameGridSkeleton.tsx ·
+             components/LoadingScreen.tsx · services/api.ts ·
+             utils/apiError.ts · SideBar.tsx
+     Script: page script (end of file) persists the ticks (Shipped ✓
+             badges pre-ticked); .reveal via the shared chrome
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="phase-2" class="reveal">
   <div class="wrap">
     <p class="kicker">Phase 2 · Responsive &amp; UX</p>
@@ -2939,8 +3018,8 @@ flowchart LR
       of an actual reviewer.
     </p>
 
+    <!-- ── Cards · F9, F10, F11, F12 · div.rm-grid ── -->
     <div class="rm-grid">
-
       <article class="rm-card v-crit">
         <div class="rm-head">
           <label class="rm-tick"><input type="checkbox" data-ck="F9" /><span class="rm-id">F9</span></label>
@@ -3023,12 +3102,22 @@ flowchart LR
           <div class="rm-metric"><span class="m-k">Impact</span><span class="m-v">Medium</span></div>
         </div>
       </article>
-
     </div>
   </div>
 </section>
 
-<!-- ─────────────────────────── PHASE 3 ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PHASE 3 · DATA LAYER & TESTS                          id="phase-3"
+     Data-layer and test tasks; most of them are gated on backend work.
+     Blocks: div.rm-grid (article ×6)
+     Cards:  F13 · F14 · F15 · F16 · F17 · F18
+     Cites:  GET /games/all?q=&genre=&page=&size= · GET /purchases/me ·
+             POST /purchases · POST /orders/checkout ·
+             catalog-architecture.html; source files are named per card
+             in p.rm-anchor
+     Script: page script (end of file) persists the ticks (Shipped ✓
+             badges pre-ticked); .reveal via the shared chrome
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="phase-3" class="reveal">
   <div class="wrap">
     <p class="kicker">Phase 3 · Data layer &amp; tests</p>
@@ -3039,8 +3128,8 @@ flowchart LR
       doing the moment the design system settles.
     </p>
 
+    <!-- ── Cards · F13, F14, F15, F16, F17, F18 · div.rm-grid ── -->
     <div class="rm-grid">
-
       <article class="rm-card v-do">
         <div class="rm-head">
           <label class="rm-tick"><input type="checkbox" data-ck="F13" checked /><span class="rm-id">F13</span></label>
@@ -3165,12 +3254,22 @@ flowchart LR
           <div class="rm-metric"><span class="m-k">Pair with</span><span class="m-v pair">P9 · B19</span></div>
         </div>
       </article>
-
     </div>
   </div>
 </section>
 
-<!-- ─────────────────────────── OFF-ROADMAP ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     LANDED OFF THE ROADMAP · 2026-09-20                   id="offroad"
+     Five things shipped without a card, ahead of the F6 gate; they
+     count in the progress bar but not in the eighteen-task KPI.
+     Blocks: div.rm-grid (article ×5)
+     Cards:  FX1 · FX2 · FX3 · FX4 · FX5
+     Cites:  GET /wishlist/me · POST/DELETE /wishlist/{gameId} ·
+             PUT /users/me/profile, /account, /password · DESIGN.md ·
+             PRODUCT.md; source files are named per card in p.rm-anchor
+     Script: page script (end of file) persists the ticks (Shipped ✓
+             badges pre-ticked); .reveal via the shared chrome
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="offroad" class="reveal">
   <div class="wrap">
     <p class="kicker">Landed off the roadmap · 2026-09-20</p>
@@ -3182,8 +3281,8 @@ flowchart LR
       eighteen-task KPI.
     </p>
 
+    <!-- ── Cards · FX1, FX2, FX3, FX4, FX5 · div.rm-grid ── -->
     <div class="rm-grid">
-
       <article class="rm-card v-do">
         <div class="rm-head">
           <label class="rm-tick"><input type="checkbox" data-ck="FX1" checked /><span class="rm-id">FX1</span></label>
@@ -3292,12 +3391,22 @@ flowchart LR
           <div class="rm-metric"><span class="m-k">Closed</span><span class="m-v">F13</span></div>
         </div>
       </article>
-
     </div>
   </div>
 </section>
 
-<!-- ─────────────────────────── PAIRINGS ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CROSS-STACK · RECOMMENDED PAIRINGS                   id="pairings"
+     Backend + frontend task pairs that only make sense done together;
+     the same list appears verbatim in the backend roadmap.
+     Blocks: div.pair-grid (article.pair ×9)
+     Pairs:  P1 · P2 · P3 · P4 · P5 · P6 · P7 · P8 · P9
+     Cites:  CorsConfig.java (backend) · services/api.ts ·
+             DemoPage.tsx · PurchaseRepository (backend) ·
+             LibraryPage.tsx · GamesService.searchGames() (backend) ·
+             GlobalExceptionHandler (backend) · utils/apiError.ts
+     Script: reveal on .reveal via the shared chrome (GS:CHROME-JS)
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="pairings" class="reveal">
   <div class="wrap">
     <p class="kicker">Cross-stack · Recommended Pairings</p>
@@ -3308,8 +3417,8 @@ flowchart LR
       tackled in the same sitting. This section is duplicated verbatim in the backend roadmap.
     </p>
 
+    <!-- ── Pairs · P1 to P9, backend side, frontend side, why together · div.pair-grid ── -->
     <div class="pair-grid">
-
       <article class="pair">
         <div class="pair-no">P1</div>
         <div class="pair-side be"><span class="ps-k">Backend</span><span class="ps-v">B1 · CORS origin from env</span><span class="ps-sub">CorsConfig.java:21</span></div>
@@ -3396,12 +3505,20 @@ flowchart LR
           the server rejects a request, and the client responds with a hard page reload. Issuing refresh
           tokens the client never exchanges changes nothing a user would notice.</p>
       </article>
-
     </div>
   </div>
 </section>
 
-<!-- ─────────────────────────── SKIPPED ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     DISCARDED · QUICK WINS THAT AREN'T                    id="skipped"
+     Fast shortcuts rejected because they would have to be redone,
+     kept so the decision is on record; plus an out-of-scope callout.
+     Blocks: div.rm-grid (article ×4) · div.callout.tradeoff
+     Cards:  FS1 · FS2 · FS3 · FS4
+     Cites:  main.tsx · getAll()
+     Script: page script (end of file) persists the ticks; FS ids never
+             count toward the bar; .reveal via the shared chrome
+     ═══════════════════════════════════════════════════════════════════════ -->
 <section id="skipped" class="reveal">
   <div class="wrap">
     <p class="kicker">Discarded · Quick wins that aren't</p>
@@ -3411,8 +3528,8 @@ flowchart LR
       on the record rather than rediscovered.
     </p>
 
+    <!-- ── Cards · FS1, FS2, FS3, FS4 · div.rm-grid ── -->
     <div class="rm-grid">
-
       <article class="rm-card v-skip">
         <div class="rm-head">
           <label class="rm-tick"><input type="checkbox" data-ck="FS1" /><span class="rm-id">✕</span></label>
@@ -3453,9 +3570,9 @@ flowchart LR
         <p>Gives the <em>appearance</em> of pagination while still downloading the whole catalogue, and
           cements a component API that server-side paging will invalidate. Wait for <code>B10</code>.</p>
       </article>
-
     </div>
 
+    <!-- ── Callout · deliberately out of scope · div.callout.tradeoff ── -->
     <div class="callout tradeoff">
       <span class="t-k">Deliberately out of scope</span>
       Also left off the board, per the architecture briefs: Kubernetes · Redis · microservices ·
@@ -3465,7 +3582,6 @@ flowchart LR
     </div>
   </div>
 </section>
-
 </main>
 
 <footer>
@@ -5165,16 +5281,21 @@ window.GS_SEARCH = [{"doc":"fe-arch","id":"overview","title":"The whole system o
 </script>
 <!-- GS:CHROME-JS:END -->
 <script>
-  /* ══════════════════════════════════════════════════════════════
+  /* ═══════════════════════════════════════════════════════════════════════
+     PAGE SCRIPT · docs/frontend-roadmap.html · checkbox persistence
+
      Document-specific state. The generic chrome (theme, scroll-spy,
      progress, back-to-top, filter chips) lives in GS:CHROME-JS above.
      Only what is unique to THIS document belongs here.
-     ══════════════════════════════════════════════════════════════ */
-/* ══════════════════════════════════════════════════════════════
+
      Checkbox persistence — same pattern as the recruiter checklist
      in architecture.html, but under its own key so the two roadmaps
      never share state.
-     ══════════════════════════════════════════════════════════════ */
+
+     Drives #checkDone, #checkTotal, #checkBar, #checkReset and every
+     input[data-ck] tick under the key gamestore-frontend-roadmap-v1;
+     Shipped ✓ badges seed the ticks; FS ids never count in the bar.
+     ═══════════════════════════════════════════════════════════════════════ */
   const CK_KEY = "gamestore-frontend-roadmap-v1";
   const ckBoxes = [...document.querySelectorAll("input[data-ck]")];
   const ckDone = document.getElementById("checkDone");
@@ -5235,4 +5356,6 @@ window.GS_SEARCH = [{"doc":"fe-arch","id":"overview","title":"The whole system o
   if (ckReset) ckReset.addEventListener("click", () => { saveCk({}); renderCk(); });
   renderCk();
 </script>
+
+</body>
 </html>
