@@ -3328,7 +3328,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
        #layers      § 2   Interactive Layer Explorer  three tabs, file list per layer
        #flows       § 3   Data Flow Walkthroughs      four tabbed journeys: sequence diagram + code steps
        #auth-state  § 4   Client Auth State Machine   Mermaid state diagram, two accordions
-       #model       § 5   Data Model                  Mermaid ER diagram, three entity tables
+       #model       § 5   Data Model                  Mermaid ER diagram, seven entity tables
        #anatomy     § 6   Request Anatomy             four annotated HTTP wire samples
        #failure     § 7   Failure Modes               six error-path cards
        #features    § 8   The Increment               three feature cards
@@ -3363,7 +3363,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
         <a href="frontend-roadmap.html"><span class="t">Frontend Roadmap</span><span class="d">Ranked frontend work, with the quick wins that were deliberately discarded.</span></a>
         <p class="ds-pop-h">Backend · Spring Boot</p>
         <a href="../../gameStore-backend/docs/architecture.html"><span class="t">Backend Architecture</span><span class="d">Stateless JWT-secured Spring Boot API — filter chain to persistence.</span></a>
-        <a href="../../gameStore-backend/docs/architecture-and-learning-guide.html"><span class="t">Learning Guide</span><span class="d">How to read the codebase: patterns, annotations, and 21 quizzes.</span></a>
+        <a href="../../gameStore-backend/docs/architecture-and-learning-guide.html"><span class="t">Learning Guide</span><span class="d">How to read the codebase: patterns, annotations, and 20 quizzes.</span></a>
         <a href="../../gameStore-backend/docs/backend-roadmap.html"><span class="t">Backend Roadmap</span><span class="d">Ranked backend work, paired against the frontend roadmap.</span></a>
       </div>
     </details>
@@ -3418,7 +3418,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
       </p>
       <div class="stack">
         <span class="chip">React · <b>Vite 5173</b> · TypeScript</span>
-        <span class="chip">Chakra UI</span>
+        <span class="chip">Custom CSS design system</span>
         <span class="chip">Spring Boot <b>:8181</b></span>
         <span class="chip">Spring Security · <b>JWT</b></span>
         <span class="chip">JPA / Hibernate</span>
@@ -3431,7 +3431,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
         <div class="s-node is-accent"><em>React SPA</em>Vite · TypeScript · :5173</div>
         <div class="s-node is-auth"><em>JWT boundary</em>Bearer token on every call that matters</div>
         <div class="s-node"><em>Spring Boot API</em>filter chain → controller → service</div>
-        <div class="s-node is-new"><em>MySQL</em>JPA / Hibernate · three entities</div>
+        <div class="s-node is-new"><em>MySQL</em>JPA / Hibernate · seven entities</div>
       </div>
       <dl class="plate-meta"></dl>
     </aside>
@@ -3451,7 +3451,7 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
       </div>
       <div class="kpi">
         <div class="k">Persistence</div>
-        <div class="v">JPA <small>3 entities · MySQL</small></div>
+        <div class="v">JPA <small>7 entities · MySQL</small></div>
       </div>
     </div>
   </div>
@@ -3462,9 +3462,10 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
      The whole stack as one Mermaid flowchart: browser, Spring Boot API and MySQL,
      with the auth boundary marked in amber.
      Blocks: div.diagram-shell (pre.mermaid flowchart) · p.caption
-     Cites:  AuthContext · QuickLaunchProvider · JWTAuthenticationFilter (backend) ·
-             SecurityFilterChain (backend) · /api/v2/auth/** · /games · /purchases ·
-             /users
+     Cites:  AuthContext · QuickLaunchProvider · CartContext · WishlistProvider ·
+             JWTAuthenticationFilter (backend) · SecurityFilterChain (backend) ·
+             /api/v2/auth/** · /games · /purchases · /users · /orders/** ·
+             /rewards/me · /wishlist/**
      Script: shared chrome (GS:CHROME-JS) renders pre.mermaid
      ═══════════════════════════════════════════════════════════════════════ -->
 <section id="overview">
@@ -3481,18 +3482,24 @@ tr.is-pick td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
     <div class="diagram-shell">
       <pre class="mermaid">
 flowchart TB
-  subgraph Client["🌐 React SPA — Vite · TypeScript · Chakra UI"]
+  subgraph Client["🌐 React SPA — Vite · TypeScript · custom CSS"]
     direction TB
-    UI["Pages &amp; Components&lt;br/&gt;Browse · GameDetails · Library · Cart · Admin"]
+    UI["Pages &amp; Components&lt;br/&gt;Login · Register · Home · Browse · GameDetails&lt;br/&gt;Library · Wishlist · Cart · Profile · Settings&lt;br/&gt;Admin dashboard, games, users · Demo · NotFound"]
     Ctx["AuthContext&lt;br/&gt;decodes JWT · exposes role"]
     QL["QuickLaunchProvider&lt;br/&gt;idle carousel over the user's library"]
+    Cart["CartContext&lt;br/&gt;cart state, keyed per user"]
+    Wish["WishlistProvider&lt;br/&gt;wishlist state, server-backed"]
     Axios["axios instance&lt;br/&gt;request + response interceptors"]
     LS[("localStorage&lt;br/&gt;JWT · cart, keyed per user")]
     UI --> Ctx
     UI --> QL
+    UI --> Cart
+    UI --> Wish
     UI --> Axios
     QL --> Axios
+    Wish --> Axios
     Ctx <--> LS
+    Cart <--> LS
     Axios -->|reads Bearer token| LS
   end
 
@@ -3503,22 +3510,31 @@ flowchart TB
     AuthC["/api/v2/auth/**&lt;br/&gt;public"]
     GamesC["/games&lt;br/&gt;GET public · paginated&lt;br/&gt;writes ADMIN"]
     PurchC["/purchases&lt;br/&gt;authenticated · own rows only"]
-    UsersC["/users&lt;br/&gt;ADMIN only · paginated"]
+    OrdersC["/orders/**&lt;br/&gt;authenticated · checkout + history"]
+    RewardsC["/rewards/me&lt;br/&gt;authenticated · points ledger"]
+    WishC["/wishlist/**&lt;br/&gt;authenticated · own rows only"]
+    UsersC["/users&lt;br/&gt;/me: authenticated (self-service)&lt;br/&gt;rest: ADMIN only · paginated"]
     Svc["Service layer"]
     Repo["JPA Repositories · Hibernate"]
     Filter --> Chain
     Chain --> AuthC
     Chain --> GamesC
     Chain --> PurchC
+    Chain --> OrdersC
+    Chain --> RewardsC
+    Chain --> WishC
     Chain --> UsersC
     AuthC --> Svc
     GamesC --> Svc
     PurchC --> Svc
+    OrdersC --> Svc
+    RewardsC --> Svc
+    WishC --> Svc
     UsersC --> Svc
     Svc --> Repo
   end
 
-  DB[("🗄️ MySQL&lt;br/&gt;games · users · purchases")]
+  DB[("🗄️ MySQL&lt;br/&gt;games · users · purchases · wishlist&lt;br/&gt;orders · order_items · reward_transactions")]
 
   Axios -->|"HTTP · Authorization: Bearer JWT"| Filter
   AuthC -.->|issues signed JWT| Axios
@@ -3537,8 +3553,8 @@ flowchart TB
      Three layer tabs; each shows that layer's summary and its file list.
      Blocks: div.layer-grid (button.layer-btn[data-layer] ×3) ·
              div.layer-detail ×3 (h3 · p · div.files of div.file-row)
-     Cites:  31 div.file-row paths: 13 under src/ (#layer-client), 10 Java files
-             (#layer-api, backend), 8 entity, repository, migration and config files
+     Cites:  48 div.file-row paths: 20 under src/ (#layer-client), 13 Java files
+             (#layer-api, backend), 15 entity, repository, migration and config files
              (#layer-db, backend); the prose also names ProtectedRoute · AdminRoute ·
              JWTAuthenticationFilter · GlobalExceptionHandler · JpaRepository
      Script: page script at the end of this file toggles .layer-btn and shows one of
@@ -3578,8 +3594,10 @@ flowchart TB
       <h3>Layer 1 — React SPA (browser)</h3>
       <p>
         Ships from Vite on port <code>5173</code>. React renders pages behind two guards
-        (<code>ProtectedRoute</code>, <code>AdminRoute</code>). All HTTP goes through a single
-        axios instance so the Bearer token is attached in exactly one place. Auth state lives in
+        (<code>ProtectedRoute</code>, <code>AdminRoute</code>). All app HTTP goes through one shared
+        axios instance in services/api.ts, so one place attaches the token. The public /demo page is
+        the only exception. It uses a bare axios client and attaches the token itself, so a 401 shows
+        as a result and does not log the user out. Auth state lives in
         React context, backed by <code>localStorage</code> for reload survival.
       </p>
       <div class="files">
@@ -3591,10 +3609,17 @@ flowchart TB
         <div class="file-row"><span class="path">src/services/gameService.ts</span><span class="role">/games client · paged + cached</span></div>
         <div class="file-row"><span class="path">src/services/authService.ts</span><span class="role">/api/v2/auth client</span></div>
         <div class="file-row"><span class="path">src/services/purchaseService.ts</span><span class="role">/purchases client</span></div>
+        <div class="file-row"><span class="path">src/services/userService.ts</span><span class="role">/users/me + admin /users client</span></div>
+        <div class="file-row"><span class="path">src/services/orderService.ts</span><span class="role">/orders client · checkout</span></div>
+        <div class="file-row"><span class="path">src/services/rewardsService.ts</span><span class="role">/rewards/me client</span></div>
+        <div class="file-row"><span class="path">src/services/wishlistService.ts</span><span class="role">/wishlist client</span></div>
         <div class="file-row"><span class="path">src/types/pagination.ts</span><span class="role">PagedResponse mirror · toPage</span></div>
         <div class="file-row"><span class="path">src/components/Pagination.tsx</span><span class="role">shared pager control</span></div>
         <div class="file-row"><span class="path">src/context/CartContext.tsx</span><span class="role">cart · per-user localStorage</span></div>
         <div class="file-row"><span class="path">src/context/QuickLaunchProvider.tsx</span><span class="role">idle carousel state</span></div>
+        <div class="file-row"><span class="path">src/context/WishlistProvider.tsx</span><span class="role">wishlist state · server-backed</span></div>
+        <div class="file-row"><span class="path">src/hooks/use*.ts</span><span class="role">context + data hooks</span></div>
+        <div class="file-row"><span class="path">src/components/checkout/CheckoutModal.tsx</span><span class="role">four-step simulated checkout</span></div>
         <div class="file-row"><span class="path">src/pages/**</span><span class="role">screen components</span></div>
       </div>
     </div>
@@ -3615,8 +3640,11 @@ flowchart TB
         <div class="file-row"><span class="path">JWTAuthenticationFilter.java</span><span class="role">token → SecurityContext</span></div>
         <div class="file-row"><span class="path">AuthenticationController.java</span><span class="role">register · authenticate</span></div>
         <div class="file-row"><span class="path">GamesControllers.java</span><span class="role">CRUD + paged search</span></div>
-        <div class="file-row"><span class="path">PurchaseController.java</span><span class="role">checkout · my purchases</span></div>
-        <div class="file-row"><span class="path">UsersController.java</span><span class="role">admin user ops</span></div>
+        <div class="file-row"><span class="path">PurchaseController.java</span><span class="role">library (GET /purchases/me) · legacy POST</span></div>
+        <div class="file-row"><span class="path">OrderController.java</span><span class="role">simulated checkout · my orders</span></div>
+        <div class="file-row"><span class="path">RewardsController.java</span><span class="role">points ledger</span></div>
+        <div class="file-row"><span class="path">WishlistController.java</span><span class="role">my wishlist · add / remove</span></div>
+        <div class="file-row"><span class="path">UsersController.java</span><span class="role">admin user ops · /users/me self-service</span></div>
         <div class="file-row"><span class="path">dto/PagedResponse.java</span><span class="role">the paging envelope</span></div>
         <div class="file-row"><span class="path">*Service.java</span><span class="role">business rules</span></div>
         <div class="file-row"><span class="path">GlobalExceptionHandler.java</span><span class="role">exception → JSON</span></div>
@@ -3628,7 +3656,8 @@ flowchart TB
     <div class="layer-detail" id="layer-db" hidden>
       <h3>Layer 3 — MySQL via JPA / Hibernate</h3>
       <p>
-        Three tables, mapped as JPA entities. Repositories extend <code>JpaRepository</code>, giving
+        Seven tables (games, users, purchases, wishlist, orders, order_items and reward_transactions)
+        map to JPA entities. Repositories extend <code>JpaRepository</code>, giving
         CRUD for free. The catalogue read is one explicit <code>@Query</code> taking an optional
         <code>q</code>, an optional <code>genre</code> and a <code>Pageable</code> — it replaced a
         pair of derived finders that no controller ever reached.
@@ -3643,9 +3672,16 @@ flowchart TB
         <div class="file-row"><span class="path">Games.java</span><span class="role">@Entity → games</span></div>
         <div class="file-row"><span class="path">Users.java</span><span class="role">@Entity → users</span></div>
         <div class="file-row"><span class="path">Purchases.java</span><span class="role">@Entity → purchases</span></div>
+        <div class="file-row"><span class="path">Wishlists.java</span><span class="role">@Entity → wishlist</span></div>
+        <div class="file-row"><span class="path">Orders.java</span><span class="role">@Entity → orders</span></div>
+        <div class="file-row"><span class="path">OrderItems.java</span><span class="role">@Entity → order_items · title + price snapshot</span></div>
+        <div class="file-row"><span class="path">RewardTransactions.java</span><span class="role">@Entity → reward_transactions</span></div>
         <div class="file-row"><span class="path">GamesRepository.java</span><span class="role">one @Query, paged</span></div>
         <div class="file-row"><span class="path">UserRepository.java</span><span class="role">findByEmail</span></div>
         <div class="file-row"><span class="path">PurchaseRepository.java</span><span class="role">by user / game</span></div>
+        <div class="file-row"><span class="path">WishlistRepository.java</span><span class="role">by user, newest first</span></div>
+        <div class="file-row"><span class="path">OrderRepository.java</span><span class="role">my orders, newest first</span></div>
+        <div class="file-row"><span class="path">RewardTransactionRepository.java</span><span class="role">latest 20 per user</span></div>
         <div class="file-row"><span class="path">db/migration/V*.sql</span><span class="role">Flyway owns the schema</span></div>
         <div class="file-row"><span class="path">application.properties</span><span class="role">datasource · ddl-auto=validate</span></div>
       </div>
@@ -3660,7 +3696,8 @@ flowchart TB
              each div.diagram-shell (pre.mermaid) + div.steps of div.step-item (21 in
              all; 9 carry a pre[data-lang] snippet: 8 ts, 1 jpql) · div.legend
      Cites:  pages/auth/LoginPage.tsx · context/AuthContext.tsx · routes/AppRoutes.tsx ·
-             pages/user/BrowsePage.tsx · services/api.ts · services/gameService.ts ·
+             components/search/SearchBar.tsx · pages/user/BrowsePage.tsx ·
+             services/api.ts · services/gameService.ts ·
              routes/AdminRoute.tsx · repositories/GamesRepository.java (backend)
      Script: page script at the end of this file switches .tab / .flow-panel and
              calls GS.renderMermaid on the panel just revealed
@@ -3694,7 +3731,7 @@ sequenceDiagram
   participant F as LoginPage
   participant C as AuthContext
   participant AX as axios
-  participant API as AuthController
+  participant API as AuthenticationController
   participant JS as JwtService
   participant DB as MySQL
 
@@ -3711,8 +3748,11 @@ sequenceDiagram
   AX-->>C: response
   C->>C: jwtDecode → set role & subject
   C->>C: localStorage.setItem("token")
-  C-->>F: resolve login()
   F-->>U: AppRoutes redirects to / (or /admin)
+  C->>AX: GET /users/me (Bearer attached)
+  AX-->>C: 200 UserResponse
+  C->>C: setCurrentUser(me) · on failure logout() and throw
+  C-->>F: resolve login()
         </pre>
       </div>
       <div class="steps">
@@ -3722,16 +3762,16 @@ sequenceDiagram
           <p class="body">The page owns the form state locally, then hands the payload to the auth context — no HTTP details leak into the component.</p>
           <pre data-lang="ts"><span class="c">// src/pages/auth/LoginPage.tsx</span>
 <span class="k">await</span> login(form);</pre>
-          <div class="file">pages/auth/LoginPage.tsx:23</div>
+          <div class="file">pages/auth/LoginPage.tsx:24</div>
         </div>
 
         <div class="step-item auth">
           <div class="n">Step 2 · Context calls service</div>
           <div class="title">AuthContext.login()</div>
-          <p class="body">Context is the only thing that owns the token, so credentials flow through it and it becomes the sole writer of localStorage.</p>
+          <p class="body">Context is the only thing that owns the token, so credentials flow through it. It is the only code that sets the token in localStorage. The 401 interceptor in api.ts can only remove it. activateSession applies the token, then loads the profile from GET /users/me. If that call fails, it logs out and throws.</p>
           <pre data-lang="ts"><span class="k">const</span> res = <span class="k">await</span> authService.login(data);
-<span class="k">return</span> applyToken(res.access_token);</pre>
-          <div class="file">context/AuthContext.tsx:84</div>
+<span class="k">return</span> activateSession(res.access_token);</pre>
+          <div class="file">context/AuthContext.tsx:131</div>
         </div>
 
         <div class="step-item">
@@ -3742,27 +3782,27 @@ sequenceDiagram
 
         <div class="step-item auth">
           <div class="n">Step 4 · Backend authenticates</div>
-          <div class="title">AuthController → BCrypt → JwtService</div>
+          <div class="title">AuthenticationController → BCrypt → JwtService</div>
           <p class="body">Spring Security's <code>AuthenticationManager</code> re-hashes the input and compares against the stored bcrypt digest. If it matches, <code>JwtService.generateToken()</code> signs a JWT with <em>sub</em>=email, <em>role</em>, and <em>exp</em>.</p>
         </div>
 
         <div class="step-item data">
           <div class="n">Step 5 · Token comes back</div>
           <div class="title">applyToken() decodes and stores</div>
-          <p class="body">The context decodes the JWT client-side purely to read <code>role</code> and expiry — no signature check on the client; the server is the only trust anchor.</p>
+          <p class="body">The context decodes the JWT client-side purely to read <code>role</code> and expiry — no signature check on the client; the server is the only trust anchor. The excerpt below simplifies the code. The real code also uses USER when the role claim is missing.</p>
           <pre data-lang="ts"><span class="k">const</span> decoded = jwtDecode&lt;JwtPayload&gt;(jwt);
 <span class="k">if</span> (decoded.exp * <span class="n2">1000</span> &lt; Date.now())
   <span class="k">throw new</span> Error(<span class="s">"That session has expired."</span>);
 localStorage.setItem(<span class="s">"token"</span>, jwt);
 setUserRole(decoded.role);</pre>
-          <div class="file">context/AuthContext.tsx:42</div>
+          <div class="file">context/AuthContext.tsx:73</div>
         </div>
 
         <div class="step-item">
           <div class="n">Step 6 · Route redirect</div>
           <div class="title">/login sees isAuthenticated=true → Navigate</div>
           <p class="body">The <code>/login</code> route element checks auth and pushes admins to <code>/admin</code>, regular users to <code>/</code> — the page never calls navigate() itself, keeping routing centralized.</p>
-          <div class="file">routes/AppRoutes.tsx:36</div>
+          <div class="file">routes/AppRoutes.tsx:45</div>
         </div>
       </div>
     </div>
@@ -3774,17 +3814,18 @@ setUserRole(decoded.role);</pre>
 sequenceDiagram
   autonumber
   participant U as User
+  participant SB as SearchBar (navbar)
   participant BP as BrowsePage
   participant URL as URL (?q=…&amp;page=…)
   participant GS as gameService
   participant AX as axios
   participant Filter as JWTAuthFilter
-  participant Ctrl as GamesController
+  participant Ctrl as GamesControllers
   participant Svc as GamesService
   participant DB as MySQL
 
-  U->>BP: types "witcher" (debounced)
-  BP->>URL: setSearchParams({q: "witcher"})
+  U->>SB: types "witcher" (debounced 300 ms)
+  SB->>URL: setSearchParams({q: "witcher"})
   URL-->>BP: urlQuery / urlPage change
   BP->>GS: getPage({ q, page, size: 12 })
   GS->>AX: GET /games/all?q=witcher&amp;page=0&amp;size=12
@@ -3807,11 +3848,11 @@ sequenceDiagram
         <div class="step-item">
           <div class="n">Step 1 · URL is the source of truth</div>
           <div class="title">Typing writes to <code>?q=</code></div>
-          <p class="body">A 300 ms debounce commits the input to the URL. That makes a result page shareable and lets the navbar drive the page by navigating to <code>/browse?q=…</code>.</p>
-          <pre data-lang="ts"><span class="k">const</span> timeout = setTimeout(() =&gt; {
+          <p class="body">The navbar SearchBar commits the input to the URL after a 300 ms debounce while you are on /browse. On the other pages that show the search box (Home, a game page, Library and Wishlist), a submit navigates to <code>/browse?q=…</code>. The URL makes a result page shareable.</p>
+          <pre data-lang="ts"><span class="k">const</span> timer = setTimeout(() =&gt; {
   setSearchParams(query ? { q: query } : {}, { replace: <span class="k">true</span> });
-}, <span class="n2">300</span>);</pre>
-          <div class="file">pages/user/BrowsePage.tsx:34</div>
+}, SEARCH_DEBOUNCE_MS);</pre>
+          <div class="file">components/search/SearchBar.tsx:59</div>
         </div>
 
         <div class="step-item">
@@ -3823,9 +3864,9 @@ sequenceDiagram
         <div class="step-item auth">
           <div class="n">Step 3 · Interceptor attaches the token</div>
           <div class="title">axios request interceptor</div>
-          <p class="body">Exactly one place in the codebase reads the token off <code>localStorage</code> for outbound calls — everywhere else is oblivious to auth.</p>
+          <p class="body">One place in the data layer of the app reads the token off <code>localStorage</code> for outbound calls. That place is this request interceptor. The only other reader is the /demo page, which uses its own bare axios client on purpose.</p>
           <pre data-lang="ts">config.headers.Authorization = <span class="s">`Bearer </span>${token}<span class="s">`</span>;</pre>
-          <div class="file">services/api.ts:14</div>
+          <div class="file">services/api.ts:16</div>
         </div>
 
         <div class="step-item auth">
@@ -3865,7 +3906,7 @@ sequenceDiagram
   participant AX as axios
   participant Filter as JWTAuthFilter
   participant Sec as SecurityFilterChain
-  participant Ctrl as GamesController
+  participant Ctrl as GamesControllers
   participant Svc as GamesService
   participant DB as MySQL
 
@@ -3877,13 +3918,14 @@ sequenceDiagram
   Filter->>Sec: continue chain
   Sec->>Sec: require ROLE_ADMIN for POST /games/**
   Sec->>Ctrl: authorized → dispatch
-  Ctrl->>Svc: addGame(dto)
+  Ctrl->>Svc: addGame(toEntity(request))
   Svc->>DB: INSERT INTO games …
   DB-->>Svc: generated id
   Svc-->>Ctrl: Game entity
   Ctrl-->>AX: 201 { …game with id }
   AX-->>GS: response.data
   GS-->>MG: Game
+  MG->>GS: getPage(last page) → GET /games/all
   MG-->>A: list re-renders with new row
         </pre>
       </div>
@@ -3896,30 +3938,31 @@ sequenceDiagram
         </div>
 
         <div class="step-item">
-          <div class="n">Step 2 · Optimistic UX, safe reload</div>
+          <div class="n">Step 2 · Wait for the server, then reload</div>
           <div class="title">POST /games/add</div>
           <p class="body">The service exposes <code>create(gameInput)</code>; the path is intentionally the shape the current backend serves (<code>/games/add</code>, not RESTful <code>/games</code>).</p>
           <pre data-lang="ts"><span class="k">const</span> res = <span class="k">await</span> api.post&lt;Game&gt;(<span class="s">"/games/add"</span>, game);
+invalidateCache();
 <span class="k">return</span> res.data;</pre>
-          <div class="file">services/gameService.ts:46</div>
+          <div class="file">services/gameService.ts:118</div>
         </div>
 
         <div class="step-item auth">
           <div class="n">Step 3 · Role check on the server</div>
           <div class="title">SecurityFilterChain rule</div>
-          <p class="body">Client-side <em>hiding</em> of admin links is UX, not security. The real check is here — <code>.requestMatchers(HttpMethod.POST, "/games/**").hasRole("ADMIN")</code>. A logged-in USER hitting this endpoint gets 403.</p>
+          <p class="body">Client-side <em>hiding</em> of admin links is UX, not security. The real check is here — <code>.requestMatchers("/games/**").hasRole("ADMIN")</code>. It comes after the GET /games/** permitAll rule, so every non-GET request to /games/** needs ADMIN. A logged-in USER hitting this endpoint gets 403.</p>
         </div>
 
         <div class="step-item data">
           <div class="n">Step 4 · Persist</div>
           <div class="title">JPA insert, id populated</div>
-          <p class="body">The service calls <code>repo.save(entity)</code>. Hibernate emits an INSERT and hydrates the id back onto the entity in place; the controller returns that as JSON with a 2xx.</p>
+          <p class="body">The service calls <code>repo.save(entity)</code>. Hibernate emits an INSERT and hydrates the id back onto the entity in place. The controller maps it to a GameResponse record and returns that as JSON with a 201.</p>
         </div>
 
         <div class="step-item">
           <div class="n">Step 5 · UI reflects the write</div>
           <div class="title">ManageGamesPage list refresh</div>
-          <p class="body">The response gives the page a fully-populated <code>Game</code> — including the new id — so it can prepend it to local state without a second round trip.</p>
+          <p class="body">The page ignores the returned <code>Game</code>. It closes the modal and fetches the last page again, because the list sorts by id ASC and the new row lands there. gameService.create() already cleared the catalogue cache, so this GET goes to the server.</p>
         </div>
       </div>
     </div>
@@ -3930,18 +3973,18 @@ sequenceDiagram
         <pre class="mermaid">
 sequenceDiagram
   autonumber
-  participant U as User (idle 2h)
+  participant U as User (token older than 24h)
   participant P as Any page
   participant AX as axios
   participant Filter as JWTAuthFilter
   participant WIN as window.location
 
   U->>P: clicks "Library"
-  P->>AX: GET /purchases/user/me
+  P->>AX: GET /purchases/me
   AX->>AX: attach stale Bearer
   AX->>Filter: HTTP + expired JWT
-  Filter->>Filter: exp claim &lt; now
-  Filter-->>AX: 401 Unauthorized
+  Filter->>Filter: exp claim &lt; now → continue unauthenticated
+  Filter-->>AX: 401 from HttpStatusEntryPoint
   AX->>AX: response interceptor catches 401
   AX->>AX: url is NOT /auth/… → wipe token
   AX->>WIN: location.href = "/login"
@@ -3951,8 +3994,8 @@ sequenceDiagram
       <div class="steps">
         <div class="step-item error">
           <div class="n">Step 1 · Server rejects</div>
-          <div class="title">401 from JWT filter</div>
-          <p class="body">The filter sees the <code>exp</code> claim is in the past and refuses to authenticate the request. The response leaves the API as 401 before it ever reaches a controller.</p>
+          <div class="title">Filter skips auth, the chain returns 401</div>
+          <p class="body">The filter sees the <code>exp</code> claim is in the past and refuses to authenticate the request. The authorization rules then deny it, and HttpStatusEntryPoint sends 401 before the request reaches a controller.</p>
         </div>
 
         <div class="step-item error">
@@ -3966,7 +4009,7 @@ sequenceDiagram
     window.location.href = <span class="s">"/login"</span>;
   }
 }</pre>
-          <div class="file">services/api.ts:22</div>
+          <div class="file">services/api.ts:25</div>
         </div>
 
         <div class="step-item">
@@ -3979,7 +4022,7 @@ sequenceDiagram
           <div class="n">Step 4 · Rehydrate finds nothing</div>
           <div class="title">AuthContext startup effect</div>
           <p class="body">On the fresh page, the mount effect reads <code>localStorage.getItem("token")</code>, finds null, and settles into the logged-out state without noise.</p>
-          <div class="file">context/AuthContext.tsx:70</div>
+          <div class="file">context/AuthContext.tsx:114</div>
         </div>
       </div>
     </div>
@@ -4019,8 +4062,8 @@ stateDiagram-v2
   direction TB
   [*] --> Loading: app mounts
 
-  Loading --> AuthenticatedUser: token valid
-  Loading --> AnonymousUser: no token · expired · malformed
+  Loading --> AuthenticatedUser: token valid + GET /users/me ok
+  Loading --> AnonymousUser: no token · expired · malformed · /users/me fails
 
   AnonymousUser --> AuthenticatedUser: login() / register() success
   AnonymousUser --> AnonymousUser: login() rejected (401)
@@ -4028,6 +4071,7 @@ stateDiagram-v2
   AuthenticatedUser --> AdminUser: role claim = ADMIN
   AuthenticatedUser --> AnonymousUser: logout() · interceptor 401
   AdminUser --> AnonymousUser: logout() · interceptor 401
+  AdminUser --> AuthenticatedUser: applyNewToken() after an account save · new token has no role claim
       </pre>
     </div>
     <p class="caption">Diagram 3 · <code>isLoading</code> is a distinct state, not a boolean flavor of "logged out" — that's why <code>ProtectedRoute</code> shows a spinner instead of bouncing to /login on first paint.</p>
@@ -4055,32 +4099,43 @@ stateDiagram-v2
 
 <!-- ═══════════════════════════════════════════════════════════════════════
      § 5 · DATA MODEL                                        id="model"
-     Mermaid ER diagram of User, Game and Purchase, then a field table per entity.
-     Blocks: div.diagram-shell (pre.mermaid erDiagram) · div.entities of div.entity ×3
+     Mermaid ER diagram of User, Game, Purchase, Wishlist, Order, OrderItem and
+     RewardTransaction, then a field table per entity.
+     Blocks: div.diagram-shell (pre.mermaid erDiagram) · div.entities of div.entity ×7
              (h4 · p.desc · table)
-     Cites:  Purchase (join entity) · parseGenres() · backend brief § 12 · Persistence
+     Cites:  Purchase (join entity) · order_items (V5 snapshots) · parseGenres() ·
+             backend brief § 12 · Persistence
              Strategy (../../gameStore-backend/docs/architecture.html#persistence)
      Script: shared chrome (GS:CHROME-JS) renders pre.mermaid
      ═══════════════════════════════════════════════════════════════════════ -->
 <section id="model">
   <div class="wrap">
     <p class="kicker">§ 5 · Data Model</p>
-    <h2>Three entities, one join</h2>
+    <h2>Seven entities, two user–game joins</h2>
     <p class="section-lede">
-      A user can own many games; a game can be owned by many users. <code>Purchase</code> is the
-      join table, carrying the timestamp and nothing else. It does <em>not</em> snapshot the price
-      yet — so editing a game's price silently rewrites what past revenue looks like. The backend
-      brief argues the fix in
+      Two many-to-many joins link users and games. <code>Purchase</code> is the ownership join that
+      the library reads, and it carries only the timestamp. Wishlist has the same shape and holds
+      games saved for later. Price history lives on orders and order_items, which V5 added. Each
+      order line keeps a
+      <em>snapshot</em> of the title and the unit price at checkout, so a later price edit never
+      rewrites a past order. The backend brief gives the rule in
       <a href="../../gameStore-backend/docs/architecture.html#persistence">§ 12 · Persistence Strategy</a>:
       a purchase is history, so price and title belong on the row, not behind a join.
     </p>
 
-    <!-- ── ER diagram · Mermaid erDiagram, three entities · div.diagram-shell ── -->
+    <!-- ── ER diagram · Mermaid erDiagram, seven entities · div.diagram-shell ── -->
     <div class="diagram-shell">
       <pre class="mermaid">
 erDiagram
   USER ||--o{ PURCHASE : "makes"
   GAME ||--o{ PURCHASE : "is bought in"
+  USER ||--o{ WISHLIST : "saves"
+  GAME ||--o{ WISHLIST : "is saved in"
+  USER ||--o{ ORDER : "places"
+  ORDER ||--|{ ORDER_ITEM : "contains"
+  GAME |o--o{ ORDER_ITEM : "supplies snapshots to"
+  USER ||--o{ REWARD_TRANSACTION : "earns or spends"
+  ORDER |o--o{ REWARD_TRANSACTION : "moves points in"
 
   USER {
     Integer id PK
@@ -4090,10 +4145,15 @@ erDiagram
     Role role "USER | ADMIN"
     Integer points
     boolean enabled "is_enabled"
+    String displayName "max 50, not unique"
+    String avatarKey "preset id"
+    String bio "max 280"
+    String country "ISO 3166-1 alpha-2"
+    LocalDateTime createdAt "member since"
   }
   GAME {
     Long id PK
-    String title
+    String title UK
     String genre "comma-separated"
     BigDecimal price "decimal(10,2)"
     Double rating
@@ -4103,14 +4163,49 @@ erDiagram
   }
   PURCHASE {
     Long id PK
-    Long user_id FK
+    Integer user_id FK
     Long game_id FK
     LocalDateTime purchase_date
+  }
+  WISHLIST {
+    Long id PK
+    Integer user_id FK "unique with game_id"
+    Long game_id FK
+    LocalDateTime added_at
+  }
+  ORDER {
+    Long id PK
+    Integer user_id FK
+    BigDecimal subtotal "decimal(10,2)"
+    int points_redeemed
+    BigDecimal discount
+    BigDecimal total
+    int points_earned
+    PaymentMethod payment_method "CARD | STRIPE | PAYFLEX"
+    String payment_reference UK "DEMO-XXXXXX"
+    OrderStatus status "PAID"
+    LocalDateTime created_at
+  }
+  ORDER_ITEM {
+    Long id PK
+    Long order_id FK
+    Long game_id FK "nullable, SET NULL on delete"
+    String title "snapshot"
+    BigDecimal unit_price "snapshot"
+  }
+  REWARD_TRANSACTION {
+    Long id PK
+    Integer user_id FK
+    Long order_id FK "nullable, SET NULL on delete"
+    int delta "+EARN / -REDEEM"
+    int balance_after
+    RewardReason reason "EARN | REDEEM | ADJUST"
+    LocalDateTime created_at
   }
       </pre>
     </div>
 
-    <!-- ── Entity tables · User, Game, Purchase · div.entities ── -->
+    <!-- ── Entity tables · User, Game, Purchase, Wishlist, Order, OrderItem, RewardTransaction · div.entities ── -->
     <div class="entities">
       <div class="entity">
         <h4>User</h4>
@@ -4123,6 +4218,11 @@ erDiagram
           <tr><td class="name">role</td><td class="type">enum</td></tr>
           <tr><td class="name">points</td><td class="type">Integer</td></tr>
           <tr><td class="name">enabled</td><td class="type">boolean</td></tr>
+          <tr><td class="name">displayName</td><td class="type">String(50)</td></tr>
+          <tr><td class="name">avatarKey</td><td class="type">String(32) · preset id</td></tr>
+          <tr><td class="name">bio</td><td class="type">String(280)</td></tr>
+          <tr><td class="name">country</td><td class="type">String(2) · ISO code</td></tr>
+          <tr><td class="name">createdAt</td><td class="type">timestamp</td></tr>
         </table>
       </div>
 
@@ -4131,7 +4231,7 @@ erDiagram
         <p class="desc">Catalog item. <code>genre</code> is a single comma-separated string — <code>parseGenres()</code> splits it for the UI.</p>
         <table>
           <tr><td class="name">id</td><td class="type">Long · PK</td></tr>
-          <tr><td class="name">title</td><td class="type">String</td></tr>
+          <tr><td class="name">title</td><td class="type">String · unique</td></tr>
           <tr><td class="name">genre</td><td class="type">String</td></tr>
           <tr><td class="name">price</td><td class="type">BigDecimal(10,2)</td></tr>
           <tr><td class="name">rating</td><td class="type">Double</td></tr>
@@ -4142,12 +4242,67 @@ erDiagram
 
       <div class="entity">
         <h4>Purchase</h4>
-        <p class="desc">Many-to-many join, timestamp only. No price snapshot yet — see the note above.</p>
+        <p class="desc">Many-to-many ownership join, timestamp only. Price and title snapshots live on order_items, as the note above explains.</p>
         <table>
           <tr><td class="name">id</td><td class="type">Long · PK</td></tr>
           <tr><td class="name">user_id</td><td class="type">FK · User</td></tr>
           <tr><td class="name">game_id</td><td class="type">FK · Game</td></tr>
           <tr><td class="name">purchase_date</td><td class="type">timestamp</td></tr>
+        </table>
+      </div>
+
+      <div class="entity">
+        <h4>Wishlist</h4>
+        <p class="desc">Saved for later, not owned. A unique key on user_id and game_id blocks a double add. Rows cascade away with their user or their game.</p>
+        <table>
+          <tr><td class="name">id</td><td class="type">Long · PK</td></tr>
+          <tr><td class="name">user_id</td><td class="type">FK · User</td></tr>
+          <tr><td class="name">game_id</td><td class="type">FK · Game</td></tr>
+          <tr><td class="name">added_at</td><td class="type">timestamp</td></tr>
+        </table>
+      </div>
+
+      <div class="entity">
+        <h4>Order</h4>
+        <p class="desc">One checkout receipt. The total is the subtotal minus the discount. The payment reference is DEMO- plus six random characters, and it is unique.</p>
+        <table>
+          <tr><td class="name">id</td><td class="type">Long · PK</td></tr>
+          <tr><td class="name">user_id</td><td class="type">FK · User</td></tr>
+          <tr><td class="name">subtotal</td><td class="type">BigDecimal(10,2)</td></tr>
+          <tr><td class="name">points_redeemed</td><td class="type">int</td></tr>
+          <tr><td class="name">discount</td><td class="type">BigDecimal(10,2)</td></tr>
+          <tr><td class="name">total</td><td class="type">BigDecimal(10,2)</td></tr>
+          <tr><td class="name">points_earned</td><td class="type">int</td></tr>
+          <tr><td class="name">payment_method</td><td class="type">enum</td></tr>
+          <tr><td class="name">payment_reference</td><td class="type">String · unique</td></tr>
+          <tr><td class="name">status</td><td class="type">enum · PAID</td></tr>
+          <tr><td class="name">created_at</td><td class="type">timestamp</td></tr>
+        </table>
+      </div>
+
+      <div class="entity">
+        <h4>OrderItem</h4>
+        <p class="desc">One line on a receipt. The title and the unit price are snapshots from checkout. When an admin deletes the game, the database sets game_id to null and keeps the line.</p>
+        <table>
+          <tr><td class="name">id</td><td class="type">Long · PK</td></tr>
+          <tr><td class="name">order_id</td><td class="type">FK · Order</td></tr>
+          <tr><td class="name">game_id</td><td class="type">FK · Game · nullable</td></tr>
+          <tr><td class="name">title</td><td class="type">String · snapshot</td></tr>
+          <tr><td class="name">unit_price</td><td class="type">BigDecimal(10,2) · snapshot</td></tr>
+        </table>
+      </div>
+
+      <div class="entity">
+        <h4>RewardTransaction</h4>
+        <p class="desc">The points ledger. The delta column is positive for EARN and negative for REDEEM. The balance_after column records the balance after each row, so the ledger audits users.points.</p>
+        <table>
+          <tr><td class="name">id</td><td class="type">Long · PK</td></tr>
+          <tr><td class="name">user_id</td><td class="type">FK · User</td></tr>
+          <tr><td class="name">order_id</td><td class="type">FK · Order · nullable</td></tr>
+          <tr><td class="name">delta</td><td class="type">int · signed</td></tr>
+          <tr><td class="name">balance_after</td><td class="type">int</td></tr>
+          <tr><td class="name">reason</td><td class="type">enum</td></tr>
+          <tr><td class="name">created_at</td><td class="type">timestamp</td></tr>
         </table>
       </div>
     </div>
@@ -4156,12 +4311,12 @@ erDiagram
 
 <!-- ═══════════════════════════════════════════════════════════════════════
      § 6 · REQUEST ANATOMY                                 id="anatomy"
-     Four annotated HTTP wire samples: an authenticated read and a login, each with
+     Four annotated HTTP wire samples: a public read and a login, each with
      its response; hover the underlined spans for field notes.
      Blocks: div.anatomy of div.req-block ×4 (h4 · pre[data-lang="http"] with
              span.anno[data-tip] notes inside the sample)
      Cites:  GET /games/find/42 · POST /api/v2/auth/authenticate ·
-             GamesController.getById() (backend) · SecurityFilterChain (backend) ·
+             GamesControllers.getGameById() (backend) · SecurityFilterChain (backend) ·
              JwtService (backend) · src/services/api.ts · vite.config.ts · authService ·
              parseGenres()
      Script: shared chrome (GS:CHROME-JS) adds a copy button to each pre; no page script
@@ -4179,22 +4334,22 @@ erDiagram
     <!-- ── Wire samples · two requests, two responses · div.anatomy ── -->
     <div class="anatomy">
       <div class="req-block">
-        <h4>Request · authenticated read</h4>
-        <pre data-lang="http">GET <span class="anno" data-tip="Path routed to GamesController.getById(). Note: /find/{id} not RESTful /games/{id} — that's the current contract.">/games/find/42</span> HTTP/1.1
+        <h4>Request · public read (token attached anyway)</h4>
+        <pre data-lang="http">GET <span class="anno" data-tip="GamesControllers.getGameById() handles this path. Note: the path is /find/{id}, not RESTful /games/{id}. That is the current contract.">/games/find/42</span> HTTP/1.1
 Host: localhost:8181
 Accept: application/json
-<span class="anno auth" data-tip="Attached by src/services/api.ts request interceptor. The only place the token leaves localStorage.">Authorization: Bearer eyJhbGciOiJIUzI1NiJ9…</span>
+<span class="anno auth" data-tip="Attached by the src/services/api.ts request interceptor. Only the /demo page attaches the token in a different way. It sets the header itself on a bare axios client. GET /games/** is public, so this read does not need the token.">Authorization: Bearer eyJhbGciOiJIUzI1NiJ9…</span>
 Origin: <span class="anno" data-tip="Vite is pinned to 5173 in vite.config.ts so CORS on the backend can allowlist a stable origin.">http://localhost:5173</span></pre>
       </div>
 
       <div class="req-block">
-        <h4>Response · 200 OK</h4>
+        <h4>Response · 200 OK (simplified, description left out)</h4>
         <pre data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
   "id": 42,
-  "title": <span class="anno" data-tip="The Game entity, serialized by Jackson from GamesController.">"Hollow Knight"</span>,
+  "title": <span class="anno" data-tip="The GameResponse record (GameResponse.from), serialized by Jackson. It is not the JPA entity.">"Hollow Knight"</span>,
   "genre": <span class="anno data" data-tip="One column in MySQL — split client-side by parseGenres() into an array of chip labels.">"Metroidvania, Action, Indie"</span>,
   "price": 14.99,
   "rating": 4.9,
@@ -4235,7 +4390,7 @@ Content-Type: application/json
      Blocks: div.failure-grid of div.failure ×6 (span.code · h4 · p); modifiers
              .warn ×2 · .info ×1
      Cites:  /auth/** · LoginPage · NotFoundPage · SecurityFilterChain (backend) ·
-             GlobalExceptionHandler (backend); cross-refs Flow D and § 9 feature 03
+             GlobalExceptionHandler (backend); cross-refs Flow D and § 8 feature 03
      ═══════════════════════════════════════════════════════════════════════ -->
 <section id="failure">
   <div class="wrap">
@@ -4275,7 +4430,7 @@ Content-Type: application/json
       <div class="failure">
         <span class="code">5xx · Backend error</span>
         <h4>Uncaught exception in a service</h4>
-        <p>Bubbles into <code>GlobalExceptionHandler</code>, which returns a consistent JSON error envelope. The extended state wires this to a toast (§ 9 feature 03).</p>
+        <p>Bubbles into <code>GlobalExceptionHandler</code>, which returns a consistent JSON error envelope. The extended state wires this to a toast (§ 8 feature 03, drawn in § 9).</p>
       </div>
 
       <div class="failure info">
@@ -4310,11 +4465,14 @@ Content-Type: application/json
     <div class="cards">
       <article class="card">
         <span class="num">01 / UX POLISH</span>
-        <h3>Skeleton loaders</h3>
+        <h3>Skeleton loaders <span class="tag effort">shipped</span></h3>
         <p>
           Swap the plain <em>"Loading games…"</em> text for shimmer cards that mirror
           <code>GameCard</code>'s layout while <code>isLoading</code> is true. Kills layout
           shift and signals perceived-performance maturity on first paint.
+          Update (2026-10-09): this shipped on 2026-09-20. GameGridSkeleton renders the shimmer
+          cards on Home, Browse, Library and Wishlist. The admin tables, profile and settings
+          still show text.
         </p>
         <div class="meta">
           <span class="tag effort">~1–2 hrs</span>
@@ -4346,10 +4504,13 @@ Content-Type: application/json
           Extend the axios response interceptor to raise a toast on 5xx / network failure,
           wrap the router in an <code>ErrorBoundary</code>, and return a consistent error JSON
           shape from <code>GlobalExceptionHandler</code>.
+          Update (2026-10-09): the backend half already exists. Every branch of the handler returns a
+          consistent {"message"} body, with a 500 backstop for any other exception. The toast and
+          the ErrorBoundary are still open, so the rest of this work is frontend only.
         </p>
         <div class="meta">
           <span class="tag effort">~2 hrs</span>
-          <span class="tag">Full-stack</span>
+          <span class="tag">Frontend only</span>
           <span class="tag win">Production readiness</span>
         </div>
       </article>
@@ -4384,23 +4545,27 @@ Content-Type: application/json
          data-legend='{"ok":"New in this increment","work":"Existing, gains responsibility"}'>
       <pre class="mermaid">
 flowchart TB
-  subgraph Client["React SPA — Vite · TypeScript · Chakra UI"]
+  subgraph Client["React SPA — Vite · TypeScript · custom CSS"]
     direction TB
     UI["Pages &amp; Components"]
-    Skel["Skeleton loaders&lt;br/&gt;shimmer while isLoading"]:::ok
+    Skel["Skeleton loaders&lt;br/&gt;shimmer while isLoading"]
     Boundary["ErrorBoundary&lt;br/&gt;fallback UI on render crash"]:::ok
     Toast["Toast system&lt;br/&gt;global error surface"]:::ok
     SortUI["Sort control&lt;br/&gt;price · rating · title"]:::ok
     Ctx["AuthContext"]
+    Prov["QuickLaunchProvider · CartContext&lt;br/&gt;WishlistProvider"]
     Axios["axios interceptors&lt;br/&gt;401 redirect + 5xx toast"]:::work
-    LS[("localStorage&lt;br/&gt;JWT token")]
+    LS[("localStorage&lt;br/&gt;JWT token · cart")]
     Boundary --> UI
     UI --> Skel
     UI --> SortUI
     UI --> Ctx
+    UI --> Prov
     UI --> Axios
+    Prov --> Axios
     Axios --> Toast
     Ctx <--> LS
+    Prov <--> LS
     Axios -->|reads Bearer token| LS
   end
 
@@ -4410,25 +4575,28 @@ flowchart TB
     Chain["SecurityFilterChain&lt;br/&gt;stateless · role-based"]
     AuthC["/api/v2/auth/**"]
     GamesC["/games — GET public · writes ADMIN"]
-    SearchC["/games/all?q=&amp;genre=&amp;page=&amp;size=&amp;sort=&lt;br/&gt;one @Query · paged"]:::ok
-    UsersC["/users — ADMIN only"]
+    SearchC["/games/all?q=&amp;genre=&amp;page=&amp;size=&amp;sort=&lt;br/&gt;one @Query · paged"]
+    UsersC["/users — /me: authenticated · rest: ADMIN"]
+    OwnC["/purchases · /orders/** · /rewards/me · /wishlist/**&lt;br/&gt;authenticated · own rows only"]
     Svc["Service layer"]
-    Repo["JPA Repositories · Hibernate&lt;br/&gt;GamesRepository.search(q, genre, pageable)"]:::work
-    GEH["GlobalExceptionHandler&lt;br/&gt;consistent error JSON"]:::work
+    Repo["JPA Repositories · Hibernate&lt;br/&gt;GamesRepository.search(q, genre, pageable)"]
+    GEH["GlobalExceptionHandler&lt;br/&gt;consistent error JSON"]
     Filter --> Chain
     Chain --> AuthC
     Chain --> GamesC
     Chain --> SearchC
     Chain --> UsersC
+    Chain --> OwnC
     AuthC --> Svc
     GamesC --> Svc
     SearchC --> Svc
     UsersC --> Svc
+    OwnC --> Svc
     Svc --> Repo
     Svc -.->|throws| GEH
   end
 
-  DB[("MySQL&lt;br/&gt;games · users · purchases")]
+  DB[("MySQL&lt;br/&gt;games · users · purchases · wishlist&lt;br/&gt;orders · order_items · reward_transactions")]
 
   Axios -->|"HTTP · Bearer JWT"| Filter
   SortUI -->|"query params"| Axios
@@ -4438,7 +4606,10 @@ flowchart TB
 </pre>
     </div>
     <p class="caption">Diagram 4 · the extended request path. Unmarked nodes already exist and are
-      untouched; the key below is generated from what the diagram actually colours.</p>
+      untouched; the key below is generated from what the diagram actually colours.
+      Update (2026-10-09): the skeleton loaders shipped on 2026-09-20, and the paged search shipped
+      on 2026-08-08. GlobalExceptionHandler already returns consistent error JSON. These nodes are
+      no longer marked.</p>
   </div>
 </section>
 
@@ -4471,8 +4642,8 @@ flowchart TB
         <ul>
           <li>Full-stack auth with JWT + RBAC</li>
           <li>Games/Users CRUD, DTO boundaries</li>
-          <li>H2 integration tests (auth, RBAC)</li>
-          <li>Four interactive architecture docs</li>
+          <li>H2 integration tests (auth, RBAC, checkout, wishlist, profile)</li>
+          <li>Six interactive architecture documents</li>
         </ul>
         <p class="proves"><b>Proves:</b> you can build a correctly-layered secured full-stack app.</p>
       </div>
@@ -4485,7 +4656,7 @@ flowchart TB
         <ul>
           <li>Live public URL + published docs</li>
           <li>Dockerised, one-command run</li>
-          <li>CORS &amp; secrets from env</li>
+          <li>CORS origin from env (secrets ✓)</li>
           <li>Real ownership (purchases → library) ✓</li>
         </ul>
         <p class="proves"><b>Proves:</b> you can ship, not just build. The single biggest gap today.</p>
@@ -4497,7 +4668,7 @@ flowchart TB
         <h3>Portfolio Ready</h3>
         <span class="stage-sub">defensible · maintained</span>
         <ul>
-          <li>Flyway migrations, prod profile</li>
+          <li>Flyway migrations ✓ (2026-08-08), prod profile still open</li>
           <li>Server-side search/sort + pagination ✓ (sort UI still open)</li>
           <li>CI on every push (build + test)</li>
           <li>Trimmed, single-design-system frontend</li>
@@ -4571,7 +4742,7 @@ flowchart TB
 
       <article class="rm-card v-do" data-cat="next">
         <div class="rm-head"><h3>Publish docs to GitHub Pages</h3><span class="rm-verdict v-do">Do it</span></div>
-        <p>These four HTML briefs become a clickable link in the README. Highest leverage-per-minute
+        <p>These six HTML briefs become a clickable link in the README. Highest leverage-per-minute
           item on the board — near-zero effort, immediate recruiter payoff.</p>
         <div class="rm-meta">
           <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
@@ -4594,7 +4765,9 @@ flowchart TB
       <article class="rm-card v-do" data-cat="next">
         <div class="rm-head"><h3>CORS &amp; secrets from env</h3><span class="rm-verdict v-do">Do it</span></div>
         <p><code>CorsConfig</code> hardcodes <code>localhost:5173</code>, which actively blocks
-          deployment. Move the origin, DB creds and JWT secret to environment variables.</p>
+          deployment. Move the origin, DB creds and JWT secret to environment variables.
+          Update (2026-10-09): the database credentials and the JWT secret already come from the
+          environment, since 2026-07-30. The origin and the datasource URL are still to do.</p>
         <div class="rm-meta">
           <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
           <div class="rm-metric"><span class="m-k">Effort</span><span class="m-v">~30 min</span></div>
@@ -4617,9 +4790,10 @@ flowchart TB
       <!-- ── Stage · Portfolio Ready · data-cat="portfolio" ── -->
       <article class="rm-card v-done" data-cat="portfolio">
         <div class="rm-head"><h3>Server-side search &amp; pagination</h3><span class="rm-verdict v-done">Shipped</span></div>
-        <p><b>Done (2026-08-08).</b> <code>/games/all</code> and <code>/users/all</code> take
-          <code>q</code>, <code>genre</code>, <code>page</code>, <code>size</code> and <code>sort</code>,
-          and return a <code>PagedResponse</code> envelope. Sort is plumbed end to end but no UI sets it
+        <p><b>Done (2026-08-08).</b> <code>/games/all</code> takes
+          <code>q</code>, <code>genre</code>, <code>page</code>, <code>size</code> and <code>sort</code>.
+          <code>/users/all</code> takes the same query parameters except genre. Both return a
+          <code>PagedResponse</code> envelope. Sort is plumbed end to end but no UI sets it
           yet — that half is still open.</p>
         <div class="rm-meta">
           <div class="rm-metric"><span class="m-k">Difficulty</span><span class="m-v diff-dots"><span class="on">●</span><span class="on">●</span><span class="off">●</span><span class="off">●</span><span class="off">●</span></span></div>
@@ -4731,7 +4905,7 @@ flowchart TB
 
       <article class="rm-card v-skip" data-cat="skip">
         <div class="rm-head"><h3>Redis</h3><span class="rm-verdict v-skip">Skip</span></div>
-        <p>Caffeine (in-process) plus a MySQL shadow table already cover the cache need at this scale.
+        <p>Caffeine (in-process) plus a MySQL shadow table, the design in the catalogue brief, would cover the cache need at this scale.
           A second datastore to run, secure and back up buys nothing here.</p>
       </article>
 
@@ -4796,7 +4970,7 @@ flowchart TB
     <div class="score-grid">
       <div class="score-row"><div class="s-label">Layering &amp; structure<small>controller · service · repo · dto</small></div><div class="score-bar"><div class="score-fill" data-now="90" data-target="90"></div></div><div class="score-num" data-now="9" data-target="9">9</div></div>
       <div class="score-row"><div class="s-label">Security<small>JWT · RBAC · no leaked secrets</small></div><div class="score-bar"><div class="score-fill" data-now="70" data-target="90"></div></div><div class="score-num" data-now="7" data-target="9">7</div></div>
-      <div class="score-row"><div class="s-label">Data integrity<small>Flyway owns schema · validate · no price snapshot</small></div><div class="score-bar"><div class="score-fill" data-now="70" data-target="85"></div></div><div class="score-num" data-now="7" data-target="8.5">7</div></div>
+      <div class="score-row"><div class="s-label">Data integrity<small>Flyway owns schema · validate · order price snapshots</small></div><div class="score-bar"><div class="score-fill" data-now="70" data-target="85"></div></div><div class="score-num" data-now="7" data-target="8.5">7</div></div>
       <div class="score-row"><div class="s-label">Testing<small>backend IT · no frontend tests</small></div><div class="score-bar"><div class="score-fill" data-now="55" data-target="80"></div></div><div class="score-num" data-now="5.5" data-target="8">5.5</div></div>
       <div class="score-row"><div class="s-label">Deployability<small>docker · public URL · CI</small></div><div class="score-bar"><div class="score-fill" data-now="20" data-target="90"></div></div><div class="score-num" data-now="2" data-target="9">2</div></div>
       <div class="score-row"><div class="s-label">Observability<small>health · logs · metrics</small></div><div class="score-bar"><div class="score-fill" data-now="30" data-target="70"></div></div><div class="score-num" data-now="3" data-target="7">3</div></div>
@@ -4866,7 +5040,7 @@ flowchart TB
 <script>
 /* GENERATED by docs/_src/build-index.mjs — do not edit. */
 window.GS_SEARCH_META = {"fe-arch":{"title":"Frontend Architecture","role":"frontend","file":"architecture.html"},"fe-catalog":{"title":"Catalog Pivot","role":"frontend","file":"catalog-architecture.html"},"fe-roadmap":{"title":"Frontend Roadmap","role":"frontend","file":"frontend-roadmap.html"},"be-arch":{"title":"Backend Architecture","role":"backend","file":"architecture.html"},"be-learn":{"title":"Learning Guide","role":"backend","file":"architecture-and-learning-guide.html"},"be-roadmap":{"title":"Backend Roadmap","role":"backend","file":"backend-roadmap.html"}};
-window.GS_SEARCH = [{"doc":"fe-arch","id":"overview","title":"The whole system on one page","kicker":"§ 1 · System Overview","text":"§ 1 · System Overview The whole system on one page Three tiers, one boundary. The browser holds the user (and the token). The Spring Boot API holds the rules. MySQL holds the data. Every write crosses the amber auth boundary; every byte on the wire is JSON. Diagram 1 · the request path as it stands today — amber marks the JWT / auth boundary.","kind":"section"},{"doc":"fe-arch","id":"layers","title":"What lives where","kicker":"§ 2 · Interactive Layer Explorer","text":"§ 2 · Interactive Layer Explorer What lives where Click a layer to see the files that live inside it and the job each one does. Every request crosses all three, in this order — the browser sends, the API validates and orchestrates, the database answers. Layer 1 · Presentation React SPA User-facing UI, routing, local auth state, HTTP client. Layer 2 · Application Spring Boot…","kind":"section"},{"doc":"fe-arch","id":"flows","title":"How the code handles a request","kicker":"§ 3 · Data Flow Walkthroughs","text":"§ 3 · Data Flow Walkthroughs How the code handles a request Four end-to-end journeys, each with the sequence on the left and the code path on the right. Every step names the file it happens in, so you can jump from a diagram arrow to a real line of code. Amber steps cross the auth boundary; green steps touch the database; red steps raise or handle an error. A User logs in B…","kind":"section"},{"doc":"fe-arch","id":"auth-state","title":"Every state AuthContext can be in","kicker":"§ 4 · Client Auth State Machine","text":"§ 4 · Client Auth State Machine Every state AuthContext can be in Auth is not just \"logged in / out\". The context has a startup phase where it doesn't yet know, and every transition is triggered by exactly one event. The router waits for Loading to end before deciding where to send anyone. Diagram 3 · isLoading is a distinct state, not a boolean flavor of \"logged out\" — that's…","kind":"section"},{"doc":"fe-arch","id":"model","title":"Three entities, one join","kicker":"§ 5 · Data Model","text":"§ 5 · Data Model Three entities, one join A user can own many games; a game can be owned by many users. Purchase is the join table, carrying the timestamp and nothing else. It does not snapshot the price yet — so editing a game's price silently rewrites what past revenue looks like. The backend brief argues the fix in § 12 · Persistence Strategy : a purchase is history, so…","kind":"section"},{"doc":"fe-arch","id":"anatomy","title":"What actually crosses the wire","kicker":"§ 6 · Request Anatomy","text":"§ 6 · Request Anatomy What actually crosses the wire Hover any underlined segment to see what that field means and who reads it. Left is what the browser sends; right is what Spring answers with. Request · authenticated read Response · 200 OK Request · login Response · signed JWT","kind":"section"},{"doc":"fe-arch","id":"failure","title":"What can go wrong, and who catches it","kicker":"§ 7 · Failure Modes","text":"§ 7 · Failure Modes What can go wrong, and who catches it A short catalog of the error paths, mapped to the code that handles each one. The extended state (§ 9) upgrades several of these from \"silent console error\" to \"toast the user sees\". 401 · Unauthorized Bad credentials on login Path matches /auth/** , so the response interceptor does not log the user out — LoginPage…","kind":"section"},{"doc":"fe-arch","id":"features","title":"Three low-effort, high-signal features","kicker":"§ 8 · The Increment","text":"§ 8 · The Increment Three low-effort, high-signal features Each plugs into scaffolding that already exists — axios interceptors, a GlobalExceptionHandler , the shared GameGrid , and existing entity fields — so nothing here touches the schema, the auth model, or the timeline. 01 / UX POLISH Skeleton loaders Swap the plain \"Loading games…\" text for shimmer cards that mirror…","kind":"section"},{"doc":"fe-arch","id":"extended","title":"The same backbone, three features overlaid","kicker":"§ 9 · Extended State","text":"§ 9 · Extended State The same backbone, three features overlaid Green nodes are net-new; indigo nodes are existing pieces that gain responsibility. Note the search path now terminates at the database instead of the browser. Diagram 4 · the extended request path. Unmarked nodes already exist and are untouched; the key below is generated from what the diagram actually colours.","kind":"section"},{"doc":"fe-arch","id":"maturity","title":"Where this project is, and where it's going","kicker":"§ 10 · Maturity Ladder","text":"§ 10 · Maturity Ladder Where this project is, and where it's going Four honest stages from \"runs on my machine\" to \"the version I'd defend in a system-design interview.\" The marker below is pinned to today. Each rung says what it proves to a reviewer — because a portfolio is judged on the evidence it produces, not the intentions behind it. You are here Stage 0 Current State…","kind":"section"},{"doc":"fe-arch","id":"roadmap","title":"What to build next — and what to deliberately skip","kicker":"§ 11 · Roadmap Board","text":"§ 11 · Roadmap Board What to build next — and what to deliberately skip Every candidate improvement scored on difficulty , effort and impact , with a verdict. Filter by stage. The Skip column is not filler — knowing what not to build is the clearest signal of engineering judgment on this page. All Next Milestone Portfolio Ready Best Case Deliberately Skip Deploy publicly Do it…","kind":"section"},{"doc":"fe-arch","id":"scorecard","title":"Honest now, with a target to close to","kicker":"§ 12 · Architecture Scorecard","text":"§ 12 · Architecture Scorecard Honest now, with a target to close to Nine dimensions, scored out of 10. The bars show today; toggle to reveal the Stage-2 target. The gap is the point — a scorecard with everything at 10 is a scorecard nobody believes. Show target state → Now Target (Portfolio Ready) Layering & structure controller · service · repo · dto 9 Security JWT · RBAC ·…","kind":"section"},{"doc":"fe-arch","id":"checklist","title":"The 90-second review, from the other side of the table","kicker":"§ 13 · Recruiter Checklist","text":"§ 13 · Recruiter Checklist The 90-second review, from the other side of the table This is roughly what a senior engineer checks in the first minute and a half of opening your repo. Tick items off as you land them — your progress is saved in this browser. 0 / 0 ready for review Reset README has a live demo link at the top the first thing anyone looks for Demo credentials…","kind":"section"},{"doc":"fe-catalog","id":"system","title":"Four tiers, one owner of truth","kicker":"The System","text":"The System Four tiers, one owner of truth RAWG is treated as a source , never as the system of record. Everything the store actually sells — price, ownership, order history — is written and owned locally. Client · React SPA Browse / Search TanStack Query ?search= & page= in URL Cart & Checkout useCart() — server cart, no CartContext AuthContext jwt-decode · localStorage client…","kind":"section"},{"doc":"fe-catalog","id":"problem","title":"You cannot foreign-key across a network boundary","kicker":"The Core Problem","text":"The Core Problem You cannot foreign-key across a network boundary An order_items row needs to point at a product. If the product only exists as RAWG id 3328 , the database can enforce nothing — and purchase history is one upstream edit away from lying to the customer. Naive passthrough Rejected Store the remote id as a loose column and resolve it at render time. Nothing is…","kind":"section"},{"doc":"fe-catalog","id":"identity","title":"Composite keys, and nothing is ever deleted","kicker":"Identity","text":"Identity Composite keys, and nothing is ever deleted Two constraints on the games table carry most of the design’s weight. UNIQUE (source, external_id) Never external_id alone — RAWG id 3498 and IGDB id 3498 are different games. Hand-entered rows carry source='LOCAL' with a null external id, and because MySQL treats nulls as distinct in a unique index, unlimited local rows…","kind":"section"},{"doc":"fe-catalog","id":"read-path","title":"Three tiers, cheapest first","kicker":"Read Path","text":"Read Path Three tiers, cheapest first RAWG’s free tier allows 20 000 requests a month — roughly 660 a day. A single afternoon of hot-reloading a search box would eat 500 of them. The ordering below is what makes that a non-issue, and it is also what turns a RAWG outage into a banner instead of an error page. Tier 1 · in-process Caffeine Search 10 min, detail 24 h, genres 7…","kind":"section"},{"doc":"fe-catalog","id":"flow","title":"Search to receipt, end to end","kicker":"The Flow","text":"The Flow Search to receipt, end to end Step 04 is the pivot the whole architecture turns on — the moment remote data acquires a local primary key, and every downstream feature gets to be ordinary. Guest searches “witcher” React issues GET /api/catalog/games?q=witcher&page=1 . No token required — the catalog is permitAll , so the store is browsable before signup. Cache ladder…","kind":"section"},{"doc":"fe-roadmap","id":"progress","title":"progress","kicker":"","text":"0 / 0 frontend tasks complete Reset Frontend items are tracked here. Backend items live in gameStore-backend/docs/backend-roadmap.html — the two files keep separate progress.","kind":"section"},{"doc":"fe-roadmap","id":"build-order","title":"What blocks what — including across the repo boundary","kicker":"Build order · at a glance","text":"Build order · at a glance What blocks what — including across the repo boundary An arrow means must land first . The frontend's own gate is the design-system decision ( F6 ): almost every Phase-2 UI task gets rewritten if it is done first. The dashed arrows are the ones that bite — two Phase-0/3 items cannot be finished until backend work in the other repo ships. Only items…","kind":"section"},{"doc":"fe-roadmap","id":"phase-0","title":"Get the SPA onto a URL, and make the docs reachable","kicker":"Phase 0 · Unblock deployment","text":"Phase 0 · Unblock deployment Get the SPA onto a URL, and make the docs reachable The frontend's share of the deploy work is small — the backend carries most of it. What matters here is that VITE_API_URL is inlined at build time, so the API's public origin has to exist before the production bundle is built. Gate F2 cannot be verified until the backend's B1 (CORS from env) and…","kind":"section"},{"doc":"fe-roadmap","id":"phase-1","title":"Pick one design system before writing any more CSS","kicker":"Phase 1 · Design-system focus","text":"Phase 1 · Design-system focus Pick one design system before writing any more CSS The roadmap card in the architecture brief says \"Chakra and Bootstrap and react-bootstrap and two icon sets — a reviewer spots this in ten seconds.\" The audit found it is sharper than that: this is a custom-CSS app , and almost every UI dependency is removable. Gate This phase gates Phase 2.…","kind":"section"},{"doc":"fe-roadmap","id":"phase-2","title":"The gap the docs never admit","kicker":"Phase 2 · Responsive & UX","text":"Phase 2 · Responsive & UX The gap the docs never admit The recruiter checklist in the architecture brief has a line for \"app works on a phone screen — reviewers open links on mobile\". Nothing else in the docs flags responsiveness, and the stylesheet says it is unmet. Once there is a public URL, this becomes the most likely thing to go wrong in front of an actual reviewer. F9…","kind":"section"},{"doc":"fe-roadmap","id":"phase-3","title":"Stop refetching everything, and start proving it works","kicker":"Phase 3 · Data layer & tests","text":"Phase 3 · Data layer & tests Stop refetching everything, and start proving it works Most of this phase is gated on backend work — there is no point consuming pagination that does not exist. The two items that are not gated are the test suite and code-splitting, and both are worth doing the moment the design system settles. F13 Consume server-side search & pagination Shipped ✓…","kind":"section"},{"doc":"fe-roadmap","id":"offroad","title":"Five things that shipped without a card","kicker":"Landed off the roadmap · 2026-09-20","text":"Landed off the roadmap · 2026-09-20 Five things that shipped without a card None of these were on the eighteen. They were built in one day, ahead of the design-system gate, on the hand-written stylesheet — which is the bet F6 has to honour now. They are listed so the board stays honest about what the app actually does; they are counted in the progress bar but not in the…","kind":"section"},{"doc":"fe-roadmap","id":"pairings","title":"Nine places where doing one side alone is wasted work","kicker":"Cross-stack · Recommended Pairings","text":"Cross-stack · Recommended Pairings Nine places where doing one side alone is wasted work The backend and frontend live in separate repos, which makes it easy to finish a task that cannot be verified — or worse, ship an API shape the client then has to absorb twice. These pairs should be tackled in the same sitting. This section is duplicated verbatim in the backend roadmap. P1…","kind":"section"},{"doc":"fe-roadmap","id":"skipped","title":"Four shortcuts that look cheap and cost more later","kicker":"Discarded · Quick wins that aren't","text":"Discarded · Quick wins that aren't Four shortcuts that look cheap and cost more later All four are genuinely fast, and all four would have to be redone. They are listed so the decision is on the record rather than rediscovered. ✕ Add skeletons or breakpoints before F6 Skip Both are tempting because they are visible and quick. Both get written against Bootstrap's grid and then…","kind":"section"},{"doc":"fe-roadmap","id":"phase-0","title":"F1 · One API base-URL constant, not two","kicker":"Blocker","text":"v-crit\"> F1 One API base-URL constant, not two Blocker The fallback literal \"http://localhost:8181\" is duplicated in two files. When the deployed origin changes, one of them will be missed — and the one that gets missed is the RBAC demo page, which is exactly the page a reviewer clicks. Duplicated at services/api.ts:5 and pages/DemoPage.tsx:9 . Export a single constant and…","kind":"task","ref":"F1"},{"doc":"fe-roadmap","id":"phase-0","title":"F2 · Deploy the SPA to Cloudflare Pages","kicker":"Critical","text":"v-crit\"> F2 Deploy the SPA to Cloudflare Pages Critical Half the \"single biggest gap today\". A live link changes how every other part of the project is read — the briefs' own scorecard puts deployability at 2/10 and calls it the load-bearing number. Build with VITE_API_URL set to the deployed API origin. Add an SPA fallback rewrite so deep links like /games/7 do not 404 on…","kind":"task","ref":"F2"},{"doc":"fe-roadmap","id":"phase-0","title":"F3 · Publish the frontend briefs to GitHub Pages","kicker":"Quick win","text":"v-do\"> F3 Publish the frontend briefs to GitHub Pages Quick win Highest leverage-per-minute item on either board. These briefs are the project's strongest artefact and are currently only readable by cloning the repo. Covers docs/architecture.html , docs/catalog-architecture.html and this roadmap. The cross-doc switcher currently links across repos with relative filesystem…","kind":"task","ref":"F3"},{"doc":"fe-roadmap","id":"phase-0","title":"F4 · Correct the stale claims in the README","kicker":"Quick win","text":"v-do\"> F4 Correct the stale claims in the README Quick win Three things the README says that the code no longer does. Doc drift is cheap to fix and expensive to be caught on — a reviewer who finds one stops trusting the rest. It advertises a separate /admin/login , which is now a <Navigate to=\"/login\"> at routes/AppRoutes.tsx:57 . The structure tree omits src/utils/ ,…","kind":"task","ref":"F4"},{"doc":"fe-roadmap","id":"phase-1","title":"F5 · Remove the UI dependencies nothing uses","kicker":"Gate","text":"v-crit\"> F5 Remove the UI dependencies nothing uses Gate Three of the four UI packages are effectively dead weight, and the bundle pays for all of them. react-bootstrap has zero imports anywhere in src/ . react-icons is imported only by components/ui/color-mode.tsx , whose own exports ( useColorMode , useColorModeValue , ColorModeButton ) are never imported by anything. Chakra…","kind":"task","ref":"F5"},{"doc":"fe-roadmap","id":"phase-1","title":"F6 · Decide Bootstrap's fate — commit or extract","kicker":"Gate","text":"v-crit\"> F6 Decide Bootstrap's fate — commit or extract Gate Bootstrap's CSS and its JavaScript bundle are both global imports, and Bootstrap-ish class names appear across 13 files — yet the real design system is the hand-written stylesheet. Either commit to Bootstrap properly or lift those classes into App.css and drop it. Imports at main.tsx:7 (CSS) and :9 (JS bundle). The…","kind":"task","ref":"F6"},{"doc":"fe-roadmap","id":"phase-1","title":"F7 · Delete the dead code","kicker":"Shipped ✓","text":"v-do\"> F7 Delete the dead code Shipped ✓ Done (2026-09-20). The 411-line review fixture, the unmounted AboutGame carousel and MyButton are gone from the tree, and PRODUCT.md no longer has to warn about invented reviewer names sitting in src/assets . One leftover: getFieldErrors at utils/apiError.ts:77 is still exported and never imported. Two minutes when you are next in that…","kind":"task","ref":"F7"},{"doc":"fe-roadmap","id":"phase-1","title":"F8 · Give Prettier a config and a script","kicker":"Shipped ✓","text":"v-do\"> F8 Give Prettier a config and a script Shipped ✓ Done. .prettierrc.json exists and package.json carries format and format:check scripts, so every subsequent diff is smaller. package.json:10-11 . Not yet wired into CI — that waits on F16's runner and the backend's B13. Effort ~15 min Impact Low–Medium <","kind":"task","ref":"F8"},{"doc":"fe-roadmap","id":"phase-2","title":"F9 · Add width-based breakpoints","kicker":"Critical","text":"v-crit\"> F9 Add width-based breakpoints Critical The stylesheet contains exactly one @media rule, and it is a capability query, not a breakpoint. With a fixed sidebar and a grid layout, the app almost certainly does not survive a 375px viewport — which is what a reviewer opening the link on a phone will see. Partially addressed (2026-09-20): App.css now has two width rules —…","kind":"task","ref":"F9"},{"doc":"fe-roadmap","id":"phase-2","title":"F10 · Skeleton loaders instead of \"Loading…\" text","kicker":"Shipped ✓","text":"v-do\"> F10 Skeleton loaders instead of \"Loading…\" text Shipped ✓ Done (2026-09-20), as part of the motion foundation. Every loading route shows a skeleton shaped like the content it replaces; no \"Loading…\" string is left in src/pages . The route guard shows three pulsing gold dots instead of the old bare text. components/game/GameGridSkeleton.tsx mirrors GameCard 's 3:4…","kind":"task","ref":"F10"},{"doc":"fe-roadmap","id":"phase-2","title":"F11 · ErrorBoundary, toasts, and a 5xx path in the interceptor","kicker":"Do it","text":"v-do\"> F11 ErrorBoundary, toasts, and a 5xx path in the interceptor Do it The 401 handling is genuinely thoughtful, and it is the only case handled centrally. A 500 or a dropped connection falls through to a page-local string, and a render-time throw takes the whole app to a blank screen. services/api.ts:22-34 handles 401 only. No ErrorBoundary exists anywhere in src/ .…","kind":"task","ref":"F11"},{"doc":"fe-roadmap","id":"phase-2","title":"F12 · Accessibility pass on the interactive bits","kicker":"Do it","text":"v-do\"> F12 Accessibility pass on the interactive bits Do it Only four source files carry any ARIA at all. Worth noting the irony: the architecture docs gate their own animations on prefers-reduced-motion , so the documentation is currently more accessible than the application it describes. Partially addressed (2026-09-20): the avatar menu now carries aria-expanded and…","kind":"task","ref":"F12"},{"doc":"fe-roadmap","id":"phase-3","title":"F13 · Consume server-side search & pagination","kicker":"Shipped ✓","text":"v-do\"> F13 Consume server-side search & pagination Shipped ✓ Done (2026-09-20). Search no longer downloads the catalogue. One navbar box drives GET /games/all?q=&genre=&page=&size= ; Browse mirrors q and page into the URL so results are shareable and the back button works, and the same box lists six live suggestions from any browsing route. Sort is plumbed to the server but no…","kind":"task","ref":"F13"},{"doc":"fe-roadmap","id":"phase-3","title":"F14 · Make the Library page show the user's actual library","kicker":"Shipped ✓","text":"v-do\"> F14 Make the Library page show the user's actual library Shipped ✓ Done (2026-08-07), with the full cart flow. The page no longer presents the whole store as owned — it reads GET /purchases/me and maps each purchase's game into the grid. Shipped alongside a new cart (localStorage-backed CartContext , per-user keyed), a CartPage that checks out via POST /purchases , and…","kind":"task","ref":"F14"},{"doc":"fe-roadmap","id":"phase-3","title":"F15 · Introduce a query cache (TanStack Query)","kicker":"Do it","text":"v-do\"> F15 Introduce a query cache (TanStack Query) Do it Partially addressed (2026-08-07). A lightweight interim cache now sits behind gameService.getAll() / getById() — a module-level read-through store with a 60s TTL, invalidated on create/update/delete. The full TanStack Query migration below still stands; this just stops the worst of the duplicate refetching in the…","kind":"task","ref":"F15"},{"doc":"fe-roadmap","id":"phase-3","title":"F16 · Stand up Vitest + React Testing Library","kicker":"Later","text":"v-later\"> F16 Stand up Vitest + React Testing Library Later There is no test infrastructure at all — no runner, no config, no test script, not one test file. The brief's verdict is \"Later\" and it is defensible: the backend already has 20 tests, so this raises the floor rather than the ceiling. But it is the only remaining unticked box on the recruiter checklist that you…","kind":"task","ref":"F16"},{"doc":"fe-roadmap","id":"phase-3","title":"F17 · Code-split the routes","kicker":"Later","text":"v-later\"> F17 Code-split the routes Later Every page is a static import, so an anonymous visitor downloads the entire admin portal before seeing the home page. Small change, measurable effect on first paint. routes/AppRoutes.tsx — wrap page imports in React.lazy with a Suspense fallback. Best done after F10 so the fallback is the skeleton, not a bare string. Effort ~2 hrs…","kind":"task","ref":"F17"},{"doc":"fe-roadmap","id":"phase-3","title":"F18 · Cart, checkout, and silent token renewal","kicker":"Later","text":"v-later\"> F18 Cart, checkout, and silent token renewal Later Half shipped (2026-09-20). The cart and checkout half landed with B17: a four-step CheckoutModal against POST /orders/checkout , order snapshots, rewards redemption — see FX3 . What remains is silent token renewal. Token expiry is still checked exactly once, when the token is applied, so a session that dies mid-use…","kind":"task","ref":"F18"},{"doc":"fe-roadmap","id":"offroad","title":"FX1 · Design foundation: motion tokens, focus and press states, modal, hero swap","kicker":"Shipped ✓","text":"v-do\"> FX1 Design foundation: motion tokens, focus and press states, modal, hero swap Shipped ✓ Done (2026-09-20). One token ladder for duration, easing, radius and shadow; a focus ring and press feedback on every control; a route-keyed page enter; staggered card arrival; a two-layer hero crossfade that waits for the new art to decode; a shared Modal with enter/exit motion,…","kind":"task","ref":"FX1"},{"doc":"fe-roadmap","id":"offroad","title":"FX2 · Wishlist: heart on hero, details and cards, plus /wishlist","kicker":"Shipped ✓","text":"v-do\"> FX2 Wishlist: heart on hero, details and cards, plus /wishlist Shipped ✓ Done (2026-09-20). The inert \"+ Wishlist\" buttons the README used to apologise for are now a server-backed heart with optimistic toggling and rollback, and a /wishlist page with the shared empty state. On cards the heart is revealed with hover and stays lit once wished. context/WishlistProvider.tsx…","kind":"task","ref":"FX2"},{"doc":"fe-roadmap","id":"offroad","title":"FX3 · Checkout modal with simulated payment and rewards","kicker":"Shipped ✓","text":"v-do\"> FX3 Checkout modal with simulated payment and rewards Shipped ✓ Done (2026-09-20). A four-step checkout (review, pay, processing, success) with a live card preview, inline provider-style marks and a visible \"Demo checkout, no money moves\" badge. A rewards toggle redeems 100 points for R1 off, capped at the subtotal; the cart shows points to earn; the profile shows the…","kind":"task","ref":"FX3"},{"doc":"fe-roadmap","id":"offroad","title":"FX4 · Profile and Settings behind the avatar menu","kicker":"Shipped ✓","text":"v-do\"> FX4 Profile and Settings behind the avatar menu Shipped ✓ Done (2026-09-20). /profile reads identity, region, join month, games owned, the rewards balance, the ledger and recent orders. /settings is three independent forms — presentation (display name, one of twelve code-drawn avatar presets, bio, region), account (username, email) and password — each with its own…","kind":"task","ref":"FX4"},{"doc":"fe-roadmap","id":"offroad","title":"FX5 · One search box, with live suggestions, scoped to the store","kicker":"Shipped ✓","text":"v-do\"> FX5 One search box, with live suggestions, scoped to the store Shipped ✓ Done (2026-09-20). Browse's second search input is gone. The navbar pill filters Browse live and hands a term to it from any other page, lists six suggestions as a keyboard-navigable combobox, focuses on / , clears on Escape, and hides itself on profile, cart, settings and the admin console. Browse…","kind":"task","ref":"FX5"},{"doc":"fe-roadmap","id":"skipped","title":"FS1 · Add skeletons or breakpoints before F6","kicker":"Skip","text":"v-skip\"> ✕ Add skeletons or breakpoints before F6 Skip Both are tempting because they are visible and quick. Both get written against Bootstrap's grid and then rewritten the moment the design-system decision lands. Order matters more than speed here. <","kind":"task","ref":"FS1"},{"doc":"fe-roadmap","id":"skipped","title":"FS2 · Install a toast library now","kicker":"Skip","text":"v-skip\"> ✕ Install a toast library now Skip Adds a fifth UI dependency to a project whose main frontend problem is that it already has too many — and the design-system decision may supply a toast primitive for free. <","kind":"task","ref":"FS2"},{"doc":"fe-roadmap","id":"skipped","title":"FS3 · Wire up the colour-mode toggle","kicker":"Skip","text":"v-skip\"> ✕ Wire up the colour-mode toggle Skip Looks like finishing something half-built. It is not: main.tsx:15 forces dark deliberately, and the app's entire visual identity is a dark theme. Making the toggle work means authoring a light theme for 1394 lines of CSS — that is net-new scope, not a fix. <","kind":"task","ref":"FS3"},{"doc":"fe-roadmap","id":"skipped","title":"FS4 · Paginate client-side over getAll()","kicker":"Skip","text":"v-skip\"> ✕ Paginate client-side over getAll() Skip Gives the appearance of pagination while still downloading the whole catalogue, and cements a component API that server-side paging will invalidate. Wait for B10 . <","kind":"task","ref":"FS4"},{"doc":"be-arch","id":"overview","title":"The API on one page","kicker":"§ 1 · System Overview","text":"§ 1 · System Overview The API on one page A request enters through the servlet filter chain, gets authenticated and authorized, then is dispatched to a controller. From there it flows down through a service to a repository, and Hibernate turns the call into SQL. Amber marks the auth boundary; Spring-green marks framework machinery you configure but don't hand-write. Diagram 1…","kind":"section"},{"doc":"be-arch","id":"layers","title":"What lives where","kicker":"§ 2 · Interactive Layer Explorer","text":"§ 2 · Interactive Layer Explorer What lives where Click a layer to see the classes inside it and the job each one does. A request passes through them top to bottom: the security layer decides if you may proceed, controllers decide what was asked, services decide how to do it, and repositories decide where the data lives. Layer 0 · Edge Security & Config CORS, filter chain,…","kind":"section"},{"doc":"be-arch","id":"lifecycle","title":"The filter gauntlet, in order","kicker":"§ 3 · Request Lifecycle","text":"§ 3 · Request Lifecycle The filter gauntlet, in order Order is everything in Spring Security — rules and filters are evaluated first-match-wins, top to bottom. This is the exact sequence every non-preflight request runs before your controller code executes. Stage 1 · Framework CorsFilter Registered at HIGHEST_PRECEDENCE so preflight OPTIONS is answered before anything else.…","kind":"section"},{"doc":"be-arch","id":"flows","title":"How the code handles a request","kicker":"§ 4 · Data Flow Walkthroughs","text":"§ 4 · Data Flow Walkthroughs How the code handles a request Four end-to-end journeys, each pairing the sequence diagram with the code path. Every step names the file it happens in. Amber steps cross the auth boundary; green steps touch the database; red steps raise or map an error. A Register B Authenticate C Validated read D Admin write Step 1 · Controller Bind body, delegate…","kind":"section"},{"doc":"be-arch","id":"security","title":"Who can call what","kicker":"§ 5 · Security Model","text":"§ 5 · Security Model Who can call what The whole access-control policy is one ordered list in SecurityConfiguration . Rules are evaluated top to bottom, and the first one that matches the request's method and path decides the outcome — so specific rules must come before general ones. # Matcher Requirement Rationale 1 /api/v2/auth/** permitAll You can't hold a token before you…","kind":"section"},{"doc":"be-arch","id":"jwt","title":"What's inside the token","kicker":"§ 6 · JWT Anatomy","text":"§ 6 · JWT Anatomy What's inside the token A JWT is three Base64URL segments joined by dots: header . payload . signature . The first two are just encoded JSON — readable by anyone. The signature is what can't be forged. Hover any underlined part for detail. The wire format (one string) Decoded payload (claims) Signing JwtService.generateToken Builds claims → sets…","kind":"section"},{"doc":"be-arch","id":"model","title":"Seven entities, three of them on the user–game axis","kicker":"§ 7 · Data Model","text":"§ 7 · Data Model Seven entities, three of them on the user–game axis Users and Games are the two nouns; everything else records something one did with the other. Purchases is ownership (the library reads it), Wishlists is intent (unique per user and game), and Orders is the receipt — totals, payment method, a DEMO- reference — with an OrderItems line per game that snapshots…","kind":"section"},{"doc":"be-arch","id":"errors","title":"One place turns exceptions into JSON","kicker":"§ 8 · Exception → HTTP Mapping","text":"§ 8 · Exception → HTTP Mapping One place turns exceptions into JSON A @RestControllerAdvice catches exceptions thrown anywhere below the controllers and renders each as a consistent { \"message\": … } body with the right status — so services can just throw and stay ignorant of HTTP. Thrown by the domain Status Response body When ResourceNotFoundException 404 { message: \"Game not…","kind":"section"},{"doc":"be-arch","id":"api","title":"Every endpoint, with its guard","kicker":"§ 9 · API Surface","text":"§ 9 · API Surface Every endpoint, with its guard The complete route table the controllers expose today, and the access rule each one falls under. Paths mirror the controllers exactly — including the non-RESTful /add and /find/{id} shapes the frontend already targets. Method Path Access Success Handler POST /api/v2/auth/register public 200 AuthenticationController.register POST…","kind":"section"},{"doc":"be-arch","id":"config","title":"The knobs that define the runtime","kicker":"§ 10 · Configuration","text":"§ 10 · Configuration The knobs that define the runtime Everything environment-specific lives in application.properties . Secrets ( DB_PASSWORD , JWT_SECRET ) are injected from environment variables, never committed. Setting Value Why it matters server.port 8181 The origin the React app's axios base URL points at. datasource.url …/gamestore_db MySQL on :3306 ; credentials from…","kind":"section"},{"doc":"be-arch","id":"caching","title":"Can we serve RAWG data from our own database after the first fetch?","kicker":"§ 11 · Catalog & Caching Strategy","text":"§ 11 · Catalog & Caching Strategy Can we serve RAWG data from our own database after the first fetch? Yes — and we should. The catalog will move to RAWG's live API ( the pivot is fully designed here ), but RAWG's free tier allows only ~20 000 requests a month. The answer is a read-through cache: the first user to view a game pays the remote call, every user after reads it…","kind":"section"},{"doc":"be-arch","id":"persistence","title":"Persist what must be true forever; recreate the rest","kicker":"§ 12 · Persistence Strategy","text":"§ 12 · Persistence Strategy Persist what must be true forever; recreate the rest A portfolio store does not need enterprise persistence. The discipline is knowing which data earns a permanent row, which is just a cache, and which can live in a session or a URL. Over-persisting is its own kind of amateur tell. Persist forever system of record Users, roles, credentials Profile…","kind":"section"},{"doc":"be-arch","id":"deployment","title":"From \"runs on my machine\" to a link recruiters can click — for $0","kicker":"§ 13 · Deployment Architecture","text":"§ 13 · Deployment Architecture From \"runs on my machine\" to a link recruiters can click — for $0 The whole stack can go live without a credit card. The constraint is a feature: doing it on free infrastructure forces exactly the Docker, reverse-proxy and CI decisions that make the project worth reviewing. Today Local only Runs on localhost only — no public URL No container;…","kind":"section"},{"doc":"be-arch","id":"docker","title":"Four containers, one network, one command","kicker":"§ 14 · Docker Topology","text":"§ 14 · Docker Topology Four containers, one network, one command The whole backend side runs as a small docker compose stack. Caddy is the only container exposed to the internet; everything else talks over a private bridge network and is never published to a host port. *In the $0 plan the SPA is served by Cloudflare Pages, so the web container is optional — the same compose…","kind":"section"},{"doc":"be-arch","id":"hardening","title":"What deployment forces you to fix — and what to defend as a choice","kicker":"§ 15 · Security Hardening","text":"§ 15 · Security Hardening What deployment forces you to fix — and what to defend as a choice Going public turns a few local shortcuts into real gaps. Each card is the current state, then the fix. The last one is deliberately not \"fixed\" — it's a documented trade-off, which is a different and stronger thing. CORS origin The allowed origin is hardcoded to the Vite dev server, so…","kind":"section"},{"doc":"be-arch","id":"roadmap","title":"The backend build order","kicker":"§ 16 · Roadmap & Scorecard","text":"§ 16 · Roadmap & Scorecard The backend build order The full, filterable roadmap board lives in the frontend brief §11 . Here is the backend-specific scorecard and the order the server-side work should land in. Layering & structure controller · service · repo · dto 9 → 9 Security JWT · RBAC · hardening 7 → 9 Data integrity Flyway owns schema · validate · no price snapshot 7 →…","kind":"section"},{"doc":"be-learn","id":"read","title":"How to read this codebase","kicker":"§ 1 · Orientation","text":"§ 1 · Orientation How to read this codebase Four layers, top to bottom. A request enters through security, gets routed to a controller, the controller delegates to a service, the service talks to a repository, the repository talks to the database. Nothing skips a layer. Layer 0 · Security & Configuration CORS → JWTAuthenticationFilter → SecurityConfiguration (401 if bad token,…","kind":"section"},{"doc":"be-learn","id":"patterns","title":"The patterns in this code, with the problem each one solves","kicker":"§ 2 · Design patterns","text":"§ 2 · Design patterns The patterns in this code, with the problem each one solves A pattern isn't a decoration — it's a solution to a specific problem. If you can name the pattern and the pain it removes, you understand the choice. Every row below is a pattern that's really in this codebase, with the file where you can see it working. Pattern Where it lives The problem it…","kind":"section"},{"doc":"be-learn","id":"compare","title":"Beginner mistake vs. best practice","kicker":"§ 3 · Real fixes from this repo","text":"§ 3 · Real fixes from this repo Beginner mistake vs. best practice Every card below is a change this codebase really made. The \"mistake\" panel is code that was once here (or almost was); the \"clean code\" panel is what replaced it, and the note explains why the fix matters in practice. 1. Field injection → constructor injection on a final field DI Spring BEGINNER · @Autowired…","kind":"section"},{"doc":"be-learn","id":"spring","title":"Annotations — what they do, and what they secretly do","kicker":"§ 4 · Spring, in depth","text":"§ 4 · Spring, in depth Annotations — what they do, and what they secretly do A Spring annotation is a request to the framework: \"please generate the plumbing I would otherwise write by hand.\" Every card below expands to the mechanism behind the annotation, not just its name. @RestController — @Controller + @ResponseBody @RestController is @Controller + @ResponseBody on every…","kind":"section"},{"doc":"be-learn","id":"java","title":"What this codebase teaches you about the language","kicker":"§ 5 · Java fundamentals, exam-badged","text":"§ 5 · Java fundamentals, exam-badged What this codebase teaches you about the language Every concept below carries a badge. The OCA 1Z0-808 exam covers Java SE 8 , but this codebase is Java 17 — so some of the most idiomatic code here (records, var , Stream.toList() ) is explicitly outside the exam. Read the badges before assuming. All On 1Z0-808 Java 9+ · not on exam OCP…","kind":"section"},{"doc":"be-learn","id":"quizzes","title":"Quizzes — click to reveal","kicker":"§ 6 · Knowledge check","text":"§ 6 · Knowledge check Quizzes — click to reveal Every question tests something about this codebase specifically. Filter by topic, click an option to grade it, and use the explanation to trace the reasoning back to the file it comes from. Score 0 / 0 · reset All Spring Security JPA Java Patterns","kind":"section"},{"doc":"be-learn","id":"assess","title":"What rigorous technical assessments actually probe","kicker":"§ 7 · Assessment prep","text":"§ 7 · Assessment prep What rigorous technical assessments actually probe This section is calibrated to the kind of thing graduate programmes and hiring assessments (BBD-style, for example) really test — not fact recall, but the ability to justify a design choice. Honest caveat: this is general preparation for that class of assessment, not modelled on any specific company's…","kind":"section"},{"doc":"be-learn","id":"contrib","title":"Extending this guide","kicker":"§ 8 · Contributing","text":"§ 8 · Contributing Extending this guide This doc is designed to grow as the codebase does. The additions you're most likely to make are new quizzes, new mistake-vs-best-practice cards, and new annotation cards — all structured so you never have to touch the CSS or hunt through markup. Adding a quiz All quizzes live in the QUIZZES array in the script at the bottom of this file.…","kind":"section"},{"doc":"be-learn","id":"quizzes","title":"A handler returning a plain List under @Controller (without @ResponseBody) would...","kicker":"quiz · spring","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why must the current user come from the token, never from a ?userId= query param?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why does UserResponse expose UserResponse.from(user) rather than a constructor overload UserResponse(Users)?","kicker":"quiz · patterns","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"hasRole(\"ADMIN\") in SecurityConfiguration only works because one line in Users.java pairs with it. What does hasRole prepend to the string you pass in?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"On the Users entity, what does getUsername() return, and what does getUserName() return?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"What does mappedBy = \"user\" on Users.purchases actually say?","kicker":"quiz · jpa","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why does calling this.someMethod() bypass @Transactional if you call it from another method in the same class?","kicker":"quiz · spring","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"When does this API return 401 vs 403?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why is Role annotated @Enumerated(EnumType.STRING) instead of the default ORDINAL?","kicker":"quiz · jpa","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why is price on Games declared BigDecimal instead of double?","kicker":"quiz · java","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why prefer constructor injection over @Autowired on a field?","kicker":"quiz · spring","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why return UserResponse from GET /users/all instead of the Users entity directly?","kicker":"quiz · patterns","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"What is the security risk of @PostMapping(\"/register\") public void register(@RequestBody Users user)?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"The servlet filter chain in this app is which design pattern?","kicker":"quiz · patterns","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"JpaRepository compiles even when the Users.id field is Integer. What happens?","kicker":"quiz · jpa","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why is SessionCreationPolicy set to STATELESS?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"How does a new user get the ADMIN role in this app?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"A @Valid @RequestBody fails validation. What does the response body look like?","kicker":"quiz · spring","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why did this repo change the catch-all from RuntimeException → 400 to Exception → 500 (with logged stack trace)?","kicker":"quiz · spring","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"The @AuthenticationPrincipal Users injected into UsersController.getMe is a detached entity. What would happen if you called user.getPurchases() there?","kicker":"quiz · jpa","text":"","kind":"quiz"},{"doc":"be-roadmap","id":"progress","title":"progress","kicker":"","text":"0 / 0 backend tasks complete Reset Backend items are tracked here. Frontend items live in GameStore/docs/frontend-roadmap.html — the two files keep separate progress.","kind":"section"},{"doc":"be-roadmap","id":"build-order","title":"What blocks what","kicker":"Build order · at a glance","text":"Build order · at a glance What blocks what The phases run left to right, but the hard prerequisites are what actually fix the order. An arrow means must land first . There are really only two dependency knots: getting deployed (Phase 0), and wiring Flyway ( B7 ) — after which every schema change downstream is unblocked. Only items with a hard prerequisite are drawn — the quick…","kind":"section"},{"doc":"be-roadmap","id":"phase-0","title":"Six tasks between here and a link you can send someone","kicker":"Phase 0 · Unblock deployment","text":"Phase 0 · Unblock deployment Six tasks between here and a link you can send someone Every one of these is small. Together they are the difference between a project that exists on your laptop and one a reviewer can open. Do them in order — B1 gates B5 , and B4 gates everything after it. Gate Nothing below Phase 0 is worth starting first. The briefs' own scorecard puts…","kind":"section"},{"doc":"be-roadmap","id":"phase-1","title":"Stop letting Hibernate own the schema","kicker":"Phase 1 · Data integrity","text":"Phase 1 · Data integrity Stop letting Hibernate own the schema B7 is the real gate here. A migration file already exists and reads as though Flyway is wired up — it is not. Every schema change after this point should arrive as a versioned migration, so this has to land before purchases or the catalog. B7 Actually wire Flyway up Shipped ✓ Done (2026-08-08). flyway-core and…","kind":"section"},{"doc":"be-roadmap","id":"phase-2","title":"Make the API shape defensible before features pile on top of it","kicker":"Phase 2 · API quality & proof","text":"Phase 2 · API quality & proof Make the API shape defensible before features pile on top of it Two inconsistencies are worth fixing before anything else consumes the API: service methods that no controller exposes, and /games returning raw entities while /users returns a DTO. Fix the shape once, not twice. B10 Expose server-side search, sort & pagination Shipped ✓ Done…","kind":"section"},{"doc":"be-roadmap","id":"phase-3","title":"The multi-day work, once the foundations hold","kicker":"Phase 3 · Headline features","text":"Phase 3 · Headline features The multi-day work, once the foundations hold These are the items that make the project memorable rather than merely correct. They are last on purpose: each one is significantly more expensive if the schema, the API shape or the deploy story is still in flux underneath it. B16 RAWG catalog with a tiered read-through cache Standout The headline…","kind":"section"},{"doc":"be-roadmap","id":"offroad","title":"Four things that shipped without a card","kicker":"Landed off the roadmap","text":"Landed off the roadmap Four things that shipped without a card All four were built on 2026-09-20, the same day as B17 , outside the planned order — each was either a prerequisite the checkout turned out to need (the ledger), a page the frontend already had a slot for (wishlist, settings), or a bug the new endpoints exposed (the 404). They are recorded here so the board matches…","kind":"section"},{"doc":"be-roadmap","id":"pairings","title":"Nine places where doing one side alone is wasted work","kicker":"Cross-stack · Recommended Pairings","text":"Cross-stack · Recommended Pairings Nine places where doing one side alone is wasted work The backend and frontend live in separate repos, which makes it easy to finish a task that cannot be verified — or worse, ship an API shape the client then has to absorb twice. These pairs should be tackled in the same sitting. This section is duplicated verbatim in the frontend roadmap.…","kind":"section"},{"doc":"be-roadmap","id":"skipped","title":"Six shortcuts that look cheap and cost more later","kicker":"Discarded · Quick wins that aren't","text":"Discarded · Quick wins that aren't Six shortcuts that look cheap and cost more later Each of these is genuinely fast to do and would each create work to undo. They are listed so the decision is on the record rather than rediscovered. ✕ Flip ddl-auto to validate now Skip Looks like a one-word hardening win. Without Flyway actually wired up ( B7 ) there is no migration runner to…","kind":"section"},{"doc":"be-roadmap","id":"phase-0","title":"B1 · Read the CORS origin from an env var","kicker":"Blocker","text":"v-crit\"> B1 Read the CORS origin from an env var Blocker The allowed origin is a hardcoded literal, so the API physically cannot accept a request from a deployed frontend. This is the single cheapest task on the board and it unblocks the most expensive one. configuration/CorsConfig.java:21 — List.of(\"http://localhost:5173\") . The placeholder CORS_ALLOWED_ORIGINS already sits…","kind":"task","ref":"B1"},{"doc":"be-roadmap","id":"phase-0","title":"B2 · Add a production Spring profile","kicker":"Quick win","text":"v-do\"> B2 Add a production Spring profile Quick win There is exactly one properties file, and it ships SQL echo plus six DEBUG/TRACE loggers — including org.springframework.security . In production that leaks your schema and slows every request. Create application-prod.properties : show-sql=false , logging at WARN, no security tracing. Today's noise is at…","kind":"task","ref":"B2"},{"doc":"be-roadmap","id":"phase-0","title":"B3 · Fix the startup log that lies about the admin account","kicker":"Quick win","text":"v-do\"> B3 Fix the startup log that lies about the admin account Quick win Boot prints \"ADMIN email=admin@gamestore.com password=12345678\" on every run — but only the USER is ever seeded. If a real admin exists with a different password, the log publishes a credential that is simply false. Either seed the admin for real, or delete the claim. BinoApplication.java:40 . The…","kind":"task","ref":"B3"},{"doc":"be-roadmap","id":"phase-0","title":"B4 · Dockerise: Dockerfile + compose.yml","kicker":"Critical","text":"v-crit\"> B4 Dockerise: Dockerfile + compose.yml Critical The four-container topology is already fully designed in the backend brief §14 — caddy, api, db and an optional web container on gamestore-net . This task is implementing a design that already exists, not making one. No Dockerfile , compose.yml or .dockerignore exists anywhere in the repo today. Base the API image on…","kind":"task","ref":"B4"},{"doc":"be-roadmap","id":"phase-0","title":"B5 · Deploy to an Oracle Cloud Always-Free ARM VM","kicker":"Critical","text":"v-crit\"> B5 Deploy to an Oracle Cloud Always-Free ARM VM Critical The highest-impact task in the entire backlog. Caddy handles HTTPS and Let's Encrypt; config comes from host env vars. Budget extra time for A1.Flex capacity errors — the brief flags them honestly. Depends on B1 (CORS) and B4 (compose). Set CORS_ALLOWED_ORIGINS to the real Pages domain once the frontend is up.…","kind":"task","ref":"B5"},{"doc":"be-roadmap","id":"phase-0","title":"B6 · Publish the two backend briefs to GitHub Pages","kicker":"Quick win","text":"v-do\"> B6 Publish the two backend briefs to GitHub Pages Quick win Highest leverage-per-minute item on the board. These briefs are the strongest artefact in the project and they are currently invisible unless someone clones the repo and opens a local file. Publishes docs/architecture.html , docs/architecture-and-learning-guide.html and this roadmap. Cross-link with the two…","kind":"task","ref":"B6"},{"doc":"be-roadmap","id":"phase-1","title":"B7 · Actually wire Flyway up","kicker":"Shipped ✓","text":"v-do\"> B7 Actually wire Flyway up Shipped ✓ Done (2026-08-08). flyway-core and flyway-mysql are now real dependencies; spring.flyway.baseline-on-migrate=true stamps existing databases at V1 without re-running the baseline, and spring.jpa.hibernate.ddl-auto is validate . Hibernate no longer touches the schema — drift fails startup. Tests keep ddl-auto=create-drop against H2…","kind":"task","ref":"B7"},{"doc":"be-roadmap","id":"phase-1","title":"B8 · Give games.price a real precision","kicker":"Shipped ✓","text":"v-do\"> B8 Give games.price a real precision Shipped ✓ Done (2026-08-08). V2__games_price_precision.sql narrows the column to decimal(10,2) via an in-place MODIFY , and Games.java gains @Column(nullable = false, precision = 10, scale = 2) so ddl-auto=validate stays happy. $99,999,999.99 of headroom per row — absurdly generous for a store where real prices live at $0.99–$99.99,…","kind":"task","ref":"B8"},{"doc":"be-roadmap","id":"phase-1","title":"B9 · Build the purchase & library endpoints","kicker":"Shipped ✓","text":"v-do\"> B9 Build the purchase & library endpoints Shipped ✓ Done (2026-08-07). The entity and repository were already written and injected nowhere; now wired into POST /purchases and GET /purchases/me via a new PurchaseService and PurchaseController . The Library page was showing the whole catalogue and calling it \"yours\" — it now reads only what the user bought (pair P4 / F14,…","kind":"task","ref":"B9"},{"doc":"be-roadmap","id":"phase-2","title":"B10 · Expose server-side search, sort & pagination","kicker":"Shipped ✓","text":"v-do\"> B10 Expose server-side search, sort & pagination Shipped ✓ Done (2026-08-08). One repository method backs three UX modes now: GamesRepository.search(q, genre, Pageable) — a JPQL query with optional filters, so ?q= alone, ?genre= alone, both together, or neither all use the same code path. Same treatment for UsersRepository.search(q, Pageable) . The old dead methods (…","kind":"task","ref":"B10"},{"doc":"be-roadmap","id":"phase-2","title":"B11 · Add a GameResponse DTO","kicker":"Shipped ✓","text":"v-do\"> B11 Add a GameResponse DTO Shipped ✓ Done (2026-08-08). Landed alongside B10 because shipping pagination first would have baked the raw Games entity into the paginated contract — exactly the asymmetry this card was created to fix. dto/GameResponse.java is a record mirroring UserResponse , with a static from(Games) factory; every /games/* route now returns GameResponse…","kind":"task","ref":"B11"},{"doc":"be-roadmap","id":"phase-2","title":"B12 · Add Actuator, exposing only /health","kicker":"Quick win","text":"v-do\"> B12 Add Actuator, exposing only /health Quick win Observability scores 3/10 and there is no health endpoint at all — which also means the Docker compose stack has nothing to health-check against. No actuator dependency exists today. Expose health only; keep the rest closed. Effort ~1 hr Impact Medium <","kind":"task","ref":"B12"},{"doc":"be-roadmap","id":"phase-2","title":"B13 · CI on every push ( mvnw verify )","kicker":"Do it","text":"v-do\"> B13 CI on every push ( mvnw verify ) Do it There are 20 passing integration tests and nothing that proves they pass on any machine but yours. A green badge converts \"I wrote tests\" into evidence. No .github/ directory exists. verify runs both Surefire ( *Tests ) and Failsafe ( *IT ); H2 means no MySQL service container is needed. Effort ~half day Impact Medium–High Pair…","kind":"task","ref":"B13"},{"doc":"be-roadmap","id":"phase-2","title":"B14 · Add unit tests for the pure logic","kicker":"Do it","text":"v-do\"> B14 Add unit tests for the pure logic Do it All 20 existing tests boot a Spring context. The three pieces of genuinely testable pure logic have no direct coverage, and they are exactly the pieces where a subtle bug is silent. Target service/JwtService.java (expiry maths, claim extraction), models/GenreDeserializer.java (array-vs-string) and…","kind":"task","ref":"B14"},{"doc":"be-roadmap","id":"phase-2","title":"B15 · Document POST /games/sync/rawg","kicker":"Quick win","text":"v-do\"> B15 Document POST /games/sync/rawg Quick win The endpoint exists, is reachable, and is admin-guarded — and appears in no endpoint table in either brief or the README. The docs list 12 routes; the code serves 13. controllers/GamesControllers.java:26 returns a deliberate 501 so the RBAC ladder demo can show 401 / 403 / 501. Worth documenting precisely because it looks…","kind":"task","ref":"B15"},{"doc":"be-roadmap","id":"phase-3","title":"B16 · RAWG catalog with a tiered read-through cache","kicker":"Standout","text":"v-do\"> B16 RAWG catalog with a tiered read-through cache Standout The headline feature, and already designed down to TTLs: Caffeine (search 10 min · detail 24 h · genres 7 days) → MySQL shadow rows ( UNIQUE(source, external_id) , 14-day cached_at ) → RAWG on a genuine miss, with 2s/4s timeouts and a 60-second circuit breaker. Brief §11. Cache annotations belong on…","kind":"task","ref":"B16"},{"doc":"be-roadmap","id":"phase-3","title":"B17 · Cart, checkout & order snapshots","kicker":"Shipped ✓","text":"v-do\"> B17 Cart, checkout & order snapshots Shipped ✓ Done (2026-09-20). POST /orders/checkout takes {gameIds, paymentMethod, redeemPoints} and, in one transaction, writes an orders receipt with an order_items line per game that snapshots title and unit_price — the distinction the brief drew: a catalogue row is a cache and may change; a line on a receipt is history and may not…","kind":"task","ref":"B17"},{"doc":"be-roadmap","id":"phase-3","title":"B18 · Rate-limit the auth endpoints","kicker":"Later","text":"v-later\"> B18 Rate-limit the auth endpoints Later /api/v2/auth/** is permitAll , skipped by the JWT filter, and completely unthrottled — an unlimited credential-stuffing surface. Low effort, but only matters once the app is publicly reachable. bucket4j in the filter chain, or a Caddy-level rate limit on the auth path. Effort ~half day Depends on B5 <","kind":"task","ref":"B18"},{"doc":"be-roadmap","id":"phase-3","title":"B19 · Refresh-token rotation","kicker":"Later","text":"v-later\"> B19 Refresh-token rotation Later The textbook-correct answer, and genuinely optional here — the brief's position is that a 24-hour token with no revocation is a defensible portfolio trade-off. Do it to show you know the pattern, not because the current design is broken. Short-lived access token + httpOnly refresh cookie on a scoped path. Meaningless without the…","kind":"task","ref":"B19"},{"doc":"be-roadmap","id":"offroad","title":"BX1 · Wishlist endpoints","kicker":"Shipped ✓","text":"v-do\"> BX1 Wishlist endpoints Shipped ✓ Done (2026-09-20). GET /wishlist/me lists the caller's saved games newest first; POST /wishlist/{gameId} saves one (201) and DELETE /wishlist/{gameId} removes it (204). Both writes are idempotent — a repeat add returns the existing entry, a repeat delete is still 204 — so the client can always send the request without checking first. The…","kind":"task","ref":"BX1"},{"doc":"be-roadmap","id":"offroad","title":"BX2 · Rewards ledger & redemption","kicker":"Shipped ✓","text":"v-do\"> BX2 Rewards ledger & redemption Shipped ✓ Done (2026-09-20). users.points stops being an undefined \"loyalty score\" and becomes a simulated rewards balance with two rules, both constants on RewardsService : POINTS_PER_RAND_EARNED = 10 (earn 10 points per R1 of an order's final total, rounded down) and POINTS_PER_RAND_OFF = 100 (100 points = R1 off at checkout, capped at…","kind":"task","ref":"BX2"},{"doc":"be-roadmap","id":"offroad","title":"BX3 · Self-service profile, account & password endpoints","kicker":"Shipped ✓","text":"v-do\"> BX3 Self-service profile, account & password endpoints Shipped ✓ Done (2026-09-20). Until now GET /users/me was the whole self-service API. Four PUT s join it: /users/me (username only), /users/me/profile ( displayName ≤50, avatarKey ≤32, bio ≤280, country two letters — where null or blank replaces , so a bio can be cleared), /users/me/account (username and email) and…","kind":"task","ref":"BX3"},{"doc":"be-roadmap","id":"offroad","title":"BX4 · 404 for unmapped routes","kicker":"Shipped ✓","text":"v-do\"> BX4 404 for unmapped routes Shipped ✓ Done (2026-09-20). A request to a path no controller owns used to fall into the Exception backstop and come back as 500 \"An unexpected error occurred\" — the server blaming itself for a client built against a newer API than the one running. Spring raises NoResourceFoundException for that case; it now has its own handler and returns…","kind":"task","ref":"BX4"},{"doc":"be-roadmap","id":"skipped","title":"BS1 · Flip ddl-auto to validate now","kicker":"Skip","text":"v-skip\"> ✕ Flip ddl-auto to validate now Skip Looks like a one-word hardening win. Without Flyway actually wired up ( B7 ) there is no migration runner to create the schema, so the app simply refuses to start. <","kind":"task","ref":"BS1"},{"doc":"be-roadmap","id":"skipped","title":"BS2 · Put @Cacheable on the controllers","kicker":"Skip","text":"v-skip\"> ✕ Put @Cacheable on the controllers Skip Fast to add, and would be deleted during B16 . The brief argues the cache belongs on the provider precisely so the internal materialization path is protected too — controller-level caching misses that and has to be unwound. <","kind":"task","ref":"BS2"},{"doc":"be-roadmap","id":"skipped","title":"BS3 · Implement the RAWG sync ad hoc","kicker":"Skip","text":"v-skip\"> ✕ Implement the RAWG sync ad hoc Skip Filling in the 501 stub with a quick fetch-and-save discards a design that already exists: dto/GameRequest.java:16-18 documents a future RawgImportService mapping RAWG JSON onto that record, so import reuses the same validation as the API. A shortcut here throws that reuse away. <","kind":"task","ref":"BS3"},{"doc":"be-roadmap","id":"skipped","title":"BS4 · Expose /games/search returning a plain List","kicker":"Skip","text":"v-skip\"> ✕ Expose /games/search returning a plain List Skip Half an hour, and it guarantees a second breaking change the moment pagination lands — plus a second frontend rewrite. If the method is worth exposing, expose it with the final envelope. <","kind":"task","ref":"BS4"},{"doc":"be-roadmap","id":"skipped","title":"BS5 · Change users.id from Integer to Long","kicker":"Skip","text":"v-skip\"> ✕ Change users.id from Integer to Long Skip The inconsistency with games.id is real and slightly ugly. V1__baseline.sql already calls it accepted debt: changing a primary-key type that other tables reference is genuine risk for a cosmetic payoff. <","kind":"task","ref":"BS5"},{"doc":"be-roadmap","id":"skipped","title":"BS6 · Move duplicate-email from 400 to 409 on its own","kicker":"Skip","text":"v-skip\"> ✕ Move duplicate-email from 400 to 409 on its own Skip Correct in isolation, breaking in practice — the frontend keys on 400. Valid only as pairing P6 , never as a standalone tidy-up. <","kind":"task","ref":"BS6"}];
+window.GS_SEARCH = [{"doc":"fe-arch","id":"overview","title":"The whole system on one page","kicker":"§ 1 · System Overview","text":"§ 1 · System Overview The whole system on one page Three tiers, one boundary. The browser holds the user (and the token). The Spring Boot API holds the rules. MySQL holds the data. Every write crosses the amber auth boundary; every byte on the wire is JSON. Diagram 1 · the request path as it stands today — amber marks the JWT / auth boundary.","kind":"section"},{"doc":"fe-arch","id":"layers","title":"What lives where","kicker":"§ 2 · Interactive Layer Explorer","text":"§ 2 · Interactive Layer Explorer What lives where Click a layer to see the files that live inside it and the job each one does. Every request crosses all three, in this order — the browser sends, the API validates and orchestrates, the database answers. Layer 1 · Presentation React SPA User-facing UI, routing, local auth state, HTTP client. Layer 2 · Application Spring Boot…","kind":"section"},{"doc":"fe-arch","id":"flows","title":"How the code handles a request","kicker":"§ 3 · Data Flow Walkthroughs","text":"§ 3 · Data Flow Walkthroughs How the code handles a request Four end-to-end journeys, each with the sequence on the left and the code path on the right. Every step names the file it happens in, so you can jump from a diagram arrow to a real line of code. Amber steps cross the auth boundary; green steps touch the database; red steps raise or handle an error. A User logs in B…","kind":"section"},{"doc":"fe-arch","id":"auth-state","title":"Every state AuthContext can be in","kicker":"§ 4 · Client Auth State Machine","text":"§ 4 · Client Auth State Machine Every state AuthContext can be in Auth is not just \"logged in / out\". The context has a startup phase where it doesn't yet know, and every transition is triggered by exactly one event. The router waits for Loading to end before deciding where to send anyone. Diagram 3 · isLoading is a distinct state, not a boolean flavor of \"logged out\" — that's…","kind":"section"},{"doc":"fe-arch","id":"model","title":"Seven entities, two user–game joins","kicker":"§ 5 · Data Model","text":"§ 5 · Data Model Seven entities, two user–game joins Two many-to-many joins link users and games. Purchase is the ownership join that the library reads, and it carries only the timestamp. Wishlist has the same shape and holds games saved for later. Price history lives on orders and order_items, which V5 added. Each order line keeps a snapshot of the title and the unit price at…","kind":"section"},{"doc":"fe-arch","id":"anatomy","title":"What actually crosses the wire","kicker":"§ 6 · Request Anatomy","text":"§ 6 · Request Anatomy What actually crosses the wire Hover any underlined segment to see what that field means and who reads it. Left is what the browser sends; right is what Spring answers with. Request · public read (token attached anyway) Response · 200 OK (simplified, description left out) Request · login Response · signed JWT","kind":"section"},{"doc":"fe-arch","id":"failure","title":"What can go wrong, and who catches it","kicker":"§ 7 · Failure Modes","text":"§ 7 · Failure Modes What can go wrong, and who catches it A short catalog of the error paths, mapped to the code that handles each one. The extended state (§ 9) upgrades several of these from \"silent console error\" to \"toast the user sees\". 401 · Unauthorized Bad credentials on login Path matches /auth/** , so the response interceptor does not log the user out — LoginPage…","kind":"section"},{"doc":"fe-arch","id":"features","title":"Three low-effort, high-signal features","kicker":"§ 8 · The Increment","text":"§ 8 · The Increment Three low-effort, high-signal features Each plugs into scaffolding that already exists — axios interceptors, a GlobalExceptionHandler , the shared GameGrid , and existing entity fields — so nothing here touches the schema, the auth model, or the timeline. 01 / UX POLISH Skeleton loaders shipped Swap the plain \"Loading games…\" text for shimmer cards that…","kind":"section"},{"doc":"fe-arch","id":"extended","title":"The same backbone, three features overlaid","kicker":"§ 9 · Extended State","text":"§ 9 · Extended State The same backbone, three features overlaid Green nodes are net-new; indigo nodes are existing pieces that gain responsibility. Note the search path now terminates at the database instead of the browser. Diagram 4 · the extended request path. Unmarked nodes already exist and are untouched; the key below is generated from what the diagram actually colours.…","kind":"section"},{"doc":"fe-arch","id":"maturity","title":"Where this project is, and where it's going","kicker":"§ 10 · Maturity Ladder","text":"§ 10 · Maturity Ladder Where this project is, and where it's going Four honest stages from \"runs on my machine\" to \"the version I'd defend in a system-design interview.\" The marker below is pinned to today. Each rung says what it proves to a reviewer — because a portfolio is judged on the evidence it produces, not the intentions behind it. You are here Stage 0 Current State…","kind":"section"},{"doc":"fe-arch","id":"roadmap","title":"What to build next — and what to deliberately skip","kicker":"§ 11 · Roadmap Board","text":"§ 11 · Roadmap Board What to build next — and what to deliberately skip Every candidate improvement scored on difficulty , effort and impact , with a verdict. Filter by stage. The Skip column is not filler — knowing what not to build is the clearest signal of engineering judgment on this page. All Next Milestone Portfolio Ready Best Case Deliberately Skip Deploy publicly Do it…","kind":"section"},{"doc":"fe-arch","id":"scorecard","title":"Honest now, with a target to close to","kicker":"§ 12 · Architecture Scorecard","text":"§ 12 · Architecture Scorecard Honest now, with a target to close to Nine dimensions, scored out of 10. The bars show today; toggle to reveal the Stage-2 target. The gap is the point — a scorecard with everything at 10 is a scorecard nobody believes. Show target state → Now Target (Portfolio Ready) Layering & structure controller · service · repo · dto 9 Security JWT · RBAC ·…","kind":"section"},{"doc":"fe-arch","id":"checklist","title":"The 90-second review, from the other side of the table","kicker":"§ 13 · Recruiter Checklist","text":"§ 13 · Recruiter Checklist The 90-second review, from the other side of the table This is roughly what a senior engineer checks in the first minute and a half of opening your repo. Tick items off as you land them — your progress is saved in this browser. 0 / 0 ready for review Reset README has a live demo link at the top the first thing anyone looks for Demo credentials…","kind":"section"},{"doc":"fe-catalog","id":"system","title":"Four tiers, one owner of truth","kicker":"The System","text":"The System Four tiers, one owner of truth RAWG is treated as a source , never as the system of record. Everything the store actually sells — price, ownership, order history — is written and owned locally. Client · React SPA Browse / Search TanStack Query ?q= & page= in URL Cart & Checkout useCart() — server cart replaces CartContext AuthContext jwt-decode · localStorage client…","kind":"section"},{"doc":"fe-catalog","id":"problem","title":"You cannot foreign-key across a network boundary","kicker":"The Core Problem","text":"The Core Problem You cannot foreign-key across a network boundary An order_items row needs to point at a product. If the product only exists as RAWG id 3328 , the database can enforce nothing — and purchase history is one upstream edit away from lying to the customer. Naive passthrough Rejected Store the remote id as a loose column and resolve it at render time. Nothing is…","kind":"section"},{"doc":"fe-catalog","id":"identity","title":"Composite keys, and nothing is ever deleted","kicker":"Identity","text":"Identity Composite keys, and nothing is ever deleted Two constraints on the games table carry most of the design’s weight. UNIQUE (source, external_id) Never external_id alone — RAWG id 3498 and IGDB id 3498 are different games. Hand-entered rows carry source='LOCAL' with a null external id, and because MySQL treats nulls as distinct in a unique index, unlimited local rows…","kind":"section"},{"doc":"fe-catalog","id":"read-path","title":"Three tiers, cheapest first","kicker":"Read Path","text":"Read Path Three tiers, cheapest first RAWG’s free tier allows 20 000 requests a month — roughly 660 a day. A single afternoon of hot-reloading a search box would eat 500 of them. The ordering below is what makes that a non-issue, and it is also what turns a RAWG outage into a banner instead of an error page. Tier 1 · in-process Caffeine Search 10 min, detail 24 h, genres 7…","kind":"section"},{"doc":"fe-catalog","id":"flow","title":"Search to receipt, end to end","kicker":"The Flow","text":"The Flow Search to receipt, end to end Step 04 is the pivot the whole architecture turns on — the moment remote data acquires a local primary key, and every downstream feature gets to be ordinary. Guest searches “witcher” React issues GET /api/catalog/games?q=witcher&page=1 . No token required — the catalog is permitAll , so the store is browsable before signup. Cache ladder…","kind":"section"},{"doc":"fe-roadmap","id":"progress","title":"progress","kicker":"","text":"0 / 0 frontend tasks complete Reset Frontend items are tracked here. Backend items live in gameStore-backend/docs/backend-roadmap.html — the two files keep separate progress.","kind":"section"},{"doc":"fe-roadmap","id":"build-order","title":"What blocks what — including across the repo boundary","kicker":"Build order · at a glance","text":"Build order · at a glance What blocks what — including across the repo boundary An arrow means must land first . The frontend's own gate is the design-system decision ( F6 ): almost every Phase-2 UI task gets rewritten if it is done first. The dashed arrows come from backend work in the other repo. You still cannot finish one Phase-0 item (F2) until that work ships. Update…","kind":"section"},{"doc":"fe-roadmap","id":"phase-0","title":"Get the SPA onto a URL, and make the docs reachable","kicker":"Phase 0 · Unblock deployment","text":"Phase 0 · Unblock deployment Get the SPA onto a URL, and make the docs reachable The frontend's share of the deploy work is small — the backend carries most of it. What matters here is that VITE_API_URL is inlined at build time, so the API's public origin has to exist before the production bundle is built. Gate F2 cannot be verified until the backend's B1 (CORS from env) and…","kind":"section"},{"doc":"fe-roadmap","id":"phase-1","title":"Pick one design system before writing any more CSS","kicker":"Phase 1 · Design-system focus","text":"Phase 1 · Design-system focus Pick one design system before writing any more CSS The roadmap card in the architecture brief says \"Chakra and Bootstrap and react-bootstrap and two icon sets — a reviewer spots this in ten seconds.\" The audit found it is sharper than that: this is a custom-CSS app , and almost every UI dependency is removable. Gate This phase gates Phase 2.…","kind":"section"},{"doc":"fe-roadmap","id":"phase-2","title":"The gap the documents now admit","kicker":"Phase 2 · Responsive & UX","text":"Phase 2 · Responsive & UX The gap the documents now admit The recruiter checklist in the architecture brief has a line for \"app works on a phone screen — reviewers open links on mobile\". The README, PRODUCT.md and DESIGN.md now flag the app as desktop-first. The stylesheet confirms that the line is unmet. Once there is a public URL, this becomes the most likely thing to go…","kind":"section"},{"doc":"fe-roadmap","id":"phase-3","title":"Stop refetching everything, and start proving it works","kicker":"Phase 3 · Data layer & tests","text":"Phase 3 · Data layer & tests Stop refetching everything, and start proving it works On 2026-08-01, most of this phase waited on backend work, because the frontend cannot consume pagination that does not exist. Update (2026-10-09): F13 and F14 shipped once B9, B10 and B11 landed. Only F18 still waits on backend work (B19). F15, F16 and F17 need nothing from the backend. The…","kind":"section"},{"doc":"fe-roadmap","id":"offroad","title":"Five things that shipped without a card","kicker":"Landed off the roadmap · 2026-09-20","text":"Landed off the roadmap · 2026-09-20 Five things that shipped without a card None of these were on the eighteen. They were built in one day, ahead of the design-system gate, on the hand-written stylesheet — which is the bet F6 has to honour now. They are listed so the board stays honest about what the app actually does; they are counted in the progress bar but not in the…","kind":"section"},{"doc":"fe-roadmap","id":"pairings","title":"Nine places where doing one side alone is wasted work","kicker":"Cross-stack · Recommended Pairings","text":"Cross-stack · Recommended Pairings Nine places where doing one side alone is wasted work The backend and frontend live in separate repos, which makes it easy to finish a task that cannot be verified — or worse, ship an API shape the client then has to absorb twice. These pairs should be tackled in the same sitting. This section is duplicated verbatim in the backend roadmap. P1…","kind":"section"},{"doc":"fe-roadmap","id":"skipped","title":"Four shortcuts that look cheap and cost more later","kicker":"Discarded · Quick wins that aren't","text":"Discarded · Quick wins that aren't Four shortcuts that look cheap and cost more later All four are genuinely fast, and all four would have to be redone. They are listed so the decision is on the record rather than rediscovered. ✕ Add skeletons or breakpoints before F6 Skip Both are tempting because they are visible and quick. Both get written against Bootstrap's grid and then…","kind":"section"},{"doc":"fe-roadmap","id":"phase-0","title":"F1 · One API base-URL constant, not two","kicker":"Blocker","text":"v-crit\"> F1 One API base-URL constant, not two Blocker The fallback literal \"http://localhost:8181\" is duplicated in two files. When the deployed origin changes, one of them will be missed — and the one that gets missed is the RBAC demo page, which is exactly the page a reviewer clicks. Duplicated at services/api.ts:5 and pages/DemoPage.tsx:9 . Export a single constant and…","kind":"task","ref":"F1"},{"doc":"fe-roadmap","id":"phase-0","title":"F2 · Deploy the SPA to Cloudflare Pages","kicker":"Critical","text":"v-crit\"> F2 Deploy the SPA to Cloudflare Pages Critical Half the \"single biggest gap today\". A live link changes how every other part of the project is read — the briefs' own scorecard puts deployability at 2/10 and calls it the load-bearing number. Build with VITE_API_URL set to the deployed API origin. Add an SPA fallback rewrite so deep links like /games/7 do not 404 on…","kind":"task","ref":"F2"},{"doc":"fe-roadmap","id":"phase-0","title":"F3 · Publish the frontend briefs to GitHub Pages","kicker":"Quick win","text":"v-do\"> F3 Publish the frontend briefs to GitHub Pages Quick win Highest leverage-per-minute item on either board. These briefs are the project's strongest artefact and are currently only readable by cloning the repo. Covers docs/architecture.html , docs/catalog-architecture.html and this roadmap. The cross-doc switcher currently links across repos with relative filesystem…","kind":"task","ref":"F3"},{"doc":"fe-roadmap","id":"phase-0","title":"F4 · Correct the stale claims in the README","kicker":"Shipped ✓","text":"v-do\"> F4 Correct the stale claims in the README Shipped ✓ The README said three things that the code no longer did. Doc drift is cheap to fix and expensive to be caught on — a reviewer who finds one stops trusting the rest. Done (2026-10-09). Since 2026-08-08 (2ecbebe), the README lists /admin/login as a legacy redirect, the <Navigate to=\"/login\"> at routes/AppRoutes.tsx:63 .…","kind":"task","ref":"F4"},{"doc":"fe-roadmap","id":"phase-1","title":"F5 · Remove the UI dependencies nothing uses","kicker":"Gate","text":"v-crit\"> F5 Remove the UI dependencies nothing uses Gate Three of the four UI packages are effectively dead weight, and the bundle pays for all of them. react-bootstrap has zero imports anywhere in src/ . react-icons is imported only by components/ui/color-mode.tsx , whose own exports ( useColorMode , useColorModeValue , ColorModeButton ) are never imported by anything. Chakra…","kind":"task","ref":"F5"},{"doc":"fe-roadmap","id":"phase-1","title":"F6 · Decide Bootstrap's fate — commit or extract","kicker":"Gate","text":"v-crit\"> F6 Decide Bootstrap's fate — commit or extract Gate Bootstrap's CSS and its JavaScript bundle are both global imports, and Bootstrap-ish class names appear across 13 files — yet the real design system is the hand-written stylesheet. Either commit to Bootstrap properly or lift those classes into App.css and drop it. Imports at main.tsx:7 (CSS) and :9 (JS bundle). The…","kind":"task","ref":"F6"},{"doc":"fe-roadmap","id":"phase-1","title":"F7 · Delete the dead code","kicker":"Shipped ✓","text":"v-do\"> F7 Delete the dead code Shipped ✓ Done (2026-09-20). The 411-line review fixture, the unmounted AboutGame carousel and MyButton are gone from the tree, and PRODUCT.md no longer has to warn about invented reviewer names sitting in src/assets . One leftover: getFieldErrors at utils/apiError.ts:77 is still exported and never imported. Two minutes when you are next in that…","kind":"task","ref":"F7"},{"doc":"fe-roadmap","id":"phase-1","title":"F8 · Give Prettier a config and a script","kicker":"Shipped ✓","text":"v-do\"> F8 Give Prettier a config and a script Shipped ✓ Done. .prettierrc.json exists and package.json carries format and format:check scripts, so every subsequent diff is smaller. package.json:10-11 . Not yet wired into CI — that waits on F16's runner and the backend's B13. Effort ~15 min Impact Low–Medium <","kind":"task","ref":"F8"},{"doc":"fe-roadmap","id":"phase-2","title":"F9 · Add width-based breakpoints","kicker":"Critical","text":"v-crit\"> F9 Add width-based breakpoints Critical On 2026-08-01 the stylesheet had one @media rule, and it was a capability query, not a breakpoint. It now has six, but only three are width rules, and none of them touches the fixed sidebar that the store layout is built on. With a fixed sidebar and a grid layout, the app almost certainly does not survive a 375px viewport —…","kind":"task","ref":"F9"},{"doc":"fe-roadmap","id":"phase-2","title":"F10 · Skeleton loaders instead of \"Loading…\" text","kicker":"Shipped ✓","text":"v-do\"> F10 Skeleton loaders instead of \"Loading…\" text Shipped ✓ Done (2026-09-20), as part of the motion foundation. Every loading route shows a skeleton shaped like the content it replaces; no \"Loading…\" string is left in src/pages . The route guard shows three pulsing gold dots instead of the old bare text. components/game/GameGridSkeleton.tsx mirrors GameCard 's 3:4…","kind":"task","ref":"F10"},{"doc":"fe-roadmap","id":"phase-2","title":"F11 · ErrorBoundary, toasts, and a 5xx path in the interceptor","kicker":"Do it","text":"v-do\"> F11 ErrorBoundary, toasts, and a 5xx path in the interceptor Do it The 401 handling is genuinely thoughtful, and it is the only case handled centrally. A 500 or a dropped connection falls through to a page-local string, and a render-time throw takes the whole app to a blank screen. services/api.ts:22-35 handles 401 only. No ErrorBoundary exists anywhere in src/ .…","kind":"task","ref":"F11"},{"doc":"fe-roadmap","id":"phase-2","title":"F12 · Accessibility pass on the interactive bits","kicker":"Do it","text":"v-do\"> F12 Accessibility pass on the interactive bits Do it On 2026-08-01, four source files carried ARIA. Now 23 of the 47 TSX files carry it, but the sidebars in SideBar.tsx and AdminLayout.tsx still carry none. Since FX1, the app also honours prefers-reduced-motion ( App.css:3026 ), as the architecture documents do. Thus motion is no longer the gap. The gap is labels.…","kind":"task","ref":"F12"},{"doc":"fe-roadmap","id":"phase-3","title":"F13 · Consume server-side search & pagination","kicker":"Shipped ✓","text":"v-do\"> F13 Consume server-side search & pagination Shipped ✓ Done (2026-08-08). Search no longer downloads the catalogue. One navbar box drives GET /games/all?q=&genre=&page=&size= . Browse mirrors q and page into the URL, so results are shareable and the back button works. On 2026-09-20, FX5 replaced the separate Browse input with the navbar box and added six live suggestions…","kind":"task","ref":"F13"},{"doc":"fe-roadmap","id":"phase-3","title":"F14 · Make the Library page show the user's actual library","kicker":"Shipped ✓","text":"v-do\"> F14 Make the Library page show the user's actual library Shipped ✓ Done (2026-08-07), with the full cart flow. The page no longer presents the whole store as owned — it reads GET /purchases/me and maps each purchase's game into the grid. It shipped with a new cart (a localStorage-backed CartContext , keyed per user) and a CartPage that checked out through POST…","kind":"task","ref":"F14"},{"doc":"fe-roadmap","id":"phase-3","title":"F15 · Introduce a query cache (TanStack Query)","kicker":"Do it","text":"v-do\"> F15 Introduce a query cache (TanStack Query) Do it Partially addressed (2026-08-07). A lightweight interim cache now sits behind gameService.getPage() / getById() . This module-level read-through store keeps each page for 60s, keyed by query string, with a FIFO cap of 20 pages, and skips keyword searches. It keeps single games by id with no TTL, and a create, update or…","kind":"task","ref":"F15"},{"doc":"fe-roadmap","id":"phase-3","title":"F16 · Stand up Vitest + React Testing Library","kicker":"Later","text":"v-later\"> F16 Stand up Vitest + React Testing Library Later There is no test infrastructure at all — no runner, no config, no test script, not one test file. The brief's verdict is \"Later\" and it is defensible: the backend already has 63 integration tests, so this raises the floor rather than the ceiling. But it is the only remaining unticked box on the recruiter checklist…","kind":"task","ref":"F16"},{"doc":"fe-roadmap","id":"phase-3","title":"F17 · Code-split the routes","kicker":"Later","text":"v-later\"> F17 Code-split the routes Later Every page is a static import, so an anonymous visitor downloads the entire admin portal before the login page appears. Small change, measurable effect on first paint. routes/AppRoutes.tsx — wrap page imports in React.lazy with a Suspense fallback. Best done after F10 so the fallback is the skeleton, not a bare string. Effort ~2 hrs…","kind":"task","ref":"F17"},{"doc":"fe-roadmap","id":"phase-3","title":"F18 · Cart, checkout, and silent token renewal","kicker":"Later","text":"v-later\"> F18 Cart, checkout, and silent token renewal Later Half shipped (2026-09-20). The cart and checkout half landed with B17: a four-step CheckoutModal against POST /orders/checkout , order snapshots, rewards redemption — see FX3 . What remains is silent token renewal. Token expiry is still checked exactly once, when the token is applied, so a session that dies mid-use…","kind":"task","ref":"F18"},{"doc":"fe-roadmap","id":"offroad","title":"FX1 · Design foundation: motion tokens, focus and press states, modal, hero swap","kicker":"Shipped ✓","text":"v-do\"> FX1 Design foundation: motion tokens, focus and press states, modal, hero swap Shipped ✓ Done (2026-09-20). One token ladder for duration, easing, radius and shadow; a focus ring and press feedback on every control; a route-keyed page enter; staggered card arrival; a two-layer hero crossfade that waits for the new art to decode; a shared Modal with enter/exit motion,…","kind":"task","ref":"FX1"},{"doc":"fe-roadmap","id":"offroad","title":"FX2 · Wishlist: heart on hero, details and cards, plus /wishlist","kicker":"Shipped ✓","text":"v-do\"> FX2 Wishlist: heart on hero, details and cards, plus /wishlist Shipped ✓ Done (2026-09-20). The inert \"+ Wishlist\" buttons the README used to apologise for are now a server-backed heart with optimistic toggling and rollback, and a /wishlist page with the shared empty state. On cards the heart is revealed with hover and stays lit once wished. context/WishlistProvider.tsx…","kind":"task","ref":"FX2"},{"doc":"fe-roadmap","id":"offroad","title":"FX3 · Checkout modal with simulated payment and rewards","kicker":"Shipped ✓","text":"v-do\"> FX3 Checkout modal with simulated payment and rewards Shipped ✓ Done (2026-09-20). A four-step checkout (review, pay, processing, success) with a live card preview, inline provider-style marks and a visible \"Demo checkout, no money moves\" badge. A rewards toggle redeems 100 points for R1 off, capped at the subtotal; the cart shows points to earn; the profile shows the…","kind":"task","ref":"FX3"},{"doc":"fe-roadmap","id":"offroad","title":"FX4 · Profile and Settings behind the avatar menu","kicker":"Shipped ✓","text":"v-do\"> FX4 Profile and Settings behind the avatar menu Shipped ✓ Done (2026-09-20). /profile reads identity, region, join month, games owned, the rewards balance, the ledger and recent orders. /settings is three independent forms — presentation (display name, one of twelve code-drawn avatar presets, bio, region), account (username, email) and password — each with its own…","kind":"task","ref":"FX4"},{"doc":"fe-roadmap","id":"offroad","title":"FX5 · One search box, with live suggestions, scoped to the store","kicker":"Shipped ✓","text":"v-do\"> FX5 One search box, with live suggestions, scoped to the store Shipped ✓ Done (2026-09-20). Browse's second search input is gone. The navbar pill filters Browse live and hands a term to it from any other page, lists six suggestions as a keyboard-navigable combobox, focuses on / , clears on Escape, and hides itself on profile, cart, settings and the admin console. Browse…","kind":"task","ref":"FX5"},{"doc":"fe-roadmap","id":"skipped","title":"FS1 · Add skeletons or breakpoints before F6","kicker":"Skip","text":"v-skip\"> ✕ Add skeletons or breakpoints before F6 Skip Both are tempting because they are visible and quick. Both get written against Bootstrap's grid and then rewritten the moment the design-system decision lands. Order matters more than speed here. Update (2026-10-09): F10 and three width rules of F9 landed before F6. They use the custom App.css and not the Bootstrap grid,…","kind":"task","ref":"FS1"},{"doc":"fe-roadmap","id":"skipped","title":"FS2 · Install a toast library now","kicker":"Skip","text":"v-skip\"> ✕ Install a toast library now Skip Adds a fifth UI dependency to a project whose main frontend problem is that it already has too many — and the design-system decision may supply a toast primitive for free. <","kind":"task","ref":"FS2"},{"doc":"fe-roadmap","id":"skipped","title":"FS3 · Wire up the colour-mode toggle","kicker":"Skip","text":"v-skip\"> ✕ Wire up the colour-mode toggle Skip Looks like finishing something half-built. It is not: main.tsx:18 forces dark deliberately, and the app's entire visual identity is a dark theme. If you make the toggle work, you must write a light theme for about 3,700 lines of CSS. That is net-new scope, not a fix. <","kind":"task","ref":"FS3"},{"doc":"fe-roadmap","id":"skipped","title":"FS4 · Paginate client-side over getAll()","kicker":"Skip","text":"v-skip\"> ✕ Paginate client-side over getAll() Skip Gives the appearance of pagination while still downloading the whole catalogue, and cements a component API that server-side paging will invalidate. Wait for B10 . Update (2026-10-09): B10 shipped on 2026-08-08, and F13 consumes it. On the same day, gameService.getPage() replaced getAll() . <","kind":"task","ref":"FS4"},{"doc":"be-arch","id":"overview","title":"The API on one page","kicker":"§ 1 · System Overview","text":"§ 1 · System Overview The API on one page A request enters through the servlet filter chain, gets authenticated and authorized, then is dispatched to a controller. From there it flows down through a service to a repository, and Hibernate turns the call into SQL. Amber marks the auth boundary; Spring-green marks framework machinery you configure but don't hand-write. Diagram 1…","kind":"section"},{"doc":"be-arch","id":"layers","title":"What lives where","kicker":"§ 2 · Interactive Layer Explorer","text":"§ 2 · Interactive Layer Explorer What lives where Click a layer to see the classes inside it and the job each one does. A request passes through them top to bottom: the security layer decides if you may proceed, controllers decide what was asked, services decide how to do it, and repositories decide where the data lives. Layer 0 · Edge Security & Config CORS, filter chain,…","kind":"section"},{"doc":"be-arch","id":"lifecycle","title":"The filter gauntlet, in order","kicker":"§ 3 · Request Lifecycle","text":"§ 3 · Request Lifecycle The filter gauntlet, in order Order is everything in Spring Security — rules and filters are evaluated first-match-wins, top to bottom. This is the exact sequence every non-preflight request runs before your controller code executes. Stage 1 · Framework CorsFilter Registered at HIGHEST_PRECEDENCE so preflight OPTIONS is answered before anything else.…","kind":"section"},{"doc":"be-arch","id":"flows","title":"How the code handles a request","kicker":"§ 4 · Data Flow Walkthroughs","text":"§ 4 · Data Flow Walkthroughs How the code handles a request Four end-to-end journeys, each pairing the sequence diagram with the code path. Every step names the file it happens in. Amber steps cross the auth boundary; green steps touch the database; red steps raise or map an error. A Register B Authenticate C Validated read D Admin write Step 1 · Controller Bind body, delegate…","kind":"section"},{"doc":"be-arch","id":"security","title":"Who can call what","kicker":"§ 5 · Security Model","text":"§ 5 · Security Model Who can call what The whole access-control policy is one ordered list in SecurityConfiguration . Rules are evaluated top to bottom, and the first one that matches the request's method and path decides the outcome — so specific rules must come before general ones. # Matcher Requirement Rationale 1 /api/v2/auth/** permitAll You can't hold a token before you…","kind":"section"},{"doc":"be-arch","id":"jwt","title":"What's inside the token","kicker":"§ 6 · JWT Anatomy","text":"§ 6 · JWT Anatomy What's inside the token A JWT is three Base64URL segments joined by dots: header . payload . signature . The first two are just encoded JSON — readable by anyone. The signature is what can't be forged. Hover any underlined part for detail. The wire format (one string) Decoded payload (claims) Signing JwtService.generateToken Builds claims → sets…","kind":"section"},{"doc":"be-arch","id":"model","title":"Seven entities, three of them on the user–game axis","kicker":"§ 7 · Data Model","text":"§ 7 · Data Model Seven entities, three of them on the user–game axis Users and Games are the two nouns; everything else records something one did with the other. Purchases is ownership (the library reads it), Wishlists is intent (unique per user and game), and Orders is the receipt — totals, payment method, a DEMO- reference — with an OrderItems line per game that snapshots…","kind":"section"},{"doc":"be-arch","id":"errors","title":"One place turns exceptions into JSON","kicker":"§ 8 · Exception → HTTP Mapping","text":"§ 8 · Exception → HTTP Mapping One place turns exceptions into JSON A @RestControllerAdvice catches exceptions thrown anywhere below the controllers and renders each as a consistent { \"message\": … } body with the right status — so services can just throw and stay ignorant of HTTP. Thrown by the domain Status Response body When ResourceNotFoundException 404 { message: \"Game not…","kind":"section"},{"doc":"be-arch","id":"api","title":"Every endpoint, with its guard","kicker":"§ 9 · API Surface","text":"§ 9 · API Surface Every endpoint, with its guard The complete route table the controllers expose today, and the access rule each one falls under. Paths mirror the controllers exactly — including the non-RESTful /add and /find/{id} shapes the frontend already targets. Method Path Access Success Handler POST /api/v2/auth/register public 200 AuthenticationController.register POST…","kind":"section"},{"doc":"be-arch","id":"config","title":"The knobs that define the runtime","kicker":"§ 10 · Configuration","text":"§ 10 · Configuration The knobs that define the runtime Everything environment-specific lives in application.properties . Secrets ( DB_PASSWORD , JWT_SECRET ) are ${…} placeholders. Their values come from environment variables or from the gitignored application-local.properties of the local profile. Neither value is in the repo. Setting Value Why it matters server.port 8181 The…","kind":"section"},{"doc":"be-arch","id":"caching","title":"Can we serve RAWG data from our own database after the first fetch?","kicker":"§ 11 · Catalog & Caching Strategy","text":"§ 11 · Catalog & Caching Strategy Can we serve RAWG data from our own database after the first fetch? Yes — and we should. The catalog will move to RAWG's live API ( the pivot is fully designed here ), but RAWG's free tier allows only ~20 000 requests a month. The answer is a read-through cache: the first user to view a game pays the remote call, every user after reads it…","kind":"section"},{"doc":"be-arch","id":"persistence","title":"Persist what must be true forever; recreate the rest","kicker":"§ 12 · Persistence Strategy","text":"§ 12 · Persistence Strategy Persist what must be true forever; recreate the rest A portfolio store does not need enterprise persistence. The discipline is knowing which data earns a permanent row, which is just a cache, and which can live in a session or a URL. Over-persisting is its own kind of amateur tell. Persist forever system of record Users, roles, credentials Profile…","kind":"section"},{"doc":"be-arch","id":"deployment","title":"From \"runs on my machine\" to a link recruiters can click — for $0","kicker":"§ 13 · Deployment Architecture","text":"§ 13 · Deployment Architecture From \"runs on my machine\" to a link recruiters can click — for $0 The whole stack can go live without a credit card. The constraint is a feature: doing it on free infrastructure forces exactly the Docker, reverse-proxy and CI decisions that make the project worth reviewing. Today Local only Runs on localhost only — no public URL No container;…","kind":"section"},{"doc":"be-arch","id":"docker","title":"Four containers, one network, one command","kicker":"§ 14 · Docker Topology","text":"§ 14 · Docker Topology Four containers, one network, one command The target backend runs as a small docker compose stack. Item B4 will add it. The repo has no Dockerfile or compose file yet. Caddy is the only container exposed to the internet; everything else talks over a private bridge network and is never published to a host port. *In the $0 plan the SPA is served by…","kind":"section"},{"doc":"be-arch","id":"hardening","title":"What deployment forces you to fix — and what to defend as a choice","kicker":"§ 15 · Security Hardening","text":"§ 15 · Security Hardening What deployment forces you to fix — and what to defend as a choice Going public turns a few local shortcuts into real gaps. Each card is the current state, then the fix. The last one is deliberately not \"fixed\" — it's a documented trade-off, which is a different and stronger thing. CORS origin The allowed origin is hardcoded to the Vite dev server, so…","kind":"section"},{"doc":"be-arch","id":"roadmap","title":"The backend build order","kicker":"§ 16 · Roadmap & Scorecard","text":"§ 16 · Roadmap & Scorecard The backend build order The full, filterable roadmap board lives in the frontend brief §11 . Here is the backend-specific scorecard and the order the server-side work should land in. Layering & structure controller · service · repo · dto 9 → 9 Security JWT · RBAC · hardening 7 → 9 Data integrity Flyway owns schema · validate · order_items price…","kind":"section"},{"doc":"be-learn","id":"read","title":"How to read this codebase","kicker":"§ 1 · Orientation","text":"§ 1 · Orientation How to read this codebase Four layers, top to bottom. A request enters through security, gets routed to a controller, the controller delegates to a service, the service talks to a repository, the repository talks to the database. Nothing skips a layer. Layer 0 · Security & Configuration CORS → JWTAuthenticationFilter → SecurityConfiguration (401 if bad token,…","kind":"section"},{"doc":"be-learn","id":"patterns","title":"The patterns in this code, with the problem each one solves","kicker":"§ 2 · Design patterns","text":"§ 2 · Design patterns The patterns in this code, with the problem each one solves A pattern isn't a decoration — it's a solution to a specific problem. If you can name the pattern and the pain it removes, you understand the choice. Every row below is a pattern that's really in this codebase, with the file where you can see it working. Pattern Where it lives The problem it…","kind":"section"},{"doc":"be-learn","id":"compare","title":"Beginner mistake vs. best practice","kicker":"§ 3 · Real fixes from this repo","text":"§ 3 · Real fixes from this repo Beginner mistake vs. best practice Every card below is a change this codebase really made. The \"mistake\" panel is code that was once here (or almost was); the \"clean code\" panel is what replaced it, and the note explains why the fix matters in practice. 1. Field injection → constructor injection on a final field DI Spring BEGINNER · @Autowired…","kind":"section"},{"doc":"be-learn","id":"spring","title":"Annotations — what they do, and what they secretly do","kicker":"§ 4 · Spring, in depth","text":"§ 4 · Spring, in depth Annotations — what they do, and what they secretly do A Spring annotation is a request to the framework: \"please generate the plumbing I would otherwise write by hand.\" Every card below expands to the mechanism behind the annotation, not just its name. @RestController — @Controller + @ResponseBody @RestController is @Controller + @ResponseBody on every…","kind":"section"},{"doc":"be-learn","id":"java","title":"What this codebase teaches you about the language","kicker":"§ 5 · Java fundamentals, exam-badged","text":"§ 5 · Java fundamentals, exam-badged What this codebase teaches you about the language Every concept below carries a badge. The OCA 1Z0-808 exam covers Java SE 8 , but this codebase is Java 17 — so some of the most idiomatic code here (records, var , Stream.toList() ) is explicitly outside the exam. Read the badges before assuming. All On 1Z0-808 Java 9+ · not on exam OCP…","kind":"section"},{"doc":"be-learn","id":"quizzes","title":"Quizzes — click to reveal","kicker":"§ 6 · Knowledge check","text":"§ 6 · Knowledge check Quizzes — click to reveal Every question tests something about this codebase specifically. Filter by topic, click an option to grade it, and use the explanation to trace the reasoning back to the file it comes from. Score 0 / 0 · reset All Spring Security JPA Java Patterns","kind":"section"},{"doc":"be-learn","id":"assess","title":"What rigorous technical assessments actually probe","kicker":"§ 7 · Assessment prep","text":"§ 7 · Assessment prep What rigorous technical assessments actually probe This section is calibrated to the kind of thing graduate programmes and hiring assessments (BBD-style, for example) really test — not fact recall, but the ability to justify a design choice. Honest caveat: this is general preparation for that class of assessment, not modelled on any specific company's…","kind":"section"},{"doc":"be-learn","id":"contrib","title":"Extending this guide","kicker":"§ 8 · Contributing","text":"§ 8 · Contributing Extending this guide This doc is designed to grow as the codebase does. The additions you're most likely to make are new quizzes, new mistake-vs-best-practice cards, and new annotation cards — all structured so you never have to touch the CSS or hunt through markup. Adding a quiz All quizzes live in the QUIZZES array in the script at the bottom of this file.…","kind":"section"},{"doc":"be-learn","id":"quizzes","title":"A handler returning a plain List under @Controller (without @ResponseBody) would...","kicker":"quiz · spring","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why must the current user come from the token, never from a ?userId= query param?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why does UserResponse expose UserResponse.from(user) rather than a constructor overload UserResponse(Users)?","kicker":"quiz · patterns","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"hasRole(\"ADMIN\") in SecurityConfiguration only works because one line in Users.java pairs with it. What does hasRole prepend to the string you pass in?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"On the Users entity, what does getUsername() return, and what does getUserName() return?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"What does mappedBy = \"user\" on Users.purchases actually say?","kicker":"quiz · jpa","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why does calling this.someMethod() bypass @Transactional if you call it from another method in the same class?","kicker":"quiz · spring","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"When does this API return 401 vs 403?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why is Role annotated @Enumerated(EnumType.STRING) instead of the default ORDINAL?","kicker":"quiz · jpa","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why is price on Games declared BigDecimal instead of double?","kicker":"quiz · java","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why prefer constructor injection over @Autowired on a field?","kicker":"quiz · spring","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why does GET /users/all return UserResponse rows (inside a PagedResponse) instead of Users entities?","kicker":"quiz · patterns","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"What is the security risk of @PostMapping(\"/register\") public void register(@RequestBody Users user)?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"The servlet filter chain in this app is which design pattern?","kicker":"quiz · patterns","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"JpaRepository compiles even when the Users.id field is Integer. What happens?","kicker":"quiz · jpa","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why is SessionCreationPolicy set to STATELESS?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"When a user self-registers, how does the app decide whether they get the ADMIN role?","kicker":"quiz · security","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"A @Valid @RequestBody fails validation. What does the response body look like?","kicker":"quiz · spring","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"Why did this repo change the catch-all from RuntimeException → 400 to Exception → 500 (with logged stack trace)?","kicker":"quiz · spring","text":"","kind":"quiz"},{"doc":"be-learn","id":"quizzes","title":"The @AuthenticationPrincipal Users injected into UsersController.getMe is a detached entity. What would happen if you called user.getPurchases() there?","kicker":"quiz · jpa","text":"","kind":"quiz"},{"doc":"be-roadmap","id":"progress","title":"progress","kicker":"","text":"0 / 0 backend tasks complete Reset Backend items are tracked here. Frontend items live in gameStore/docs/frontend-roadmap.html — the two files keep separate progress.","kind":"section"},{"doc":"be-roadmap","id":"build-order","title":"What blocks what","kicker":"Build order · at a glance","text":"Build order · at a glance What blocks what The phases run left to right, but the hard prerequisites are what actually fix the order. An arrow means must land first . There are really only two dependency knots: getting deployed (Phase 0), and wiring Flyway ( B7 ) — after which every schema change downstream is unblocked. Only items with a hard prerequisite are drawn — the quick…","kind":"section"},{"doc":"be-roadmap","id":"phase-0","title":"Six tasks between here and a link you can send someone","kicker":"Phase 0 · Unblock deployment","text":"Phase 0 · Unblock deployment Six tasks between here and a link you can send someone Every one of these is small. Together they are the difference between a project that exists on your laptop and one a reviewer can open. Do them in order — B1 gates B5 , and B4 gates everything after it. Gate Nothing below Phase 0 is worth starting first. The briefs' own scorecard puts…","kind":"section"},{"doc":"be-roadmap","id":"phase-1","title":"Stop letting Hibernate own the schema","kicker":"Phase 1 · Data integrity","text":"Phase 1 · Data integrity Stop letting Hibernate own the schema B7 was the real gate here. When this phase was planned, a migration file existed and read as though Flyway was wired up, but nothing ran it. The plan put it before purchases and the catalogue. Update (2026-10-09): B7 shipped on 2026-08-08. Flyway now runs V1–V6 at startup, so every schema change arrives as a…","kind":"section"},{"doc":"be-roadmap","id":"phase-2","title":"Make the API shape defensible before features pile on top of it","kicker":"Phase 2 · API quality & proof","text":"Phase 2 · API quality & proof Make the API shape defensible before features pile on top of it Two inconsistencies are worth fixing before anything else consumes the API: service methods that no controller exposes, and /games returning raw entities while /users returns a DTO. Fix the shape once, not twice. Update (2026-10-09): B10 and B11 fixed both of them on 2026-08-08, and…","kind":"section"},{"doc":"be-roadmap","id":"phase-3","title":"The multi-day work, once the foundations hold","kicker":"Phase 3 · Headline features","text":"Phase 3 · Headline features The multi-day work, once the foundations hold These are the items that make the project memorable rather than merely correct. They are last on purpose: each one is significantly more expensive if the schema, the API shape or the deploy story is still in flux underneath it. B16 RAWG catalog with a tiered read-through cache Standout The headline…","kind":"section"},{"doc":"be-roadmap","id":"offroad","title":"Four things that shipped without a card","kicker":"Landed off the roadmap","text":"Landed off the roadmap Four things that shipped without a card All four were built on 2026-09-20, the same day as B17 , outside the planned order — each was either a prerequisite the checkout turned out to need (the ledger), a page the frontend already had a slot for (wishlist, settings), or a bug the new endpoints exposed (the 404). They are recorded here so the board matches…","kind":"section"},{"doc":"be-roadmap","id":"pairings","title":"Nine places where doing one side alone is wasted work","kicker":"Cross-stack · Recommended Pairings","text":"Cross-stack · Recommended Pairings Nine places where doing one side alone is wasted work The backend and frontend live in separate repos, which makes it easy to finish a task that cannot be verified — or worse, ship an API shape the client then has to absorb twice. These pairs should be tackled in the same sitting. This section is duplicated verbatim in the frontend roadmap.…","kind":"section"},{"doc":"be-roadmap","id":"skipped","title":"Six shortcuts that look cheap and cost more later","kicker":"Discarded · Quick wins that aren't","text":"Discarded · Quick wins that aren't Six shortcuts that look cheap and cost more later Each of these is genuinely fast to do and would each create work to undo. They are listed so the decision is on the record rather than rediscovered. ✕ Flip ddl-auto to validate now Skip Looks like a one-word hardening win. Before Flyway was wired up ( B7 ), no migration runner created the…","kind":"section"},{"doc":"be-roadmap","id":"phase-0","title":"B1 · Read the CORS origin from an env var","kicker":"Blocker","text":"v-crit\"> B1 Read the CORS origin from an env var Blocker The allowed origin is a hardcoded literal, so the API physically cannot accept a request from a deployed frontend. This is the single cheapest task on the board and it unblocks the most expensive one. configuration/CorsConfig.java:21 — List.of(\"http://localhost:5173\") . The placeholder CORS_ALLOWED_ORIGINS already sits…","kind":"task","ref":"B1"},{"doc":"be-roadmap","id":"phase-0","title":"B2 · Add a production Spring profile","kicker":"Quick win","text":"v-do\"> B2 Add a production Spring profile Quick win There is one main properties file. The only other files are a gitignored application-local.properties for secrets, which comes from a committed template, and the H2 config for the tests. None of them is a production profile. The main file ships SQL echo plus six DEBUG/TRACE loggers, including org.springframework.security . In…","kind":"task","ref":"B2"},{"doc":"be-roadmap","id":"phase-0","title":"B3 · Fix the startup log that lies about the admin account","kicker":"Quick win","text":"v-do\"> B3 Fix the startup log that lies about the admin account Quick win Boot prints \"ADMIN email=admin@gamestore.com password=12345678\" on every run — but only the USER is ever seeded. If a real admin exists with a different password, the log publishes a credential that is simply false. Either seed the admin for real, or delete the claim. BinoApplication.java:40 . The…","kind":"task","ref":"B3"},{"doc":"be-roadmap","id":"phase-0","title":"B4 · Dockerise: Dockerfile + compose.yml","kicker":"Critical","text":"v-crit\"> B4 Dockerise: Dockerfile + compose.yml Critical The four-container topology is already fully designed in the backend brief §14 — caddy, api, db and an optional web container on gamestore-net . This task is implementing a design that already exists, not making one. No Dockerfile , compose.yml or .dockerignore exists anywhere in the repo today. Base the API image on…","kind":"task","ref":"B4"},{"doc":"be-roadmap","id":"phase-0","title":"B5 · Deploy to an Oracle Cloud Always-Free ARM VM","kicker":"Critical","text":"v-crit\"> B5 Deploy to an Oracle Cloud Always-Free ARM VM Critical The highest-impact task in the entire backlog. Caddy handles HTTPS and Let's Encrypt; config comes from host env vars. Budget extra time for A1.Flex capacity errors — the brief flags them honestly. Depends on B1 (CORS) and B4 (compose). Set CORS_ALLOWED_ORIGINS to the real Pages domain once the frontend is up.…","kind":"task","ref":"B5"},{"doc":"be-roadmap","id":"phase-0","title":"B6 · Publish the two backend briefs to GitHub Pages","kicker":"Quick win","text":"v-do\"> B6 Publish the two backend briefs to GitHub Pages Quick win Highest leverage-per-minute item on the board. These briefs are the strongest artefact in the project and they are currently invisible unless someone clones the repo and opens a local file. Publishes docs/architecture.html , docs/architecture-and-learning-guide.html and this roadmap. Cross-link with the two…","kind":"task","ref":"B6"},{"doc":"be-roadmap","id":"phase-1","title":"B7 · Actually wire Flyway up","kicker":"Shipped ✓","text":"v-do\"> B7 Actually wire Flyway up Shipped ✓ Done (2026-08-08). flyway-core and flyway-mysql are now real dependencies; spring.flyway.baseline-on-migrate=true stamps existing databases at V1 without re-running the baseline, and spring.jpa.hibernate.ddl-auto is validate . Hibernate no longer touches the schema — drift fails startup. Tests keep ddl-auto=create-drop against H2…","kind":"task","ref":"B7"},{"doc":"be-roadmap","id":"phase-1","title":"B8 · Give games.price a real precision","kicker":"Shipped ✓","text":"v-do\"> B8 Give games.price a real precision Shipped ✓ Done (2026-08-08). V3__games_price_precision.sql narrows the column to decimal(10,2) via an in-place MODIFY , and Games.java gains @Column(nullable = false, precision = 10, scale = 2) so ddl-auto=validate stays happy. The column allows up to R99,999,999.99 per row. That is absurdly generous for a store where real prices run…","kind":"task","ref":"B8"},{"doc":"be-roadmap","id":"phase-1","title":"B9 · Build the purchase & library endpoints","kicker":"Shipped ✓","text":"v-do\"> B9 Build the purchase & library endpoints Shipped ✓ Done (2026-08-07). The entity and repository were already written and injected nowhere; now wired into POST /purchases and GET /purchases/me via a new PurchaseService and PurchaseController . The Library page was showing the whole catalogue and calling it \"yours\" — it now reads only what the user bought (pair P4 / F14,…","kind":"task","ref":"B9"},{"doc":"be-roadmap","id":"phase-2","title":"B10 · Expose server-side search, sort & pagination","kicker":"Shipped ✓","text":"v-do\"> B10 Expose server-side search, sort & pagination Shipped ✓ Done (2026-08-08). One repository method backs three UX modes now: GamesRepository.search(q, genre, Pageable) — a JPQL query with optional filters, so ?q= alone, ?genre= alone, both together, or neither all use the same code path. Same treatment for UserRepository.search(q, Pageable) . The old dead methods (…","kind":"task","ref":"B10"},{"doc":"be-roadmap","id":"phase-2","title":"B11 · Add a GameResponse DTO","kicker":"Shipped ✓","text":"v-do\"> B11 Add a GameResponse DTO Shipped ✓ Done (2026-08-08). Landed alongside B10 because shipping pagination first would have baked the raw Games entity into the paginated contract — exactly the asymmetry this card was created to fix. dto/GameResponse.java is a record mirroring UserResponse , with a static from(Games) factory. Every /games/* endpoint that returns a game now…","kind":"task","ref":"B11"},{"doc":"be-roadmap","id":"phase-2","title":"B12 · Add Actuator, exposing only /health","kicker":"Quick win","text":"v-do\"> B12 Add Actuator, exposing only /health Quick win Observability scores 3/10 and there is no health endpoint at all — which also means the Docker compose stack has nothing to health-check against. No actuator dependency exists today. Expose health only; keep the rest closed. Effort ~1 hr Impact Medium <","kind":"task","ref":"B12"},{"doc":"be-roadmap","id":"phase-2","title":"B13 · CI on every push ( mvnw verify )","kicker":"Do it","text":"v-do\"> B13 CI on every push ( mvnw verify ) Do it There are 63 passing integration tests and nothing that proves they pass on any machine but yours. A green badge converts \"I wrote tests\" into evidence. No .github/ directory exists. verify runs both Surefire ( *Tests ) and Failsafe ( *IT ); H2 means no MySQL service container is needed. Effort ~half day Impact Medium–High Pair…","kind":"task","ref":"B13"},{"doc":"be-roadmap","id":"phase-2","title":"B14 · Add unit tests for the pure logic","kicker":"Do it","text":"v-do\"> B14 Add unit tests for the pure logic Do it All 64 existing tests boot a Spring context. The four pieces of genuinely testable pure logic have no direct coverage, and they are exactly the pieces where a subtle bug is silent. Target service/RewardsService.java (earn and redeem maths, the subtotal cap), service/JwtService.java (expiry maths, claim extraction),…","kind":"task","ref":"B14"},{"doc":"be-roadmap","id":"phase-2","title":"B15 · Document POST /games/sync/rawg","kicker":"Shipped ✓","text":"v-do\"> B15 Document POST /games/sync/rawg Shipped ✓ Done (2026-08-08). The endpoint exists, is reachable and is admin-guarded. When this card was written, it appeared in no endpoint table in either brief or the README. The documents listed 12 endpoints, and the code served 13. Now the README and §9 of the architecture brief list all 26 endpoints, and this one is among them.…","kind":"task","ref":"B15"},{"doc":"be-roadmap","id":"phase-3","title":"B16 · RAWG catalog with a tiered read-through cache","kicker":"Standout","text":"v-do\"> B16 RAWG catalog with a tiered read-through cache Standout The headline feature, and already designed down to TTLs: Caffeine (search 10 min · detail 24 h · genres 7 days) → MySQL shadow rows ( UNIQUE(source, external_id) , 14-day cached_at ) → RAWG on a genuine miss, with 2s/4s timeouts and a 60-second circuit breaker. Brief §11. Cache annotations belong on…","kind":"task","ref":"B16"},{"doc":"be-roadmap","id":"phase-3","title":"B17 · Cart, checkout & order snapshots","kicker":"Shipped ✓","text":"v-do\"> B17 Cart, checkout & order snapshots Shipped ✓ Done (2026-09-20). POST /orders/checkout takes {gameIds, paymentMethod, redeemPoints} and, in one transaction, writes an orders receipt with an order_items line per game that snapshots title and unit_price — the distinction the brief drew: a catalogue row is a cache and may change; a line on a receipt is history and may not…","kind":"task","ref":"B17"},{"doc":"be-roadmap","id":"phase-3","title":"B18 · Rate-limit the auth endpoints","kicker":"Later","text":"v-later\"> B18 Rate-limit the auth endpoints Later /api/v2/auth/** is permitAll , skipped by the JWT filter, and completely unthrottled — an unlimited credential-stuffing surface. Low effort, but only matters once the app is publicly reachable. bucket4j in the filter chain, or a Caddy-level rate limit on the auth path. Effort ~half day Depends on B5 <","kind":"task","ref":"B18"},{"doc":"be-roadmap","id":"phase-3","title":"B19 · Refresh-token rotation","kicker":"Later","text":"v-later\"> B19 Refresh-token rotation Later The textbook-correct answer, and genuinely optional here — the brief's position is that a 24-hour token with no revocation is a defensible portfolio trade-off. Do it to show you know the pattern, not because the current design is broken. Short-lived access token + httpOnly refresh cookie on a scoped path. Meaningless without the…","kind":"task","ref":"B19"},{"doc":"be-roadmap","id":"offroad","title":"BX1 · Wishlist endpoints","kicker":"Shipped ✓","text":"v-do\"> BX1 Wishlist endpoints Shipped ✓ Done (2026-09-20). GET /wishlist/me lists the caller's saved games newest first; POST /wishlist/{gameId} saves one (201) and DELETE /wishlist/{gameId} removes it (204). Both writes are idempotent — a repeat add returns the existing entry, a repeat delete is still 204 — so the client can always send the request without checking first. The…","kind":"task","ref":"BX1"},{"doc":"be-roadmap","id":"offroad","title":"BX2 · Rewards ledger & redemption","kicker":"Shipped ✓","text":"v-do\"> BX2 Rewards ledger & redemption Shipped ✓ Done (2026-09-20). users.points stops being an undefined \"loyalty score\" and becomes a simulated rewards balance with two rules, both constants on RewardsService : POINTS_PER_RAND_EARNED = 10 (earn 10 points per R1 of an order's final total, rounded down) and POINTS_PER_RAND_OFF = 100 (100 points = R1 off at checkout, capped at…","kind":"task","ref":"BX2"},{"doc":"be-roadmap","id":"offroad","title":"BX3 · Self-service profile, account & password endpoints","kicker":"Shipped ✓","text":"v-do\"> BX3 Self-service profile, account & password endpoints Shipped ✓ Done (2026-09-20). Until now GET /users/me was the whole self-service API. Four PUT s join it: /users/me (username only), /users/me/profile ( displayName ≤50, avatarKey ≤32, bio ≤280, country two letters — where null or blank replaces , so a bio can be cleared), /users/me/account (username and email) and…","kind":"task","ref":"BX3"},{"doc":"be-roadmap","id":"offroad","title":"BX4 · 404 for unmapped routes","kicker":"Shipped ✓","text":"v-do\"> BX4 404 for unmapped routes Shipped ✓ Done (2026-09-20). A request to a path no controller owns used to fall into the Exception backstop and come back as 500 \"An unexpected error occurred\" — the server blaming itself for a client built against a newer API than the one running. Spring raises NoResourceFoundException for that case. It now has its own handler and returns…","kind":"task","ref":"BX4"},{"doc":"be-roadmap","id":"skipped","title":"BS1 · Flip ddl-auto to validate now","kicker":"Skip","text":"v-skip\"> ✕ Flip ddl-auto to validate now Skip Looks like a one-word hardening win. Before Flyway was wired up ( B7 ), no migration runner created the schema, so the app would not start. Update (2026-10-09): B7 shipped on 2026-08-08. Flyway now builds the schema, and ddl-auto is validate . Thus the flip came in the correct order. <","kind":"task","ref":"BS1"},{"doc":"be-roadmap","id":"skipped","title":"BS2 · Put @Cacheable on the controllers","kicker":"Skip","text":"v-skip\"> ✕ Put @Cacheable on the controllers Skip Fast to add, and would be deleted during B16 . The brief argues the cache belongs on the provider precisely so the internal materialization path is protected too — controller-level caching misses that and has to be unwound. <","kind":"task","ref":"BS2"},{"doc":"be-roadmap","id":"skipped","title":"BS3 · Implement the RAWG sync ad hoc","kicker":"Skip","text":"v-skip\"> ✕ Implement the RAWG sync ad hoc Skip Filling in the 501 stub with a quick fetch-and-save discards a design that already exists: dto/GameRequest.java:16-18 documents a future RawgImportService mapping RAWG JSON onto that record, so import reuses the same validation as the API. A shortcut here throws that reuse away. <","kind":"task","ref":"BS3"},{"doc":"be-roadmap","id":"skipped","title":"BS4 · Expose /games/search returning a plain List","kicker":"Skip","text":"v-skip\"> ✕ Expose /games/search returning a plain List Skip It would have taken half an hour. But it would have guaranteed a second breaking change when pagination landed, plus a second frontend rewrite. The rule was to expose the method only with the final envelope. B10 did that on 2026-08-08. It folded search into GET /games/all?q= , which returns the final PagedResponse…","kind":"task","ref":"BS4"},{"doc":"be-roadmap","id":"skipped","title":"BS5 · Change users.id from Integer to Long","kicker":"Skip","text":"v-skip\"> ✕ Change users.id from Integer to Long Skip The inconsistency with games.id is real and slightly ugly. V1__baseline.sql already calls it accepted debt: changing a primary-key type that other tables reference is genuine risk for a cosmetic payoff. <","kind":"task","ref":"BS5"},{"doc":"be-roadmap","id":"skipped","title":"BS6 · Move duplicate-email from 400 to 409 on its own","kicker":"Skip","text":"v-skip\"> ✕ Move duplicate-email from 400 to 409 on its own Skip Correct in isolation. This card said that it would break in practice because the frontend keys on 400. Update (2026-10-09): the frontend does not do that. getApiErrorMessage() reads the message for any status, so a 409 shows the same text. It is still valid only as pairing P6 , so that the contract in the briefs…","kind":"task","ref":"BS6"}];
 </script>
 <!-- GS:INDEX:END -->
 <!-- GS:CHROME-JS:START -->
@@ -6596,7 +6770,8 @@ window.GS_SEARCH = [{"doc":"fe-arch","id":"overview","title":"The whole system o
         p.hidden = p.dataset.flowPanel !== key;
       });
       // The panel is now visible, so its diagram can finally be laid out.
-      // renderMermaid skips any node already processed, so this runs once.
+      // renderMermaid restores each stored source and renders it again, so every
+      // click redraws the diagram of this panel.
       const active = document.querySelector(`.flow-panel[data-flow-panel="${key}"]`);
       if (active) {
         window.GS.renderMermaid([...active.querySelectorAll(".mermaid")]);
